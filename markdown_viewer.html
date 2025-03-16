@@ -1,0 +1,4860 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Markdown Viewer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+
+    <!-- Marked.js main files for markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Highlight.js main files for code highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+    <script src="https://tikzjax.com/v1/tikzjax.js"></script>
+
+    <!-- For LaTeX code -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            --highlight-color: #1a73e8;
+            --highlight-text-color: #1a73e8;
+            --highlight-bg: #e8f0fe;
+            --secondary-highlight-bg: #2c73ad;
+            --bg-color: #f0f0f0;
+            --chat-bg-color: #f6f8fa;
+            --primary-bg-color: white;
+            --secondary-bg-color: #f0f0f0;
+            --text-color: #333;
+            --red-bg: #ffebee;
+            --red-color: #d32f2f;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: #f5f5f5;
+        }
+
+        .container {
+            padding: 2rem;
+            transition: margin-left 0.2s ease;
+        }
+
+        #previewView .container {
+            padding: 2rem;
+            margin-top: 60px;
+            margin-left: 370px;
+            transition: margin-left 0.3s ease;
+        }
+
+        #previewView .container.toc-collapsed {
+            margin-left: 0;
+        }
+
+        .math-jaxs {
+            max-width: 100%;
+            overflow: auto;
+        }
+
+        .math-jaxs>svg {
+            overflow: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: var(--highlight-color);
+        }
+
+        .dropzone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            background: var(--primary-bg-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropzone.drag-over {
+            border-color: var(--highlight-color);
+            background: var(--highlight-bg);
+        }
+
+        .dropzone p {
+            margin: 1rem 0;
+            color: #666;
+        }
+
+        #browseButton {
+            background: var(--highlight-color);
+            color: var(--primary-bg-color);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        #browseButton:hover {
+            background: #1557b0;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #markdownContent {
+            background: var(--primary-bg-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: calc(100% - 315px);
+        }
+
+        /* Markdown content styles */
+        #markdownContent h1,
+        #markdownContent h2,
+        #markdownContent h3 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        #markdownContent p {
+            margin-bottom: 1em;
+        }
+
+        code {
+            border-radius: 4px;
+            background: var(--secondary-bg-color);
+            padding: 0.2em 0.4em;
+        }
+
+        .numbered-code-block {
+            position: relative;
+            font-size: 0.9em;
+            border-radius: 4px;
+            width: fit-content;
+            height: fit-content;
+            background: #ececec;
+            margin: 0.8rem 0;
+            max-width: 80%;
+            display: grid;
+        }
+
+        .numbered-code-block .content {
+            display: flex;
+            overflow-y: auto;
+            max-height: 20rem;
+            height: fit-content;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Enhanced Markdown content styles */
+        #markdownContent ul:not(.toc-sub-list),
+        #markdownContent ol,
+        .chat-container ul,
+        .chat-container ol {
+            padding-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        li:not(.toc-item) {
+            margin-bottom: 0.5em;
+        }
+
+        #markdownContent blockquote {
+            border-left: 4px solid var(--highlight-color);
+            margin: 4px 0;
+            padding: 0 1em;
+            color: #666;
+            border-radius: 0 8px 8px 0;
+        }
+
+        #markdownContent blockquote:hover {
+            background: var(--secondary-bg-color);
+        }
+
+        pre {
+            background: #f6f8fa;
+            overflow-x: auto;
+            height: fit-content;
+            width: 100%;
+            border-radius: 4px;
+            padding: 1em;
+        }
+
+        pre code {
+            background: none;
+        }
+
+        pre code.hljs {
+            background: none;
+        }
+
+        pre code.hljs {
+            padding: 0;
+        }
+
+        #markdownContent table {
+            display: table;
+            border-collapse: collapse;
+            margin: 1em 0;
+            overflow-x: auto;
+            max-width: 100%;
+            white-space: nowrap;
+            min-width: 100%;
+        }
+
+        #markdownContent table tr:hover {
+            background: #f2f2f2;
+        }
+
+        #markdownContent td,
+        #markdownContent th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #markdownContent table::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        #markdownContent table::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        #markdownContent table::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .markdown-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .file-name {
+            position: sticky;
+            top: 4rem;
+            z-index: 105;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--secondary-bg-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            transition: all 0.3s ease;
+            max-height: 22rem;
+        }
+
+        .file-name.expanded {
+            background: #f9f9f9;
+            margin-bottom: 2rem;
+        }
+
+        .file-name-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .file-name-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0;
+            opacity: 0;
+            width: 100%;
+        }
+
+        .file-name .file-name-content {
+            width: 100%;
+        }
+
+        .file-name.expanded .file-name-content {
+            max-height: 500px;
+            margin-top: 1rem;
+            opacity: 1;
+            overflow-y: auto;
+        }
+
+        .file-name .toc-list {
+            padding-left: 1rem;
+            border-left: 2px solid #e0e0e0;
+            margin: 0.5rem 0;
+        }
+
+        .move-button {
+            font-family: 'Material Symbols Rounded';
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .move-button:hover {
+            background: #e0e0e0;
+            color: var(--highlight-color);
+        }
+
+        .move-button.delete:hover {
+            background: var(--red-bg);
+            color: var(--red-color);
+        }
+
+        .add-content {
+            position: sticky;
+            justify-self: flex-end;
+            align-self: flex-end;
+            float: right;
+            right: 8px;
+            bottom: 8px;
+            margin-top: 4px;
+        }
+
+        .add-content .add-content-button {
+            width: 45px;
+            height: 45px;
+            background: var(--highlight-color);
+            border-radius: 50%;
+            color: var(--primary-bg-color);
+            border: none;
+            cursor: pointer;
+            z-index: 110;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-bottom: 1em;
+        }
+
+        .add-content-button span {
+            font-size: 24px;
+            font-family: 'Material Symbols Rounded';
+        }
+
+        .add-content-button:hover {
+            background: #1557b0;
+            transform: scale(1.05);
+        }
+
+        /* Table of Contents styles */
+        .toc {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 370px;
+            max-width: 370px;
+            height: calc(100vh - 60px);
+            background: var(--primary-bg-color);
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            padding: 1rem;
+            z-index: 500;
+            transition: width 0.2s ease;
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .toc.collapsed {
+            transform: translateX(calc(-100% - 20px));
+        }
+
+        .toc:hover {
+            overflow: auto;
+        }
+
+        .toc-content {
+            overflow-y: auto;
+            padding-top: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .toc-file {
+            font-weight: 600;
+            color: var(--highlight-color);
+            padding: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+        }
+
+        .toc-file span {
+            width: 100%;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc-item {
+            margin: 0px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding-left: calc(0.4rem + var(--level, 0) * 0.2rem);
+            /* Reduced from 1rem to 0.6rem */
+        }
+
+        .toc-item-header {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0;
+        }
+
+        .toc-collapse-button {
+            font-family: 'Material Symbols Rounded';
+            font-size: 1.2rem;
+            color: #666;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .toc-collapse-button:hover {
+            color: var(--highlight-color);
+        }
+
+        .collapsed>.toc-list,
+        .collapsed+.toc-list {
+            display: none;
+        }
+
+        .collapsed .toc-collapse-button {
+            transform: rotate(-90deg);
+        }
+
+        .toc-item.active {
+            background: var(--highlight-bg);
+            color: var(--highlight-text-color);
+        }
+
+        .toc-sub-list {
+            list-style: none;
+            margin: 0.1rem 0;
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+            /* Made border more subtle */
+            margin-left: 0.4rem;
+            /* Reduced from 0.7rem */
+        }
+
+        .toc-sub-list {
+            list-style: none;
+            margin-left: 1.5rem;
+        }
+
+        .toc-item.collapsed>.toc-sub-list {
+            display: none;
+        }
+
+        .padding-standard {
+            padding: 0.5rem;
+        }
+
+        /* Consolidate common button styles */
+        .button-base {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon-button {
+            font-family: 'Material Symbols Rounded';
+            color: #666;
+            padding: 0.3rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-button:hover {
+            background: #e0e0e0;
+            color: var(--highlight-color);
+        }
+
+        /* Remove duplicate flex patterns */
+        .flex-center {
+            display: flex;
+            align-items: center;
+        }
+
+        .flex-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Clean up TOC styles */
+        .toc-item {
+            margin: 0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding-left: calc(0.4rem + var(--level, 0) * 0.2rem);
+        }
+
+        .toc-sub-list {
+            list-style: none;
+            margin: 0.1rem 0 0.1rem 0.7rem;
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Remove duplicate transition definitions */
+        .transition-standard {
+            transition: all 0.2s ease;
+        }
+
+        #mainView {
+            height: fit-content;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #mainView.popup h1 {
+            display: none;
+        }
+
+        .toc-toggle {
+            position: static;
+            top: 1rem;
+            left: 387px;
+            z-index: 1001;
+            font-size: 1.5rem;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Material Symbols Rounded';
+            transition: left 0.3s ease;
+            background: none;
+        }
+
+        .toc-toggle.collapsed {
+            left: 18px;
+        }
+
+        .file-name-text {
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: bold;
+        }
+
+        .search-container {
+            position: static;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1001;
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Material Symbols Rounded';
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0.3rem;
+            display: none;
+            font-size: 1.2rem;
+        }
+
+        .search-clear:hover {
+            color: var(--red-color);
+        }
+
+        .search-input {
+            padding-right: 2.5rem;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .search-clear.visible {
+            display: block;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 300px;
+            max-height: 400px;
+            background: var(--primary-bg-color);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 0.5rem;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-results.visible {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background: #f5f8ff;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-headers {
+            font-size: 1rem;
+            width: 100%;
+            overflow-x: clip;
+            flex-wrap: wrap;
+            display: flex;
+        }
+
+        .search-result-context {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .search-result-file {
+            font-size: 0.8rem;
+            color: var(--highlight-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .highlight,
+        .highlight-static {
+            background: #fff6a7;
+            border-radius: 4px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .hljs {
+            background: none !important;
+            color: #383a42;
+        }
+
+        .hljs-keyword {
+            color: #a626a4;
+        }
+
+        .hljs-string {
+            color: #50a14f;
+        }
+
+        .hljs-number {
+            color: #986801;
+        }
+
+        .hljs-function {
+            color: #4078f2;
+        }
+
+        .hljs-title {
+            color: #23974a;
+        }
+
+        .hljs-params {
+            color: #383a42;
+        }
+
+        .hljs-comment {
+            color: #a0a1a7;
+            font-style: italic;
+        }
+
+        .hljs-built_in {
+            color: #c18401;
+        }
+
+        .hljs-variable {
+            color: #e45649;
+        }
+
+        .chat-container pre {
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-family: 'Material Symbols Rounded';
+            font-size: 0.9rem;
+            color: #666;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 4px;
+            padding: 0.4rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .numbered-code-block:hover .copy-button {
+            opacity: 1;
+        }
+
+        .copy-button:hover {
+            background: var(--highlight-bg);
+            color: var(--highlight-color);
+        }
+
+        .copy-button.copied {
+            color: #00c853;
+            background: #e8f5e9;
+        }
+
+        .control-button {
+            font-family: 'Material Symbols Rounded';
+            border: none;
+            background: none;
+            color: var(--highlight-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1.3rem;
+            transition: background 0.2s ease;
+        }
+
+        .back-arrow {
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        /* Topbar styles */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--primary-bg-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            z-index: 1000;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .topbar-right {
+            width: 100%;
+        }
+
+        /* Adjust existing components for topbar */
+        .toc {
+            top: 60px;
+            height: calc(100vh - 60px);
+        }
+
+        .back-arrow {
+            position: static;
+        }
+
+        .toc-toggle {
+            position: static;
+        }
+
+        #previewView .container {
+            margin-top: 60px;
+        }
+
+        /* Update KaTeX styles to better handle inline formulas */
+        .katex-display {
+            overflow-x: auto;
+            padding: 0.5rem 0;
+            margin: 0.5rem 0;
+        }
+
+        /* Hide scrollbar in WebKit browsers but keep functionality */
+        .katex-inline::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .katex-inline::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        .katex-inline::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb-path {
+            color: #666;
+            font-size: 1em;
+            margin-left: 0.5rem;
+            white-space: nowrap;
+            overflow-y: hidden;
+            text-overflow: ellipsis;
+            overflow-x: auto;
+        }
+
+        .breadcrumb-path span {
+            color: #999;
+        }
+
+        .breadcrumb-path .breadcrumb-item:not(:last-child)::after {
+            content: "›";
+            margin: 0 0.3rem;
+            color: #ccc;
+        }
+
+        .search-result-headers .header-link:not(:last-child)::after {
+            content: "›";
+            margin: 0 0.3rem;
+            color: #ccc;
+        }
+
+        .file-name-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 0.5rem;
+        }
+
+        .file-name-info {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            flex: 1;
+            gap: 0.8rem;
+        }
+
+        .toc-controls {
+            display: flex;
+            padding: 0.5rem;
+            gap: 0.5rem;
+            min-width: 40%;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .toc-controls .edit-button.active {
+            background: var(--text-color);
+            color: var(--highlight-bg);
+            border-radius: 5rem;
+            transition: .3s;
+        }
+
+        .toc-controls .edit-button .status-text {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 0.8rem;
+            color: var(--secondary-bg-color);
+            font-weight: bold;
+            padding: 4px;
+            display: none;
+        }
+
+        .toc-controls .edit-button.active .status-text {
+            display: block;
+        }
+
+        .toc-controls .control-button.mobile {
+            display: none;
+        }
+
+        .topbar-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Add position relative to save button container */
+        .save-button-container {
+            position: relative;
+        }
+
+        /* Update save menu styles */
+        .save-button-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .save-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 180px;
+            background: var(--primary-bg-color);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1003;
+            padding: 4px;
+        }
+
+        .save-menu.visible {
+            display: block;
+        }
+
+        .save-option {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border: none;
+            width: 100%;
+            background: none;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.9rem;
+            border-radius: 4px;
+        }
+
+        .control-button:hover {
+            background: var(--highlight-bg);
+            color: var(--highlight-color);
+        }
+
+        .save-option .material-symbols-rounded {
+            font-size: 1.2rem;
+        }
+
+        .save-cancel {
+            display: none;
+            text-align: center;
+            border-radius: 4px;
+            margin-top: 8px;
+            justify-content: center;
+            color: var(--red-color);
+            background: var(--red-bg);
+        }
+
+        /* Add these styles to your existing CSS */
+        #markdownContent img {
+            max-width: 65%;
+            /* min-width: 20rem; */
+            /* max-height: 25rem; */
+            height: auto;
+            width: auto;
+            display: block;
+            margin: 1rem auto;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        #markdownContent img.loading {
+            opacity: 0.5;
+        }
+
+        #timestamp {
+            font-style: italic;
+            color: #464646;
+        }
+
+        .numbered-code-block .line-numbers {
+            display: flex;
+            flex-direction: column;
+            gap: 0.295rem;
+            padding: 1em;
+            width: fit-content;
+            line-height: 1;
+            font-size: 14px;
+        }
+
+        .numbered-code-block .line-numbers .line-number {
+            display: inline-flex;
+            justify-content: flex-end;
+        }
+
+        .non-selectable {
+            -webkit-user-select: none;
+            /* Safari */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* IE10+/Edge */
+            user-select: none;
+            /* Standard */
+        }
+
+        .selection-chat-button {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            background: var(--highlight-bg);
+            color: var(--highlight-color);
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 200;
+        }
+
+        .selection-chat-button .material-symbols-rounded {
+            font-size: 1.3rem;
+        }
+
+        .selection-chat-button button {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 4px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: inherit;
+            font-size: 1.2rem;
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 48px;
+            right: 20px;
+            width: 300px;
+            min-width: 300px;
+            max-width: 50%;
+            height: 450px;
+            min-height: min(calc(100% - 124px), 450px);
+            max-height: 70%;
+            background: var(--chat-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            z-index: 990;
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 8px 1px #e5ebf7;
+        }
+
+        .chat-container.collapsed {
+            transform: translateX(calc(100% + 30px));
+        }
+
+        .chat-header {
+            font-weight: bold;
+            color: var(--highlight-color);
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: fit-content;
+            flex-grow: 1;
+        }
+
+        .chat-message {
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 90%;
+        }
+
+        .chat-message.user {
+            background: var(--highlight-bg);
+            color: var(--highlight-text-color);
+            align-self: flex-end;
+        }
+
+        .chat-message.system {
+            background: var(--border-color);
+            align-self: flex-start;
+            overflow-x: clip;
+        }
+
+        .chat-message.system .numbered-code-block .content {
+            max-height: 15rem;
+        }
+
+        .chat-container .numbered-code-block {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .chat-message.loading {
+            opacity: 0.7;
+        }
+
+        .chat-message.error {
+            background: #ff4444;
+            color: var(--primary-bg-color);
+        }
+
+        .chat-input {
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid var(--border-color);
+            align-items: center;
+        }
+
+        .chat-input textarea {
+            flex-grow: 1;
+            padding: 6px;
+            border-radius: 8px;
+            resize: none;
+            height: 55px;
+            background: #e3e3e3;
+            background: var(--primary-bg-color);
+            color: var(--text-color);
+            border: unset;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-shadow: 0 0 20px 1px #e2e6f0;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .chat-container button {
+            color: var(--text-color);
+            border: none;
+            background: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .context-message {
+            background: var(--secondary-bg-color) !important;
+            padding: 0 !important;
+            margin-bottom: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .context-header {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .context-header .toggle {
+            transition: transform 0.3s ease;
+        }
+
+        .context-content {
+            padding: 8px 12px;
+            border-top: 1px solid var(--border-color);
+            display: block;
+            max-height: 100%;
+            overflow-y: auto;
+            overflow-x: auto;
+            max-width: 100%;
+            transition: max-height 0.3s ease;
+        }
+
+        .context-message.collapsed .context-content,
+        .chat-message.collapsed .context-content {
+            display: none;
+        }
+
+        .context-message.collapsed .context-header .toggle,
+        .chat-message.collapsed .context-header .toggle {
+            transform: rotate(-90deg);
+        }
+
+        .input-section {
+            padding: 20px;
+            border-radius: 8px;
+            background: var(--primary-bg-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            border: 2px solid #ccc;
+            max-width: 24rem;
+        }
+
+        .input-section textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--background-color);
+            color: var(--text-color);
+            resize: vertical;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .input-section button {
+            margin-top: 10px;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            background: var(--highlight-color);
+            color: var(--primary-bg-color);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .input-section button:hover {
+            background: #1557b0;
+        }
+
+        .or-divider {
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .or-divider::before {
+            left: 0;
+        }
+
+        .or-divider::after {
+            right: 0;
+        }
+
+        .or-divider span {
+            background: var(--background-color);
+            padding: 0 15px;
+            color: var(--text-secondary-color);
+            font-size: 0.9em;
+        }
+
+        mark.highlight {
+            background-color: #fff6a7;
+        }
+
+        .chat-help-content h3 {
+            margin-bottom: 1rem;
+            color: var(--highlight-color);
+        }
+
+        .chat-help-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        .chat-help-buttons button {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .understood-btn {
+            background: var(--highlight-color);
+            color: white;
+        }
+
+        .remind-btn {
+            background: var(--secondary-bg-color);
+            color: var(--text-color);
+        }
+
+        .resize-handle {
+            width: 24px;
+            height: 24px;
+            cursor: nw-resize;
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            background: none;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 6px;
+            border-top-right-radius: 6px;
+            border-left: 3px solid var(--secondary-highlight-bg);
+            border-top: 3px solid var(--secondary-highlight-bg);
+            border-bottom: 6px solid transparent;
+            border-right: 6px solid transparent;
+            opacity: .3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .resize-handle:hover,
+        .resize-handle.resizing {
+            opacity: .8;
+        }
+
+        .action-buttons {
+            display: flex;
+            min-width: fit-content;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .settings-header h2 {
+            margin: 0;
+            color: var(--highlight-color);
+        }
+
+        .settings-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .settings-panel select,
+        .settings-panel input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--secondary-bg-color);
+            color: var(--text-color);
+        }
+
+        .save-key-btn {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--highlight-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .save-key-btn:hover {
+            background: var(--secondary-highlight-bg);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .settings-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1005;
+        }
+
+        .file-name-edit {
+            background: none;
+            border: none;
+            font-size: inherit;
+            font-family: inherit;
+            color: inherit;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            outline: none;
+            border-bottom: 1px solid var(--text-color);
+        }
+
+        .file-name-text {
+            transition: background-color 0.2s;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .file-name-text:hover {
+            background-color: var(--hover-bg-color);
+        }
+
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup-container.active {
+            opacity: 1;
+        }
+
+        .popup-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-backdrop.blur {
+            backdrop-filter: blur(5px);
+        }
+
+        .popup-content {
+            position: relative;
+            background: var(--primary-bg-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .popup-container.active .popup-content {
+            transform: scale(1);
+        }
+
+        .popup-close-button {
+            position: absolute;
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: background-color 0.2s;
+        }
+
+        .popup-close-button:hover {
+            background: var(--secondary-bg-color);
+        }
+
+        .popup-close-button.top-right {
+            top: 10px;
+            right: 10px;
+        }
+
+        .popup-close-button.top-left {
+            top: 10px;
+            left: 10px;
+        }
+
+        .popup-close-button.bottom {
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Animation variants */
+        .popup-container.slide .popup-content {
+            transform: translateY(20px);
+        }
+
+        .popup-container.slide.active .popup-content {
+            transform: translateY(0);
+        }
+
+        .popup-container.scale .popup-content {
+            transform: scale(0.7);
+        }
+
+        .popup-container.scale.active .popup-content {
+            transform: scale(1);
+        }
+
+        .toc-section.dragging {
+            opacity: 0.5;
+            border: 2px dashed var(--highlight-color);
+            background: var(--highlight-bg);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .toc-section {
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .toc-section:not(.dragging) {
+            transform: translateZ(0);
+        }
+
+        .initial-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-bg-color);
+            z-index: 9999;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--highlight-bg);
+            border-top: 4px solid var(--highlight-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+        }
+
+        .loader-text {
+            margin-top: 20px;
+            color: var(--highlight-color);
+            font-size: 1.2rem;
+            animation: fade 2s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        @keyframes fade {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .toggle-switch {
+            position: relative;
+            cursor: pointer;
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 20px;
+            transition: .3s;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .3s;
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--highlight-color);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(16px);
+        }
+
+        .repo-container {
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+
+        #repoInput {
+            flex: 1;
+        }
+
+        html.dark-mode {
+            * {
+                --highlight-color: #619dcc;
+                --highlight-text-color: #4bafff;
+                --highlight-bg: #303b48;
+                --primary-bg-color: #2d2d2d;
+                --secondary-bg-color: #383838;
+                --chat-bg-color: #222;
+                --text-color: #e0e0e0;
+                --red-bg: #713535;
+                --red-color: #fdbebd;
+            }
+
+            mark.highlight {
+                background-color: #1673bb;
+                color: #fff;
+            }
+
+            .chat-container {
+                box-shadow: 0 0 8px 1px #151515;
+            }
+
+            .chat-input textarea {
+                box-shadow: 0 0 20px 1px #1e1e1e;
+            }
+
+            #timestamp {
+                color: #b7b7b7;
+            }
+
+            body {
+                background: #1a1a1a;
+            }
+
+            .dropzone {
+                background: #2d2d2d;
+                border-color: #444;
+            }
+
+            .dropzone.drag-over {
+                border-color: #64b5f6;
+                background: #1e3a5f;
+            }
+
+            .dropzone p {
+                margin: 1rem 0;
+                color: #dfdfdf;
+            }
+
+            #browseButton {
+                background: var(--secondary-highlight-bg);
+            }
+
+            #browseButton:hover {
+                background: #175485;
+            }
+
+            #markdownContent {
+                background: #2d2d2d;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            code {
+                background: var(--secondary-bg-color);
+            }
+
+            pre {
+                background: var(--secondary-bg-color);
+            }
+
+            #markdownContent blockquote {
+                border-left-color: #29588a;
+                color: #c6c6c6;
+            }
+
+            #markdownContent blockquote:hover {
+                background: #262626;
+            }
+
+            #markdownContent table tr:hover {
+                background: #292929;
+            }
+
+            #markdownContent table::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            #markdownContent table::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            #markdownContent td,
+            #markdownContent th {
+                border-color: #444;
+            }
+
+            .numbered-code-block {
+                background: #202020;
+            }
+
+            .file-name {
+                background: var(--secondary-bg-color);
+                color: #e0e0e0;
+            }
+
+            .file-name.expanded {
+                background: #333;
+            }
+
+            .file-name-text:hover {
+                color: #64b5f6;
+            }
+
+            .move-button {
+                color: #9e9e9e;
+            }
+
+            .move-button:hover {
+                background: #444;
+                color: #64b5f6;
+            }
+
+            .move-button.delete:hover {
+                background: #4a2727;
+                color: #ef5350;
+            }
+
+            .add-content-button {
+                background: var(--secondary-highlight-bg);
+            }
+
+            .add-content-button:hover {
+                background: #175485;
+            }
+
+            .toc {
+                background: #2d2d2d;
+                box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .toc-file {
+                color: #64b5f6;
+                border-bottom-color: #444;
+            }
+
+            .toc-sub-list {
+                border-left-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .toc-toggle {
+                background: #2d2d2d;
+                color: #e0e0e0;
+            }
+
+            .search-input {
+                background: #2d2d2d;
+                border-color: #444;
+                color: #e0e0e0;
+            }
+
+            .search-input:focus {
+                border-color: #64b5f6;
+                box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+            }
+
+            .search-clear {
+                color: #9e9e9e;
+            }
+
+            .search-results {
+                background: #2d2d2d;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .search-result-item {
+                border-bottom-color: #444;
+            }
+
+            .search-result-item:hover {
+                background: #1e3a5f;
+            }
+
+            .search-result-context {
+                color: #9e9e9e;
+            }
+
+            .search-result-file {
+                color: #64b5f6;
+            }
+
+            .highlight,
+            .highlight-static {
+                background: #1673bb;
+            }
+
+            .hljs {
+                color: #d4d4d4;
+            }
+
+            .hljs-keyword,
+            .hljs-selector-tag {
+                color: #569cd6;
+            }
+
+            .hljs-string,
+            .hljs-selector-class,
+            .hljs-selector-id {
+                color: #ce9178;
+            }
+
+            .hljs-number {
+                color: #b5cea8;
+            }
+
+            .hljs-function {
+                color: #dcdcaa;
+            }
+
+            .hljs-title {
+                color: #4ec9b0;
+            }
+
+            .hljs-params {
+                color: #9cdcfe;
+            }
+
+            .hljs-comment {
+                color: #6a9955;
+            }
+
+            .hljs-built_in {
+                color: #4ec9b0;
+            }
+
+            .hljs-variable {
+                color: #9cdcfe;
+            }
+
+            .hljs-attr {
+                color: #84d7ff;
+            }
+
+            .hljs-attribute,
+            .hljs-punctuation {
+                color: #b9cbf7;
+            }
+
+            .hljs-name,
+            .hljs-tag {
+                color: #c78fcc;
+            }
+
+            .copy-button {
+                background: rgba(45, 45, 45, 0.8);
+                color: #9e9e9e;
+            }
+
+            .copy-button:hover {
+                background: #1e3a5f;
+                color: #64b5f6;
+            }
+
+            .copy-button.copied {
+                color: #69f0ae;
+                background: #1b5e20;
+            }
+
+            .topbar {
+                background: #2d2d2d;
+                border-bottom: 1px solid #444;
+            }
+
+            .katex-inline::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .katex-inline::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .katex::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .katex::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .breadcrumb-path {
+                color: #999;
+            }
+
+            .breadcrumb-path span {
+                color: #777;
+            }
+
+            .breadcrumb-path span:not(:last-child)::after {
+                color: #666;
+            }
+
+            .save-menu {
+                background: var(--secondary-bg-color);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            }
+
+            .save-option:not(.save-cancel) {
+                color: #e0e0e0;
+            }
+
+            .save-option:hover:not(.save-cancel) {
+                background: var(--primary-bg-color);
+            }
+
+            #popupContainer .control-button {
+                background: #531414;
+                color: #d25a5a;
+            }
+
+            .input-section {
+                border-color: #444;
+            }
+
+            .input-section button {
+                background: var(--secondary-highlight-bg);
+            }
+
+            .input-section button:hover {
+                background: #175485;
+            }
+        }
+
+        /* Mobile responsive styles */
+        @media (max-width: 1180px) {
+            #previewView .container {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            #markdownContent {
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .toc-toggle {
+                left: 1rem;
+                top: 1rem;
+                padding: 0.8rem;
+                font-size: 1.5rem;
+                background: none;
+            }
+
+            .toc-toggle.collapsed {
+                left: 1rem;
+            }
+
+            .back-arrow {
+                top: 1rem;
+                left: 4.5rem;
+                padding: 0.8rem;
+            }
+
+            .search-input {
+                width: 100%;
+                padding: 0.8rem;
+                font-size: 1rem;
+            }
+
+            .search-results {
+                width: 100%;
+                max-height: 60vh;
+            }
+
+            .file-name {
+                padding: 0.6rem;
+            }
+
+            .copy-button {
+                padding: 0.6rem;
+                opacity: 0.8;
+            }
+
+            pre:hover .copy-button {
+                opacity: 1;
+            }
+
+            /* Improve touch targets */
+            .toc-item {
+                padding: 0.5rem;
+                margin: 0.2rem 0;
+            }
+
+            .move-button {
+                padding: 0.6rem;
+            }
+
+            .toc-collapse-button {
+                padding: 0.4rem;
+            }
+
+            #markdownContent img {
+                max-width: min(70%, 30rem);
+            }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            #markdownContent table {
+                display: block;
+            }
+
+            .topbar {
+                padding: 0 0.5rem;
+            }
+
+            .topbar-right {
+                margin: auto;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .search-results {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                width: 100%;
+            }
+
+            .toc {
+                width: 100%;
+                max-width: 100%;
+                transform: translateX(0);
+            }
+
+            .toc.collapsed {
+                transform: translateX(-100%);
+            }
+
+            .toc-controls .control-button.mobile {
+                display: block;
+            }
+
+            .toc {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .topbar-left .control-button {
+                display: none;
+            }
+
+            .save-menu {
+                position: fixed;
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 40px);
+                max-width: none;
+                border-radius: 8px;
+                padding: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                padding: 12px;
+            }
+
+            .save-option {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .save-option:hover:not(.save-cancel) {
+                background: var(--secondary-bg-color);
+            }
+
+            .save-option .material-symbols-rounded {
+                font-size: 1.4rem;
+            }
+
+            .save-cancel {
+                display: flex;
+            }
+
+            .numbered-code-block {
+                min-width: 100%;
+            }
+
+            .chat-container {
+                bottom: 0;
+                right: 0;
+                max-width: 100%;
+                min-width: 100%;
+                width: 100%;
+                height: 60%;
+                min-height: 20%;
+                transform: translateY(0) translateX(0);
+                border-radius: 1.2rem 1.2rem 0 0;
+            }
+
+            .chat-container.collapsed {
+                transform: translateY(calc(100% + 20px));
+            }
+
+            .chat-container .resize-handle {
+                border: unset;
+                cursor: ns-resize;
+                top: -18px;
+                left: 50%;
+                transform: translate(-50%);
+                width: 8rem;
+                padding: 0.5rem 2rem;
+            }
+
+            .chat-container .resize-handle div {
+                background: var(--highlight-color);
+                width: 100%;
+                height: 4px;
+                border-radius: 2px;
+            }
+
+            .add-content .add-content-button {
+                margin-bottom: 4em;
+            }
+
+            #markdownContent img {
+                max-width: min(100%, 25rem);
+            }
+
+        }
+
+        @media print {
+            body {
+                margin-right: 2rem !important;
+                background: var(--primary-bg-color) !important;
+                color: black !important;
+                font-size: 9pt !important;
+                line-height: 1.4 !important;
+            }
+
+            /* Hide UI elements */
+            #mainView,
+            .topbar,
+            .toc,
+            .toc-toggle,
+            .back-arrow,
+            .add-content-button,
+            .search-container,
+            .file-controls,
+            .copy-button,
+            .save-button,
+            .theme-toggle,
+            .breadcrumb-path,
+            .numbered-code-block .line-numbers,
+            .file-name-content,
+            .chat-container,
+            .selection-chat-button {
+                display: none !important;
+            }
+
+            /* Reset layout */
+            #previewView .container {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            #markdownContent {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+
+            /* Optimize file name display */
+            .file-name {
+                border-radius: unset !important;
+                position: static !important;
+                padding: 0.5rem 0 !important;
+                background: none !important;
+                box-shadow: none !important;
+                border-bottom: 1px solid #ccc !important;
+                margin-bottom: 1rem !important;
+                page-break-after: avoid !important;
+            }
+
+            /* Ensure headers don't break across pages */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid !important;
+            }
+
+            /* Ensure proper page breaks between sections */
+            .markdown-section {
+                page-break-before: always !important;
+                border-bottom: none !important;
+            }
+
+            .markdown-section:first-child {
+                page-break-before: auto !important;
+            }
+
+            /* Show full URLs for links */
+            a[href]:after {
+                content: " (" attr(href) ")" !important;
+                font-size: 0.9em !important;
+                color: #666 !important;
+            }
+
+            /* Ensure proper margins for printing */
+            @page {
+                margin: 2cm !important;
+            }
+
+            code {
+                font-size: 10pt !important;
+            }
+
+            .numbered-code-block {
+                border: 1px solid #ddd !important;
+                background-color: #f8f8f8 !important;
+                height: unset;
+                max-height: unset;
+            }
+
+            .numbered-code-block .content {
+                max-height: unset !important;
+            }
+
+            pre {
+                white-space: pre-wrap !important;
+                font-size: 8pt !important;
+                line-height: 1.3 !important;
+                padding: 0.4em !important;
+                margin: 0.4em 0 !important;
+            }
+
+            pre code {
+                background: none !important;
+                font-size: 8pt !important;
+            }
+
+            /* Add file name watermark */
+            .markdown-section {
+                position: relative !important;
+            }
+
+            /* Adjust margins for the watermark */
+            #markdownContent {
+                margin-left: 20px !important;
+            }
+
+            /* Reduce spacing between elements */
+            p,
+            ul,
+            ol,
+            blockquote {
+                margin-bottom: 0.5em !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            code:not(pre code) {
+                background-color: var(--secondary-bg-color) !important;
+                border: 1px solid #e0e0e0 !important;
+                border-radius: 2px !important;
+                font-size: 8pt !important;
+                padding: 0.1em 0.2em !important;
+            }
+
+            table {
+                font-size: 8pt !important;
+                border-collapse: collapse !important;
+            }
+
+            td,
+            th {
+                padding: 4px 8px !important;
+                border: 1px solid #ddd !important;
+            }
+
+            h1 {
+                font-size: 14pt !important;
+                margin-top: 1em !important;
+                margin-bottom: 0.5em !important;
+            }
+
+            h2 {
+                font-size: 12pt !important;
+                margin-top: 0.8em !important;
+                margin-bottom: 0.4em !important;
+            }
+
+            h3 {
+                font-size: 11pt !important;
+                margin-top: 0.7em !important;
+                margin-bottom: 0.3em !important;
+            }
+
+            h4,
+            h5,
+            h6 {
+                font-size: 10pt !important;
+                margin-top: 0.6em !important;
+                margin-bottom: 0.3em !important;
+            }
+
+            td,
+            th {
+                padding: 3px 6px !important;
+            }
+
+            /* File name header */
+            .file-name-text {
+                font-size: 9pt !important;
+            }
+
+            /* Adjust list spacing */
+            ul,
+            ol {
+                margin: 0.3em 0 !important;
+                padding-left: 1.5em !important;
+            }
+
+            li {
+                margin-bottom: 0.2em !important;
+            }
+
+            /* Adjust blockquotes */
+            blockquote {
+                padding: 0.3em 0.6em !important;
+                margin: 0.4em 0 !important;
+                font-size: 8.5pt !important;
+            }
+
+            /* Remove extra spacing */
+            p {
+                margin: 0.4em 0 !important;
+            }
+
+            /* Adjust URL display in links */
+            a[href]:after {
+                font-size: 8pt !important;
+                color: #666 !important;
+            }
+
+            /* File name watermark */
+            .markdown-section::before {
+                font-size: 7pt !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="initialLoader" class="initial-loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Loading...</div>
+    </div>
+    
+    <div id="mainView" class="container hidden">
+        <h1>Markdown Viewer</h1>
+        <input type="file" id="fileInput" accept=".md, .txt" multiple>
+        <div class="dropzone" id="dropzone">
+            <p class="translate" data-translate-key="dragDropText">Drag and drop your Markdown files here</p>
+            <p class="translate" data-translate-key="or">or</p>
+            <button id="browseButton" class="translate" data-translate-key="chooseFiles" onclick="browse(this)">Choose
+                Files</button>
+        </div>
+
+        <div class="or-divider">
+            <span class="translate" data-translate-key="or">OR</span>
+        </div>
+
+        <div class="input-section">
+            <textarea id="markdownInput" class="translate" data-translate-key="inputPlaceholder"
+                placeholder="Enter or paste your Markdown text here..."></textarea>
+            <button class="translate" data-translate-key="renderMarkdown"
+                onclick="renderMarkdownInput(this.parentNode.querySelector('#markdownInput'))">Render
+                Markdown</button>
+        </div>
+    </div>
+
+    <div id="previewView" class="hidden">
+        <div class="topbar">
+            <div class="topbar-left non-selectable">
+                <button class="toc-toggle" onclick="toggleToc()">menu_open</button>
+                <button class="back-arrow control-button" onclick="showMainView()">arrow_back</button>
+                <div class="save-button-container">
+                    <button class="save-button control-button" onclick="toggleSaveMenu(event)">save</button>
+                    <div class="save-menu">
+                        <button class="save-option save-html" onclick="saveHTML(); toggleSaveMenu(event)">
+                            <span class="material-symbols-rounded">code</span>
+                            Save as HTML
+                        </button>
+                        <button class="save-option save-pdf" onclick="savePDF(); toggleSaveMenu(event)">
+                            <span class="material-symbols-rounded">description</span>
+                            Save as PDF
+                        </button>
+                        <button class="save-option save-cancel" onclick="toggleSaveMenu(event)">
+                            <span class="material-symbols-rounded">close</span>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+                <button class="theme-toggle control-button" onclick="toggleTheme()">light_mode</button>
+                <button class="settings-button control-button" onclick="toggleSettings()">settings</button>
+            </div>
+            <div class="topbar-right">
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input translate" data-translate-key="searchPlaceholder"
+                            placeholder="Search in documents..." onkeyup="handleSearch(event)">
+                        <button class="search-clear" onclick="clearSearch()">close</button>
+                    </div>
+                    <div class="search-results"></div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="toc">
+            <div class="toc-controls">
+                <button class="back-arrow control-button mobile" onclick="showMainView()">arrow_back</button>
+                <button class="save-button control-button mobile" onclick="toggleSaveMenu(event)">save</button>
+                <button class="theme-toggle control-button mobile" onclick="toggleTheme()">light_mode</button>
+                <button class="settings-button control-button mobile" onclick="toggleSettings()">settings</button>
+                <button class="edit-button control-button" onclick="editMenu(this)">
+                    <span>edit</span>
+                    <span class="status-text translate" data-translate-key="active">Active</span>
+                </button>
+            </div>
+
+            <div class="toc-content"></div>
+            <div class="add-content">
+                <button class="add-content-button" onclick="addMarkdownContent()"><span>add</span></button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div id="markdownContent"></div>
+            <div id="timestamp" class="timestamp"></div>
+        </div>
+
+        <div id="selectionChatButton" class="selection-chat-button non-selectable">
+            <button onclick="toggleChat()">
+                <span class="material-symbols-rounded">forum</span>
+                <span class="translate" data-translate-key="askMe">Ask me</span>
+            </button>
+        </div>
+
+        <div id="chatContainer" class="chat-container collapsed">
+            <div class="resize-handle non-selectable">
+                <div></div>
+            </div>
+            <div class="chat-header non-selectable">
+                <span class="translate" data-translate-key="chatHeader">Ask about the selection</span>
+                <button onclick="toggleChat()"><span class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="chat-messages">
+                <div class="chat-message context-message collapsed">
+                    <div class="context-header non-selectable" onclick="toggleContext(this)">
+                        <span class="toggle material-symbols-rounded">expand_more</span>
+                        <span class="translate" data-translate-key="selectedText">Selected Text</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <textarea class="translate" data-translate-key="chatPlaceholder"
+                    placeholder="Ask a question about the selected text..."></textarea>
+                <button onclick="sendQuestion()"><span class="material-symbols-rounded">send</span></button>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        const DOM = {
+            fileInput: document.getElementById('fileInput'),
+            browseButton: document.getElementById('browseButton'),
+            dropzone: document.getElementById('dropzone'),
+            mainView: document.getElementById('mainView'),
+            previewView: document.getElementById('previewView'),
+            markdownContent: document.getElementById('markdownContent'),
+            tocContent: document.querySelector('.toc-content'),
+            markdownInput: document.getElementById('markdownInput'),
+            initialLoader: document.getElementById('initialLoader'),
+        };
+
+        const CONFIG = {
+            minTocWidth: 280,
+            indentSize: 0.2,
+            observerMargin: '-5px 0px -85% 0px',
+            minToggleWidth: 768,
+            useServer: true,
+            loadFromGithub: true,
+            providers: {
+                google: {
+                    name: "Google Gemini",
+                    models: [" gemini-2.0-pro-exp-02-05", "gemini-2.0-flash", "gemma-3-27b-it"]
+                },
+                openai: {
+                    name: "OpenAI ChatGPT",
+                    models: ["gpt-4o", "gpt-o3-mini", "gpt-3.5-turbo"]
+                },
+                anthropic: {
+                    name: "Anthropic Claude",
+                    models: ["claude-3.7-sonnet", "claude-3.5-sonnet", "claude-3-haiku"]
+                },
+                llama: {
+                    name: "Llama",
+                    models: ["llama-2-70b-chat", "llama-2-13b-chat", "llama-2-7b-chat"]
+                }
+            }
+        };
+
+        const TRANSLATIONS = {
+            de: {
+                dragDropText: "Ziehen Sie Ihre Markdown-Dateien hierher",
+                or: "oder",
+                chooseFiles: "Dateien auswählen",
+                inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
+                renderMarkdown: "Markdown anzeigen",
+                createdOn: "Erstellt am",
+                noResults: "Keine Ergebnisse gefunden",
+                searchPlaceholder: "Dokumente durchsuchen...",
+                chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
+                askMe: "Fragen",
+                selectedText: "Ausgewählter Text",
+                chatHeader: "Stelle Fragen zum ausgewählten Text",
+                noHeaders: "Keine Überschriften in diesem Abschnitt gefunden",
+                settings: "Einstellungen",
+                language: "Sprache",
+                aiProvider: "KI-Anbieter",
+                model: "Modell",
+                apiKey: "API-Schlüssel",
+                enterApiKey: "API-Schlüssel eingeben",
+                saveKey: "Schlüssel speichern",
+                close: "Schließen",
+                keySaved: "API-Schlüssel erfolgreich gespeichert!",
+                active: "Aktiv",
+                howToUseChat: "Chat Anleitung",
+                chatHelperText: "Um den Chat zu nutzen, markieren Sie zuerst Text im Dokument. Dies setzt den Kontext für die KI, um Ihre Fragen zu beantworten.",
+                iUnderstand: "Ich verstehe",
+                remindLater: "Später erinnern"
+            },
+            en: {
+                dragDropText: "Drag and drop your Markdown files here",
+                or: "or",
+                chooseFiles: "Choose Files",
+                inputPlaceholder: "Enter or paste your Markdown text here...",
+                renderMarkdown: "Render Markdown",
+                createdOn: "Created on",
+                noResults: "No results found",
+                searchPlaceholder: "Search in documents...",
+                chatPlaceholder: "Ask a question about the selected text...",
+                askMe: "Ask me",
+                chatHeader: "Ask about the selection",
+                selectedText: "Selected Text",
+                noHeaders: "No headers found in this section",
+                settings: "Settings",
+                language: "Language",
+                aiProvider: "AI Provider",
+                model: "Model",
+                apiKey: "API Key",
+                enterApiKey: "Enter API key",
+                saveKey: "Save Key",
+                close: "Close",
+                keySaved: "API key saved successfully!",
+                active: "Active",
+                howToUseChat: "How to use Chat",
+                chatHelperText: "To use the chat feature, first select some text in the document. This will set the context for the AI to answer your questions.",
+                iUnderstand: "I understand",
+                remindLater: "Remind me later"
+            }
+        }
+
+        let translations = TRANSLATIONS.en;
+
+        const utils = {
+            createElement(tag, className, textContent = '') {
+                const element = document.createElement(tag);
+                if (className) element.className = className;
+                if (textContent) element.textContent = textContent;
+                return element;
+            },
+
+            createButton(icon, onClick, className = 'move-button') {
+                const button = this.createElement('button', className, icon);
+                if (onClick) {
+                    if (typeof onClick === 'function') {
+                        const funcName = onClick.name || `btn_${Math.random().toString(36).substr(2, 9)}`;
+                        window[funcName] = onClick;
+                        button.setAttribute('onclick', `${funcName}()`);
+                    } else {
+                        button.setAttribute('onclick', onClick);
+                    }
+                }
+                return button;
+            },
+
+            handleError(message, error) {
+                console.error(message, error);
+            }
+        };
+
+        const popupManager = {
+            activePopups: new Set(),
+            cachedPopups: new Map(),
+            defaultOptions: {
+                closeOnEscape: true,
+                closeOnBackdropClick: true,
+                backdropBlur: true,
+                showCloseButton: true,
+                closeButtonPosition: 'top-right',
+                onClose: null,
+                customClass: '',
+                width: 'auto',
+                height: 'auto',
+                animation: 'fade',
+                cacheKey: null
+            },
+
+            create(content, options = {}) {
+                const settings = { ...this.defaultOptions, ...options };
+
+                // Check if popup is cached and should be reused
+                if (settings.cacheKey && this.cachedPopups.has(settings.cacheKey)) {
+                    const cachedPopup = this.cachedPopups.get(settings.cacheKey);
+                    if (!this.activePopups.has(cachedPopup)) {
+                        document.body.appendChild(cachedPopup);
+                        this.activePopups.add(cachedPopup);
+                        document.body.style.overflow = 'hidden';
+                        requestAnimationFrame(() => {
+                            cachedPopup.classList.add('active');
+                        });
+                        return cachedPopup;
+                    }
+                }
+
+                // Create new popup if not cached
+                const popupContainer = document.createElement('div');
+                popupContainer.className = `popup-container ${settings.animation} ${settings.customClass}`;
+
+                const backdrop = document.createElement('div');
+                backdrop.className = 'popup-backdrop';
+                if (settings.backdropBlur) backdrop.classList.add('blur');
+
+                const popupContent = document.createElement('div');
+                popupContent.className = 'popup-content';
+                if (settings.width !== 'auto') popupContent.style.width = settings.width;
+                if (settings.height !== 'auto') popupContent.style.height = settings.height;
+
+                if (settings.showCloseButton) {
+                    const closeButton = document.createElement('button');
+                    closeButton.className = `popup-close-button ${settings.closeButtonPosition}`;
+                    closeButton.innerHTML = '<span class="material-symbols-rounded">close</span>';
+                    closeButton.onclick = () => this.close(popupContainer);
+                    popupContent.appendChild(closeButton);
+                }
+
+                const contentWrapper = document.createElement('div');
+                contentWrapper.className = 'popup-content-wrapper';
+                if (typeof content === 'string') {
+                    contentWrapper.innerHTML = content;
+                } else if (content instanceof Element) {
+                    contentWrapper.appendChild(content);
+                }
+                popupContent.appendChild(contentWrapper);
+
+                popupContainer.appendChild(backdrop);
+                popupContainer.appendChild(popupContent);
+                popupContainer.popupSettings = settings;
+
+                if (settings.closeOnBackdropClick) {
+                    backdrop.addEventListener('click', () => this.close(popupContainer));
+                }
+
+                // Cache the popup if cacheKey is provided
+                if (settings.cacheKey) {
+                    this.cachedPopups.set(settings.cacheKey, popupContainer);
+                }
+
+                this.activePopups.add(popupContainer);
+                document.body.appendChild(popupContainer);
+                document.body.style.overflow = 'hidden';
+
+                requestAnimationFrame(() => {
+                    popupContainer.classList.add('active');
+                });
+
+                return popupContainer;
+            },
+
+            close(popup) {
+                const settings = popup.popupSettings;
+
+                if (settings.onClose && typeof settings.onClose === 'function') {
+                    settings.onClose();
+                }
+
+                popup.classList.remove('active');
+
+                popup.addEventListener('transitionend', () => {
+                    popup.remove();
+                    this.activePopups.delete(popup);
+
+                    if (this.activePopups.size === 0) document.body.style.overflow = '';
+                }, { once: true });
+            },
+
+            closeAll() {
+                this.activePopups.forEach(popup => this.close(popup));
+            },
+
+            clearCache() {
+                this.cachedPopups.clear();
+            }
+        };
+
+        function updateUILanguage(lang) {
+            translations = TRANSLATIONS[lang] || TRANSLATIONS['en'];
+
+            // Update all elements with translate class
+            document.querySelectorAll('.translate').forEach(element => {
+                const key = element.getAttribute('data-translate-key');
+                if (key && translations[key]) {
+                    if (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'textarea') {
+                        element.placeholder = translations[key];
+                    } else {
+                        element.textContent = translations[key];
+                    }
+                }
+            });
+
+            // Update timestamp text if it exists
+            const timestamp = document.getElementById('timestamp');
+            if (timestamp && timestamp.textContent) {
+                const date = new Date();
+                const options = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                timestamp.textContent = `${translations.createdOn} ${date.toLocaleDateString(lang, options)}`;
+            }
+
+            document.documentElement.lang = lang;
+        }
+
+        function editMenu(editButton) {
+            editButton.classList.toggle('active');
+            DOM.tocContent.querySelectorAll('.edit-menu').forEach((elem) => elem.classList.toggle('hidden'));
+            DOM.tocContent.querySelectorAll('.section-button').forEach((elem) => elem.classList.toggle('hidden'));
+            DOM.tocContent.querySelectorAll('.toc-list').forEach((elem) => elem.classList.toggle('hidden'));
+        }
+
+        function browse(elem) {
+            const input = elem.parentNode.parentNode.querySelector('#fileInput');
+            input.click();
+        }
+
+        let isDragging = false;
+        let startY, startX, startHeight, startWidth;
+
+        function initResizeDrag() {
+            const chatContainer = document.getElementById('chatContainer');
+
+            // Load stored dimensions
+            const storedWidth = localStorage.getItem('mdv_chat_width');
+            const storedHeight = localStorage.getItem('mdv_chat_height');
+            
+            if (storedWidth && storedHeight) {
+            chatContainer.style.width = storedWidth;
+            chatContainer.style.height = storedHeight;
+            }
+
+            const resizeHandle = chatContainer.querySelector('.resize-handle');
+            resizeHandle.addEventListener('mousedown', startDragging);
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('mouseup', stopDragging);
+
+            // Touch events for mobile 
+            resizeHandle.addEventListener('touchstart', startDragging);
+            document.addEventListener('touchmove', handleDrag);
+            document.addEventListener('touchend', stopDragging);
+        }
+
+        function startDragging(e) {
+            isDragging = true;
+            const chatContainer = document.getElementById('chatContainer');
+            startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+            startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            startHeight = chatContainer.offsetHeight;
+            startWidth = chatContainer.offsetWidth;
+            document.body.style.overflow = 'hidden';
+
+            const resizeHandle = chatContainer.querySelector('.resize-handle');
+            resizeHandle.classList.add('resizing');
+        }
+
+        function handleDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const chatContainer = document.getElementById('chatContainer');
+            const currentY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+            const currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+
+            const deltaY = startY - currentY;
+            const deltaX = startX - currentX;
+
+            const newHeight = Math.min(Math.max(startHeight + deltaY, 200), window.innerHeight - 100);
+            const newWidth = Math.min(Math.max(startWidth + deltaX, 300), window.innerWidth - 40);
+
+            chatContainer.style.height = newHeight + 'px';
+            chatContainer.style.width = newWidth + 'px';
+        }
+
+        function stopDragging(e) {
+            isDragging = false;
+            const chatContainer = document.getElementById('chatContainer');
+
+            // Store dimensions in localStorage
+            localStorage.setItem('mdv_chat_width', chatContainer.style.width);
+            localStorage.setItem('mdv_chat_height', chatContainer.style.height);
+
+            const resizeHandle = chatContainer.querySelector('.resize-handle');
+            resizeHandle.classList.remove('resizing');
+            document.body.style.overflow = '';
+        }
+
+
+        function initEventListeners() {
+            // Add focus handler for search input
+            document.querySelector('.search-input').addEventListener('focus', (e) => {
+                const searchTerm = e.target.value.trim().toLowerCase();
+                if (searchTerm.length >= 2) {
+                    const results = searchInContent(searchTerm);
+                    displaySearchResults(results, searchTerm);
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const topPopup = Array.from(popupManager.activePopups).pop();
+                    if (topPopup && topPopup.popupSettings.closeOnEscape) {
+                        popupManager.close(topPopup);
+                    }
+                }
+            });
+
+            document.addEventListener('selectionchange', () => {
+                const selection = window.getSelection();
+                const markdownContent = document.getElementById('markdownContent');
+
+                if (selection.toString().trim() && markdownContent.contains(selection.anchorNode)) {
+                    currentSelection = selection.toString();
+                    updateChatContext(currentSelection);
+                }
+            });
+
+            window.addEventListener('resize', handleResize);
+            initResizeDrag();
+
+            document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(observeHeader);
+
+
+            // Add keydown handler for Ctrl+Enter in textarea
+            if (DOM.markdownInput) DOM.markdownInput.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    renderMarkdownInput(e.target);
+                }
+            });
+
+            if (DOM.fileInput) DOM.fileInput.addEventListener('change', handleFile);
+
+            if (DOM.dropzone) {
+                DOM.dropzone.addEventListener('dragover', handleDragOver);
+                DOM.dropzone.addEventListener('dragleave', handleDragLeave);
+                DOM.dropzone.addEventListener('drop', handleDrop);
+            }
+        }
+
+        // Consolidated drag and drop handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                Array.from(files).forEach(readFile);
+            }
+        }
+
+        function showMainView() {
+            DOM.mainView.classList.remove('hidden');
+            DOM.previewView.classList.add('hidden');
+            DOM.markdownContent.innerHTML = '';
+            DOM.fileInput.value = '';
+        }
+
+        function handleFile(event) {
+            const files = event.target.files;
+            if (files.length) {
+                Array.from(files).forEach(readFile);
+            }
+        }
+
+        async function readFile(file) {
+            try {
+                const text = await file.text();
+                showPreview(text, file.name);
+            } catch (err) {
+                utils.handleError('Error reading file:', err);
+            }
+        }
+
+        function renderMathIn(element) {
+            renderMathInElement(element, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                ],
+                throwOnError: false,
+                output: 'html',
+                trust: true
+            });
+        }
+
+        function renderTikzIn(element) {
+            const tikzCode = element.textContent.trim();
+        }
+
+        function renderMarkdown(markdownText) {
+            const emojiMap = {
+                ":wink:": "😉", ":cry:": "😢", ":laughing:": "😆", ":yum:": "😋", ":joy:": "😂",
+                ":-)": "😊", ":-(": "☹️", "8-)": "😎", ";)": "😉"
+            };
+            let latexBlocks = {
+                mathJaxs: {
+                    environments: ["flalign\\*"],
+                    className: "math-jaxs",
+                    formulars: [],
+                    template: (className, content) => `\<p class="${className}"\>${content}\<p\>`
+                },
+                tikzJax: {
+                    environments: ["tikzpicture"],
+                    className: "tikz",
+                    formulars: [],
+                    template: (className, content) => `<div class="${className}">${content}</div>`
+                },
+                rest: {
+                    environments: ["tabular", "enumerate"],
+                    className: "rest",
+                    formulars: [],
+                    template: (className, content) => `\<div class="${className}"\>${content}\</div\>`
+                }
+            };
+
+            for (renderer in latexBlocks) {
+                let { environments, formulars } = latexBlocks[renderer];
+                environments.forEach(environment => {
+                    const regex = new RegExp(`\\\\begin\\{${environment}\\}[\\s\\S]*?\\\\end\\{${environment}\\}`, 'g');
+                    markdownText = markdownText.replace(regex, (match, content) => {
+                        const placeholder = `LATEX_BLOCK_${formulars.length}_${renderer}`;
+                        formulars.push(match);
+                        return placeholder;
+                    });
+                });
+            }
+
+            const skipMathExtension = {
+                name: 'skipMath',
+                level: 'inline',
+                start(src) {
+                    return src.match(/\$/)?.index;
+                },
+                tokenizer(src) {
+                    // Single dollar match
+                    const singleDollarMatch = /^\$((?:[^\$]|\\.)+?)\$/.exec(src);
+                    if (singleDollarMatch) {
+                        return {
+                            type: 'text',
+                            raw: singleDollarMatch[0],
+                            text: singleDollarMatch[0]
+                        };
+                    }
+                    const doubleDollarMatch = /^\$\$((?:[^\$]|\\.)+?)\$\$/.exec(src);
+                    if (doubleDollarMatch) {
+                        return {
+                            type: 'text',
+                            raw: doubleDollarMatch[0],
+                            text: doubleDollarMatch[0]
+                        };
+                    }
+                    return false;
+                }
+            }
+
+            const codeBlockExtension = {
+                name: 'customCodeBlock',
+                level: 'block',
+                start(src) {
+                    return src.match(/^```/)?.index;
+                },
+                tokenizer(src) {
+                    if (!src.startsWith('```')) {
+                        return false;
+                    }
+
+                    const closingIndex = src.indexOf('\n```', 3);
+                    if (closingIndex === -1) {
+                        return false;
+                    }
+
+                    const firstNewlineIndex = src.indexOf('\n');
+                    const firstLine = src.substring(3, firstNewlineIndex).trim();
+
+                    const code = src.substring(firstNewlineIndex + 1, closingIndex);
+
+                    let language = '';
+                    let attributes = [];
+
+                    const braceIndex = firstLine.indexOf('{');
+
+                    if (braceIndex !== -1) {
+                        language = firstLine.substring(0, braceIndex).trim();
+
+                        const closingBraceIndex = firstLine.lastIndexOf('}');
+                        if (closingBraceIndex > braceIndex) {
+                            const attributesText = firstLine.substring(braceIndex + 1, closingBraceIndex).trim();
+                            attributes = attributesText.split(',').map(attr => attr.trim()).filter(Boolean);
+                        }
+                    } else if (firstLine) {
+                        language = firstLine;
+                    }
+
+                    return {
+                        type: 'customCodeBlock',
+                        raw: src.substring(0, closingIndex + 4),
+                        text: code,
+                        language: language,
+                        attributes: attributes
+                    };
+                },
+                renderer(token) {
+                    const code = token.text.replace(/[&<>'"]/g, char => ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        "'": '&#39;',
+                        '"': '&quot;'
+                    }[char]));
+
+                    const hasNoLineNumbers = token.attributes && token.attributes.some(attr => attr === '.noLineNumbers');
+
+                    let lineNumbersHtml = '';
+                    if (!hasNoLineNumbers) {
+                        const lines = code.split('\n');
+                        lineNumbersHtml = `<div class="line-numbers">
+                            ${lines.map((_, index) => `<span class="line-number non-selectable">${index + 1}</span>`).join('')}
+                        </div>`;
+                    }
+
+                    const codeElement = document.createElement('code');
+                    codeElement.className = token.language ? `language-${token.language.replace(/[<>'"]/g, '')}` : '';
+                    codeElement.innerHTML = code;
+
+                    if (token.language) {
+                        hljs.highlightElement(codeElement);
+                    }
+
+                    return `<div class="numbered-code-block">
+                        <div class="content">
+                            ${lineNumbersHtml}
+                            <pre>${codeElement.outerHTML}</pre>
+                        </div>
+                        <button class="copy-button" title="Copy Code" onclick="copyCodeBlock(this.parentElement.querySelector('code'), this)">
+                            content_copy
+                        </button>
+                    </div>`;
+                }
+            }
+
+            const imageExtension = {
+                name: 'customImage',
+                level: 'inline',
+                start(src) {
+                    return src.match(/!\[/)?.index;
+                },
+                tokenizer(src) {
+                    const match = /^!\[(.*?)\]\((.*?)(?:\s+"(.*?)")?\)(?:\s*\{([^}]*)\})?/.exec(src);
+                    if (match) {
+                        const [raw, text, href, title, attributesText] = match;
+
+                        const attributes = {};
+                        if (attributesText) {
+                            const regex = /([^=,]+)=(?:"([^"]*?)"|([^,]*?))?(?:,|$)/g;
+                            let match;
+                            while ((match = regex.exec(attributesText))) {
+                                const key = match[1].trim();
+                                const value = (match[2] || match[3] || '').trim();
+                                if (key) {
+                                    attributes[key] = value;
+                                }
+                            }
+                        }
+
+                        return {
+                            type: 'customImage',
+                            raw: raw,
+                            href: href,
+                            title: title,
+                            text: text,
+                            attributes: attributes
+                        };
+                    }
+                    return false;
+                },
+                renderer(token) {
+                    const imgId = `img-${Math.random().toString(36).substring(2)}`;
+                    const escapedHref = token.href.replace(/[<>'"]/g, char => ({
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        "'": '&#39;',
+                        '"': '&quot;'
+                    }[char]));
+                    const escapedText = token.text.replace(/[<>'"]/g, char => ({
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        "'": '&#39;',
+                        '"': '&quot;'
+                    }[char]));
+
+                    let styleAttr = '';
+                    const styles = [];
+                    for (const [key, value] of Object.entries(token.attributes)) {
+                        styles.push(`${key}: ${value.replace(/"/g, '&quot;')}`);
+                    }
+                    styleAttr = ` style="${styles.join('; ')}"`;
+
+                    return `<img
+                        id="${imgId}"
+                        src="${escapedHref}"
+                        alt="${escapedText || 'No title'}"
+                        ${token.title ? `title="${token.title.replace(/[<>'"]/g, '')}"` : ''}
+                        class="loading"
+                        onload="this.classList.remove('loading')"${styleAttr}
+                    >`;
+                }
+            };
+
+            const symbolsExtension = {
+                name: "symbolReplace",
+                level: "inline",
+                start(src) {
+                    return src.match(/\(c\)|\(r\)|\(tm\)|\(p\)|\+-/i)?.index;
+                },
+                tokenizer(src) {
+                    const match = src.match(/^\(c\)|^\(r\)|^\(tm\)|^\(p\)|^\+-/i);
+                    if (match) {
+                        return {
+                            type: "symbolReplace",
+                            raw: match[0],
+                            text: match[0],
+                        };
+                    }
+                },
+                renderer(token) {
+                    const replacements = {
+                        "(c)": "©",
+                        "(C)": "©",
+                        "(r)": "®",
+                        "(R)": "®",
+                        "(tm)": "™",
+                        "(TM)": "™",
+                        "(p)": "℗",
+                        "(P)": "℗",
+                        "+-": "±",
+                    };
+                    return replacements[token.text] || token.text;
+                }
+            };
+
+            const emojiExtension = {
+                name: "emojiReplace",
+                level: "inline",
+                start(src) {
+                    return src.match(/:\w+:|:-\)|:-\(|8-\)|;\)/)?.index;
+                },
+                tokenizer(src) {
+                    const match = src.match(/^(:\w+:|:-\)|:-\(|8-\)|;\))/);
+                    if (match) {
+                        return {
+                            type: "emojiReplace",
+                            raw: match[0],
+                            text: match[0],
+                        };
+                    }
+                },
+                renderer(token) {
+                    return emojiMap[token.text] || token.text; // Replace with emoji if found
+                }
+            };
+
+            const highlightExtension = {
+                name: "highlightReplace",
+                level: "inline",
+                start(src) {
+                    return src.match(/==/i)?.index;
+                },
+                tokenizer(src) {
+                    const match = src.match(/^==(.*?)==/);
+                    if (match) {
+                        return {
+                            type: "highlightReplace",
+                            raw: match[0],
+                            text: match[1], // Extract the highlighted content
+                        };
+                    }
+                },
+                renderer(token) {
+                    return `<mark class="highlight-static">${token.text}</mark>`; // Wrap text in <mark>
+                }
+            };
+
+            const footnoteExtension = {
+                name: 'footnote',
+                level: 'block',
+                start(src) {
+                    return src.match(/^\[\^[^\]]+\]:/)?.index;
+                },
+                tokenizer(src) {
+                    const rule = /^\[\^([^\]]+)\]: (.*?)(?:\n|$)/;
+                    const match = rule.exec(src);
+                    if (match) {
+                        return {
+                            type: 'footnote',
+                            raw: match[0],
+                            id: match[1],
+                            text: match[2].trim()
+                        };
+                    }
+                },
+                renderer(token) {
+                    return `<div id="fn-${token.id}" class="footnote">
+                        <sup>${token.id}</sup> ${token.text}
+                        <a href="#fnref-${token.id}" class="footnote-backref">↩</a>
+                    </div>`;
+                }
+            };
+
+            const footnoteRefExtension = {
+                name: 'footnoteRef',
+                level: 'inline',
+                start(src) {
+                    return src.match(/\[\^/)?.index;
+                },
+                tokenizer(src) {
+                    const rule = /^\[\^([^\]]+)\]/;
+                    const match = rule.exec(src);
+                    if (match) {
+                        return {
+                            type: 'footnoteRef',
+                            raw: match[0],
+                            id: match[1]
+                        };
+                    }
+                },
+                renderer(token) {
+                    return `<sup id="fnref-${token.id}">
+                        <a href="#fn-${token.id}" class="footnote-ref">${token.id}</a>
+                    </sup>`;
+                }
+            };
+
+            const subscriptExtension = {
+                name: 'subscript',
+                level: 'inline',
+                start(src) {
+                    return src.match(/~/)?.index;
+                },
+                tokenizer(src) {
+                    const match = /^~([^~]+)~/.exec(src);
+                    if (match) {
+                        return {
+                            type: 'subscript',
+                            raw: match[0],
+                            text: match[1]
+                        };
+                    }
+                },
+                renderer(token) {
+                    return `<sub>${token.text}</sub>`;
+                }
+            };
+
+            const superscriptExtension = {
+                name: 'superscript',
+                level: 'inline',
+                start(src) {
+                    return src.match(/\^/)?.index;
+                },
+                tokenizer(src) {
+                    const match = /^\^([^^]+)\^/.exec(src);
+                    if (match) {
+                        return {
+                            type: 'superscript',
+                            raw: match[0],
+                            text: match[1]
+                        };
+                    }
+                },
+                renderer(token) {
+                    return `<sup>${token.text}</sup>`;
+                }
+            };
+
+            marked.use({
+                extensions: [
+                    skipMathExtension, codeBlockExtension, imageExtension, symbolsExtension,
+                    emojiExtension, highlightExtension, footnoteExtension, footnoteRefExtension,
+                    subscriptExtension, superscriptExtension
+                ],
+            });
+
+            let html = marked.parse(markdownText);
+
+            for (renderer in latexBlocks) {
+                let { className, formulars, template } = latexBlocks[renderer];
+                formulars.forEach((formular, index) => {
+                    const placeholder = `LATEX_BLOCK_${index}_${renderer}`;
+                    jax = template(className, formulars[index]);
+                    html = html.replace(placeholder, jax);
+                });
+            }
+
+            return html
+        }
+
+        function loadFromGithub() {
+            const repo = localStorage.getItem('mdv_repo') || 'newZeug/aud-summary';
+            fetch(`https://api.github.com/repos/${repo}/contents`)
+            .then(response => response.json())
+            .then(fileList => {
+                const fileFetchList = fileList.filter((f) => f.name.endsWith('.md') && !f.name.includes('README'));
+                for (f in fileFetchList) {
+                    const fileName = fileList[f].name
+                    const fileUrl = fileList[f].download_url;
+                    fetch(fileUrl)
+                    .then(response => response.text())
+                    .then(content => showPreview(content, fileName));
+                }
+                DOM.initialLoader.classList.add('hidden');
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function showPreview(markdownText, fileName = '') {
+            // Only hide mainView if it's not in popup mode
+            if (!DOM.mainView.classList.contains('popup')) {
+                DOM.mainView.classList.add('hidden');
+            }
+            document.body.style.overflow = '';
+            DOM.previewView.classList.remove('hidden');
+
+            let html = renderMarkdown(markdownText);
+
+            const section = document.createElement('div');
+            section.className = 'markdown-section';
+            section.id = 'markdown-section';
+            if (fileName) {
+                const fileNameDiv = createFileNameDiv(fileName, section);
+                section.appendChild(fileNameDiv);
+            }
+
+            const content = document.createElement('div');
+            content.id = 'content';
+            content.innerHTML = html;
+
+            ensureHeaderIds(section);
+
+            section.appendChild(content);
+            DOM.markdownContent.appendChild(section);
+            DOM.mainView.classList.add('hidden');
+            DOM.previewView.classList.remove('hidden');
+
+            const timestamp = document.getElementById('timestamp');
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            timestamp.textContent = `Created on ${now.toLocaleDateString(undefined, options)}`;
+
+            buildTOC();
+
+            // Render math & latex
+            renderMathIn(section);
+            renderMathIn(DOM.tocContent);
+
+            section.querySelectorAll(".tikz").forEach(renderTikzIn);
+            section.querySelectorAll(".math-jaxs").forEach((el) => MathJax.typeset([el]));
+
+            section.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(observeHeader);
+        }
+
+        function createFileNameDiv(fileName, section) {
+            const fileNameDiv = document.createElement('div');
+            fileNameDiv.className = 'file-name non-selectable';
+
+            const fileNameHeader = document.createElement('div');
+            fileNameHeader.className = 'file-name-header';
+
+            const fileNameInfo = document.createElement('div');
+            fileNameInfo.className = 'file-name-info';
+
+            const fileNameText = document.createElement('span');
+            fileNameText.className = 'file-name-text';
+            fileNameText.textContent = fileName;
+
+            let sameNameCount = Array.from(document.querySelectorAll('.markdown-section')).length + 1;
+            const uniqueId = `header-${generateId(fileName, sameNameCount)}`;
+            fileNameText.id = uniqueId;
+            fileNameText.setAttribute('onclick', `toggleFileToc(this.closest('.file-name'))`);
+
+            const breadcrumbPath = document.createElement('div');
+            breadcrumbPath.className = 'breadcrumb-path non-selectable';
+            fileNameInfo.append(fileNameText, breadcrumbPath);
+
+            fileNameHeader.append(fileNameInfo);
+
+            const fileNameContent = document.createElement('div');
+            fileNameContent.className = 'file-name-content';
+
+            fileNameDiv.append(fileNameHeader, fileNameContent);
+            return fileNameDiv;
+        }
+
+        function moveSection(button, direction) {
+            const tocSection = button.closest('.toc-section');
+            const tocFileId = tocSection.querySelector('span').id;
+            const section = document.querySelector(`#${tocFileId.slice('fileHeader-'.length)}`).closest('.markdown-section');
+
+            const sibling = direction === 'up' ? section.previousElementSibling : section.nextElementSibling;
+            const tocSectionSibling = direction === 'up' ? tocSection.previousElementSibling : tocSection.nextElementSibling;
+
+            if (sibling) {
+                const parent = section.parentNode;
+                const tocParent = tocSection.parentNode;
+                if (direction === 'up') {
+                    parent.insertBefore(section, sibling);
+                    tocParent.insertBefore(tocSection, tocSectionSibling);
+                } else {
+                    parent.insertBefore(sibling, section);
+                    tocParent.insertBefore(tocSectionSibling, tocSection);
+                }
+            }
+        }
+
+        function deleteSection(button) {
+            const tocSection = button.closest('.toc-section');
+            const tocFileId = tocSection.querySelector('span').id;
+            const section = document.querySelector(`#${tocFileId.slice('fileHeader-'.length)}`).closest('.markdown-section');
+
+            if (confirm('Are you sure you want to delete this section?')) {
+                section.remove();
+                if (!DOM.markdownContent.children.length) {
+                    showMainView();
+                } else {
+                    tocSection.remove();
+                }
+            }
+        }
+
+        function addMarkdownContent() {
+            const popup = DOM.mainView.cloneNode(true);
+            popup.classList.remove('hidden');
+            popup.classList.add('popup');
+
+            // Add event listeners
+            popup.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    renderMarkdownInput(e.target);
+                }
+            });
+            popup.querySelector('#dropzone').addEventListener('dragover', handleDragOver);
+            popup.querySelector('#dropzone').addEventListener('dragleave', handleDragLeave);
+            popup.querySelector('#dropzone').addEventListener('drop', handleDrop);
+            popup.querySelector('#fileInput').addEventListener('change', handleFile);
+
+            popupManager.create(popup, {
+                customClass: 'add-content-popup',
+                closeButtonPosition: 'top-right',
+                width: 'fit-content',
+                maxWidth: '600px',
+                cacheKey: 'addContent',
+                onClose: () => {
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        function showChatHelpPopup() {
+            if (localStorage.getItem('mdv_chatHelpDismissed') === 'true') {
+                return;
+            }
+
+            const content = `
+                <div class="chat-help-content">
+                    <h3>${translations.howToUseChat}</h3>
+                    <p>${translations.chatHelperText}</p>
+                    <div class="chat-help-buttons">
+                        <button class="understood-btn" onclick="removeChatHelpPopup(true)">${translations.iUnderstand}</button>
+                        <button class="remind-btn" onclick="removeChatHelpPopup(false)">${translations.remindLater}</button>
+                    </div>
+                </div>
+            `;
+
+            popupManager.create(content, {
+                customClass: 'chat-help-popup',
+                closeButtonPosition: 'top-right',
+                width: 'max(40%, 20rem)',
+                maxWidth: '400px',
+                cacheKey: 'chatHelper'
+            });
+        }
+
+        function removeChatHelpPopup(chatHelpDismissed) {
+            if (chatHelpDismissed) {
+                localStorage.setItem('mdv_chatHelpDismissed', 'true');
+            }
+            popupManager.closeAll();
+        }
+
+        function generateId(text, index) {
+            return `${text.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')}-${index}`;
+        }
+
+        function ensureHeaderIds(section) {
+            const sectionName = section.querySelector('.file-name-text').id;
+            const headers = section.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            headers.forEach((header, index) => {
+                if (!header.id) {
+                    const name = `${sectionName}-${header.textContent}`;
+                    header.id = `${generateId(name, index)}`;
+                }
+            });
+        }
+
+        function createFileHeader(fileName, fileNameId) {
+            const fileHeaderContainer = utils.createElement('div', 'toc-file');
+
+            const dragHandle = utils.createButton('drag_indicator', null, 'move-button edit-menu hidden');
+            dragHandle.draggable = true;
+            dragHandle.style.cursor = 'grab';
+
+            dragHandle.addEventListener('dragstart', (e) => {
+                const tocSection = e.target.closest('.toc-section');
+                const id = tocSection.querySelector('span').id;
+                e.dataTransfer.setData('text/plain', id);
+                tocSection.classList.add('dragging');
+                e.dataTransfer.setDragImage(fileHeaderContainer, e.offsetX, e.offsetY);
+            });
+
+            dragHandle.addEventListener('dragend', (e) => {
+                e.target.closest('.toc-section').classList.remove('dragging');
+                
+                const tocSections = Array.from(document.querySelectorAll('.toc-section'));
+                const markdownContent = document.getElementById('markdownContent');
+                
+                tocSections.forEach(tocSection => {
+                    const fileId = tocSection.querySelector('span').id.slice('fileHeader-'.length);
+                    const markdownSection = document.getElementById(fileId).closest('.markdown-section');
+                    markdownContent.appendChild(markdownSection);
+                });
+            });
+
+            fileHeaderContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const tocSection = fileHeaderContainer.closest('.toc-section');
+                const draggingSection = document.querySelector('.toc-section.dragging');
+                
+                if (!draggingSection || tocSection === draggingSection) return;
+
+                const box = tocSection.getBoundingClientRect();
+                const isAboveMiddle = e.clientY < box.top + box.height / 2;
+                
+                if (isAboveMiddle) {
+                    tocSection.parentNode.insertBefore(draggingSection, tocSection);
+                } else if (tocSection.nextSibling) {
+                    tocSection.parentNode.insertBefore(draggingSection, tocSection.nextSibling);
+                } else {
+                    tocSection.parentNode.appendChild(draggingSection);
+                }
+            });
+
+            fileHeaderContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+            });
+
+            const fileNameText = utils.createElement('span', '', fileName);
+            fileNameText.id = `fileHeader-${fileNameId}`;
+            fileNameText.ondblclick = (e) => startRenaming(e);
+
+            const actionButtons = utils.createElement('div', 'action-buttons');
+            const editMenu = utils.createElement('div', 'edit-menu hidden');
+
+            const upButton = utils.createButton('arrow_upward', `moveSection(this, 'up')`);
+            const downButton = utils.createButton('arrow_downward', `moveSection(this, 'down')`);
+            const deleteButton = utils.createButton('delete', `deleteSection(this)`);
+            deleteButton.classList.add('delete');
+            editMenu.append(upButton, downButton, deleteButton);
+
+            const onclickEvent = `scrollToSection('${fileNameId}')`;
+            const scrollButton = utils.createButton('prompt_suggestion', onclickEvent, 'move-button section-button');
+            scrollButton.title = 'Scroll to section';
+
+            actionButtons.append(editMenu, scrollButton);
+
+            fileHeaderContainer.append(dragHandle, fileNameText, actionButtons);
+            return fileHeaderContainer;
+        }
+
+        function startRenaming(event) {
+            event.stopPropagation();
+            const tocFileNameText = event.target;
+            const currentName = tocFileNameText.textContent;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'file-name-edit';
+            input.value = currentName;
+
+            tocFileNameText.replaceWith(input);
+            input.focus();
+            input.select();
+
+            input.addEventListener('blur', () => finishRenaming(input, tocFileNameText));
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    input.blur();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    tocFileNameText.textContent = currentName;
+                    input.replaceWith(tocFileNameText);
+                }
+            });
+
+            // Prevent click events while editing
+            input.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        function finishRenaming(input, tocFileNameText) {
+            const newName = input.value.trim();
+            if (newName && newName !== tocFileNameText.textContent) {
+                // Update TOC file name
+                tocFileNameText.textContent = newName;
+
+                const fileNameId = tocFileNameText.id.slice('fileHeader-'.length);
+                const fileNameHeader = document.querySelector(`#${fileNameId}`);
+                fileNameHeader.textContent = newName;
+            }
+            input.replaceWith(tocFileNameText);
+        }
+
+        function createHeaderTree(headers) {
+            const tree = [];
+            const stack = [{ level: 0, children: tree }];
+
+            headers.forEach(header => {
+                const level = parseInt(header.tagName[1]);
+                const node = {
+                    header,
+                    level,
+                    children: []
+                };
+
+                while (level <= stack[stack.length - 1].level) {
+                    stack.pop();
+                }
+
+                stack[stack.length - 1].children.push(node);
+                stack.push(node);
+            });
+
+            return tree;
+        }
+
+        function scrollToSection(fileNameId) {
+            const section = document.querySelector(`#${fileNameId}`).closest('.markdown-section');
+            scrollToElement(section, 0);
+            if (window.innerWidth <= CONFIG.minToggleWidth) {
+                const toc = document.querySelector('.toc');
+                const container = document.querySelector('#previewView .container');
+                const toggleButton = document.querySelector('.toc-toggle');
+                if (!toc.classList.contains('collapsed')) {
+                    toc.classList.add('collapsed');
+                    container.classList.add('toc-collapsed');
+                    toggleButton.textContent = 'menu';
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+
+        function scrollToHeader(headerId, withTotalOffset) {
+            const header = document.getElementById(headerId);
+            if (header) {
+                const topbarHeight = 60; // Height of the topbar
+                const fileNameHeight = 56; // Height of the file name header (0.8rem padding * 2 + line height)
+                const fileNameContentHeight = getExpandedFileNameContentHeight();
+                const totalOffset = topbarHeight + fileNameHeight + fileNameContentHeight;
+                const partialOffset = totalOffset - fileNameHeight - 32;
+                scrollToElement(header, withTotalOffset ? totalOffset : partialOffset);
+
+                if (window.innerWidth <= CONFIG.minToggleWidth) {
+                    const toc = document.querySelector('.toc');
+                    const container = document.querySelector('#previewView .container');
+                    const toggleButton = document.querySelector('.toc-toggle');
+                    if (!toc.classList.contains('collapsed')) {
+                        toc.classList.add('collapsed');
+                        container.classList.add('toc-collapsed');
+                        toggleButton.textContent = 'menu';
+                        document.body.style.overflow = '';
+                    }
+                }
+            }
+        }
+
+        function observeHeader(header) {
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting) {
+                        activateMatchingTocItems(header);
+                        updateActiveBreadcrumbs(header);
+                    }
+                },
+                {
+                    rootMargin: CONFIG.observerMargin,
+                    threshold: 0.5
+                }
+            );
+
+            observer.observe(header);
+        }
+
+        // TOC
+        function buildTOC() {
+            DOM.tocContent.innerHTML = '';
+            const sections = DOM.markdownContent.querySelectorAll('.markdown-section');
+
+            sections.forEach(section => {
+                const tocSection = utils.createElement('div', 'toc-section');
+                const fileNameElem = section.querySelector('.file-name-text');
+                const fileHeaderContainer = createFileHeader(fileNameElem.textContent, fileNameElem.id);
+
+                ensureHeaderIds(section);
+
+                const list = utils.createElement('ul', 'toc-list');
+                const headers = Array.from(section.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+                let headerTree = createHeaderTree(headers);
+                buildTocFromTree(headerTree, list);
+
+                tocSection.appendChild(fileHeaderContainer);
+                tocSection.appendChild(list);
+
+                DOM.tocContent.appendChild(tocSection);
+
+                populateFileToc(headerTree, section);
+            });
+        }
+
+        function buildTocFromTree(tree, parentList) {
+            tree.forEach(node => {
+                const item = utils.createElement('li', 'toc-item');
+                item.style.setProperty('--level', node.level);
+
+                const headerDiv = utils.createElement('div', 'toc-item-header');
+
+                if (node.children.length > 0) {
+                    const collapseBtn = utils.createButton('expand_more', null, 'toc-collapse-button');
+                    collapseBtn.setAttribute('onclick', `this.parentElement.parentElement.classList.toggle('collapsed')`);
+                    headerDiv.appendChild(collapseBtn);
+                }
+
+                // Use the header's existing ID
+                const headerId = node.header.id;
+                item.dataset.headerId = headerId;
+
+                const text = document.createElement('span');
+                text.innerHTML = node.header.innerHTML;
+                text.setAttribute('onclick', `scrollToHeader('${headerId}', true)`);
+                text.style.cursor = 'pointer';
+                headerDiv.appendChild(text);
+
+                item.appendChild(headerDiv);
+
+                if (node.children.length > 0) {
+                    const subList = utils.createElement('ul', 'toc-sub-list');
+                    buildTocFromTree(node.children, subList);
+                    item.appendChild(subList);
+                }
+
+                parentList.appendChild(item);
+            });
+        }
+
+        function activateMatchingTocItems(header) {
+            document.querySelectorAll('.toc-item').forEach(item => item.classList.remove('active'));
+
+            const activeItems = document.querySelectorAll(`.toc-item[data-header-id="${header.id}"]`);
+            activeItems.forEach(item => {
+                item.classList.add('active');
+                const container = item.closest('.file-name-content, .toc-content');
+                scrollTocToItem(container, item);
+            });
+        }
+
+        function scrollTocToItem(container, item) {
+            container.scrollTo({
+                top: item.offsetTop - (!container.classList.contains('toc') ? container.offsetTop : 0),
+                behavior: 'smooth'
+            });
+        }
+
+        function toggleToc() {
+            const toc = document.querySelector('.toc');
+            const container = document.querySelector('#previewView .container');
+            const toggleButton = document.querySelector('.toc-toggle');
+
+            toc.classList.toggle('collapsed');
+            container.classList.toggle('toc-collapsed');
+            toggleButton.textContent = toc.classList.contains('collapsed') ? 'menu' : 'menu_open';
+
+            if (window.innerWidth <= CONFIG.minToggleWidth) {
+                document.body.style.overflow = toc.classList.contains('collapsed') ? '' : 'hidden';
+            }
+        }
+
+        let resizeTriggered = false;
+        function handleResize() {
+            const toc = document.querySelector('.toc');
+            const container = document.querySelector('#previewView .container');
+            const toggleButton = document.querySelector('.toc-toggle');
+            const wasCollapsed = toc.classList.contains("collapsed");
+
+            if (window.innerWidth <= CONFIG.minToggleWidth && !wasCollapsed && !resizeTriggered) {
+                toc.classList.add('collapsed');
+                container.classList.add('toc-collapsed');
+                toggleButton.textContent = 'menu';
+                resizeTriggered = true;
+            }
+
+            if (window.innerWidth > CONFIG.minToggleWidth) {
+                document.body.style.overflow = '';
+                resizeTriggered = false;
+            }
+        }
+
+        function populateFileToc(headerTree, section) {
+            const fileNameContent = section.querySelector('.file-name-content');
+            const list = utils.createElement('ul', 'toc-list');
+            fileNameContent.innerHTML = '';
+
+            if (headerTree) {
+                buildTocFromTree(headerTree, list);
+                fileNameContent.appendChild(list);
+            } else {
+                fileNameContent.innerHTML = '<p style="padding: 0.5rem;">No headers found in this section</p>';
+            }
+        }
+
+        function toggleFileToc(fileNameDiv) {
+            fileNameDiv.classList.toggle('expanded');
+        }
+
+        // SEARCH
+
+        function handleSearch(event) {
+            const searchInput = event.target;
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const clearButton = document.querySelector('.search-clear');
+            const resultsContainer = document.querySelector('.search-results');
+
+            clearButton.classList.toggle('visible', searchTerm.length > 0);
+
+            if (searchTerm.length < 2) {
+                resultsContainer.classList.remove('visible');
+                return;
+            }
+
+            const results = searchInContent(searchTerm);
+            displaySearchResults(results, searchTerm);
+        }
+
+        function displaySearchResults(results, searchTerm) {
+            const resultsContainer = document.querySelector('.search-results');
+            resultsContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-result-item">No results found</div>';
+                resultsContainer.classList.add('visible');
+                return;
+            }
+
+            results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+
+                const fileNameEl = document.createElement('div');
+                fileNameEl.className = 'search-result-file';
+                fileNameEl.textContent = result.fileName;
+
+                const headerEl = document.createElement('div');
+                headerEl.className = 'search-result-headers';
+                headerEl.innerHTML = result.headers.map(header => `<span class="header-link">${header.text}</span>`).join('');
+
+                const contextEl = document.createElement('div');
+                contextEl.className = 'search-result-context';
+                contextEl.innerHTML = highlightText(result.context, searchTerm);
+
+                resultItem.append(fileNameEl, headerEl, contextEl);
+
+                const elementId = result.element.id ? result.element.id : `element_${Math.random().toString(36).substr(2, 9)}`;
+                result.element.id = elementId;
+                resultItem.onclick = () => {
+                    clearHighlights();
+                    scrollToHeader(elementId, true);
+                    highlightElement(document.getElementById(elementId), result.searchTerm);
+                    document.querySelector('.search-results').classList.remove('visible');
+                    setTimeout(() => clearHighlights(), 3000);
+                };
+
+                resultsContainer.appendChild(resultItem);
+            });
+            resultsContainer.classList.add('visible');
+        }
+
+        function clearSearch() {
+            const searchInput = document.querySelector('.search-input');
+            const clearButton = document.querySelector('.search-clear');
+            const resultsContainer = document.querySelector('.search-results');
+
+            searchInput.value = '';
+            clearButton.classList.remove('visible');
+            resultsContainer.classList.remove('visible');
+        }
+
+        function searchInContent(searchTerm) {
+            const results = [];
+            const sections = document.querySelectorAll('.markdown-section');
+
+            sections.forEach(section => {
+                const fileName = section.querySelector('.file-name-text').textContent;
+                let contentElements = section.querySelectorAll('code, p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote');
+                contentElements = Array.from(contentElements).filter((content) => !content.closest('.file-name'));
+
+                contentElements.forEach(element => {
+                    const text = element.textContent.toLowerCase();
+                    const index = text.indexOf(searchTerm);
+
+                    if (index !== -1) {
+                        const context = getContext(element.textContent, index, searchTerm.length);
+                        const parentHeaders = findParentHeaders(element);
+
+                        results.push({
+                            fileName,
+                            context,
+                            element: element,
+                            headers: parentHeaders,
+                            searchTerm
+                        });
+                    }
+                });
+            });
+
+            return results;
+        }
+
+        function findParentHeaders(node) {
+            const section = node.closest('.markdown-section');
+            if (!section) return [];
+
+            let parentHeaders = [];
+            let currentNode = node;
+            let currentLevel = 6;
+
+            while (currentNode && parentHeaders.length < 3) {
+                currentNode = currentNode.previousElementSibling;
+                while (currentNode) {
+                    if (currentNode.matches(`h${currentLevel}, h${currentLevel - 1}, h${currentLevel - 2}, h${currentLevel - 3}, h${currentLevel - 4}, h${currentLevel - 5}`)) {
+                        const headerLevel = parseInt(currentNode.tagName[1]);
+                        if (headerLevel < currentLevel) {
+                            parentHeaders.push({
+                                id: currentNode.id,
+                                text: currentNode.textContent
+                            });
+                            currentLevel = headerLevel;
+                            break;
+                        }
+                    }
+                    currentNode = currentNode.previousElementSibling;
+                }
+            }
+            return parentHeaders.reverse();
+        }
+
+        function highlightElement(element, searchTerm) {
+            const text = element.innerHTML;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            element.innerHTML = text.replace(regex, '<mark class="highlight">$1</mark>');
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('mark.highlight').forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+            });
+        }
+
+        function getTextNodes(element) {
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                {
+                    acceptNode: function (node) {
+                        if (node.parentElement.closest('.file-name-content')) {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                        return NodeFilter.FILTER_ACCEPT;
+                    }
+                }
+            );
+
+            const nodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                if (node.textContent.trim()) {
+                    nodes.push(node);
+                }
+            }
+            return nodes;
+        }
+
+        function getContext(text, index, searchLength) {
+            const contextLength = 50;
+            const start = Math.max(0, index - contextLength);
+            const end = Math.min(text.length, index + searchLength + contextLength);
+            let context = text.slice(start, end);
+
+            if (start > 0) context = '...' + context;
+            if (end < text.length) context += '...';
+
+            return context;
+        }
+
+
+        function highlightText(text, searchTerm) {
+            const regex = new RegExp(searchTerm, 'gi');
+            return text.replace(regex, match => `<span class="highlight">${match}</span>`);
+        }
+
+        function scrollToElement(element, offset) {
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+
+            document.querySelectorAll('.file-name.expanded').forEach(div => {
+                div.classList.remove('expanded');
+            });
+        }
+
+        function initThemeDetection() {
+            const savedTheme = localStorage.getItem('mdv_theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            document.documentElement.classList.remove('dark-mode', 'light-mode');
+
+            if (savedTheme) {
+                document.documentElement.classList.add(savedTheme === 'dark' ? 'dark-mode' : 'light-mode');
+                updateThemeToggle(savedTheme === 'dark');
+            } else {
+                document.documentElement.classList.add(prefersDark ? 'dark-mode' : 'light-mode');
+                updateThemeToggle(prefersDark);
+            }
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (!localStorage.getItem('mdv_theme')) {
+                    document.documentElement.classList.remove('dark-mode', 'light-mode');
+                    document.documentElement.classList.add(e.matches ? 'dark-mode' : 'light-mode');
+                    updateThemeToggle(e.matches);
+                }
+            });
+        }
+
+        function toggleTheme() {
+            const isDark = !document.documentElement.classList.contains('dark-mode');
+            document.documentElement.classList.remove('dark-mode', 'light-mode');
+            document.documentElement.classList.add(isDark ? 'dark-mode' : 'light-mode');
+            localStorage.setItem('mdv_theme', isDark ? 'dark' : 'light');
+            updateThemeToggle(isDark);
+        }
+
+        function updateThemeToggle(isDark) {
+            document.querySelectorAll('.theme-toggle').forEach(toggle => {
+                toggle.textContent = isDark ? 'dark_mode' : 'light_mode';
+                toggle.title = `Switch to ${isDark ? 'light' : 'dark'} mode`;
+            });
+        }
+
+        function copyCodeBlock(codeElement, button) {
+            const tempElement = codeElement.cloneNode(true);
+            const lineNumbers = tempElement.querySelectorAll('.line-number');
+            lineNumbers.forEach(lineNumber => lineNumber.remove());
+
+            const code = tempElement.textContent;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(code).then(() => {
+                    showCopySuccess(button);
+                }).catch(() => {
+                    fallbackCopy(code, button);
+                });
+            } else {
+                fallbackCopy(code, button);
+            }
+        }
+
+        function fallbackCopy(text, button) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+
+            textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.opacity = '0';
+            textArea.style.zIndex = '-1';
+
+            document.body.appendChild(textArea);
+
+            if (navigator.userAgent.match(/ipad|iphone/i)) {
+                const scrollY = window.scrollY;
+
+                const range = document.createRange();
+                range.selectNodeContents(textArea);
+
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                textArea.setSelectionRange(0, 999999);
+                textArea.contentEditable = true;
+                textArea.readOnly = false;
+
+                window.scrollTo(0, scrollY);
+            } else {
+                textArea.select();
+            }
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopySuccess(button);
+                } else {
+                    showCopyError(button);
+                }
+            } catch (err) {
+                showCopyError(button);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        function showCopySuccess(button) {
+            button.textContent = 'done';
+            button.classList.add('copied');
+            setTimeout(() => {
+                button.textContent = 'content_copy';
+                button.classList.remove('copied');
+            }, 2000);
+        }
+
+        function showCopyError(button) {
+            button.textContent = 'error';
+            setTimeout(() => {
+                button.textContent = 'content_copy';
+            }, 2000);
+        }
+
+        function getExpandedFileNameContentHeight() {
+            const expandedContent = document.querySelector('.file-name.expanded .file-name-content');
+            return expandedContent ? expandedContent.offsetHeight + 16 : 0; // 16px for margin-top
+        }
+
+        function saveHTML() {
+            const menu = document.querySelector('.save-menu');
+            if (menu.classList.contains('visible')) {
+                menu.classList.remove('visible');
+            }
+            const clone = document.documentElement.cloneNode(true);
+
+            if (document.documentElement.classList.contains('dark-mode')) {
+                clone.classList.add('dark-mode');
+            }
+
+            clone.querySelectorAll('.back-arrow, #mainView, .edit-button, .edit-menu, .add-content-button, .save-option.save-html').forEach(el => el.remove());
+            clone.querySelectorAll('.breadcrumb-path, .chat-message.system, .chat-message.user').forEach((elem) => elem.innerHTML = '');
+            clone.querySelectorAll('.toc-list.hidden, .section-button').forEach((elem) => elem.classList.remove('hidden'));
+
+            const html = `<!DOCTYPE html>
+            <html${clone.getAttribute('lang') ? ` lang="${clone.getAttribute('lang')}"` : ''} class="${clone.className}">
+            <head>
+                <meta charset="UTF-8">
+                ${clone.querySelector('head').innerHTML}
+                </head>
+                <body>
+                    ${clone.querySelector('body').innerHTML}
+                    </body>
+                    </html>`;
+
+            const blob = new Blob([new TextEncoder().encode(html)], {
+                type: 'text/html;charset=utf-8'
+            });
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = 'markdown_viewer-export.html';
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(downloadLink.href);
+        }
+
+        function updateActiveBreadcrumbs(activeHeader) {
+            const section = activeHeader.closest('.markdown-section');
+            if (section) {
+                const breadcrumbPath = section.querySelector('.breadcrumb-path');
+                const headers = Array.from(section.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+
+                const breadcrumbs = getBreadcrumbPath(activeHeader, headers);
+                breadcrumbPath.innerHTML = breadcrumbs
+                    .map(header => `<span class="breadcrumb-item" onclick="scrollToHeader('${header.id}', true)" style="cursor: pointer">${header.innerHTML}</span>`)
+                    .join('');
+            }
+        }
+
+        function getBreadcrumbPath(activeHeader, allHeaders) {
+            const breadcrumbs = [];
+            const sectionContent = activeHeader.closest('.markdown-section');
+
+            let currentHeader = activeHeader;
+            let targetLevel = parseInt(currentHeader.tagName[1]);
+            breadcrumbs.push(currentHeader);
+
+            while (currentHeader && breadcrumbs.length < 3) {
+                currentHeader = getPreviousHeader(currentHeader, targetLevel - 1, sectionContent);
+                if (currentHeader) {
+                    breadcrumbs.unshift(currentHeader);
+                    targetLevel = parseInt(currentHeader.tagName[1]);
+                }
+            }
+
+            return breadcrumbs;
+        }
+
+        function getPreviousHeader(currentHeader, targetLevel, container) {
+            let element = currentHeader;
+
+            while (element = element.previousElementSibling) {
+                if (element.matches('h1, h2, h3, h4, h5, h6')) {
+                    const headerLevel = parseInt(element.tagName[1]);
+                    if (headerLevel === targetLevel) {
+                        return element;
+                    }
+                    if (headerLevel < targetLevel) {
+                        return element;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function toggleSaveMenu(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            const menu = document.querySelector('.save-menu');
+
+            if (!menu.classList.contains('visible')) {
+                menu.classList.add('visible');
+            } else {
+                menu.classList.remove('visible');
+            }
+        }
+
+        function savePDF() {
+            window.print();
+        }
+
+        function toggleChat() {
+            const popup = document.getElementById('chatContainer');
+            if (popup.classList.contains('collapsed')) showChatHelpPopup();
+            popup.classList.toggle('collapsed');
+        }
+
+        function toggleContext(elem) {
+            const contextMessage = elem.parentNode;
+            contextMessage.classList.toggle('collapsed');
+        }
+
+        let currentSelection = '';
+
+        function updateChatContext(text) {
+            const popup = document.getElementById('chatContainer');
+            const contextMessage = popup.querySelector('.context-message');
+            let contextContent = contextMessage.querySelector('.context-content');
+
+            if (!contextContent) {
+                contextContent = document.createElement('div');
+                contextContent.className = 'context-content';
+                contextMessage.appendChild(contextContent);
+            }
+
+            contextContent.textContent = text;
+            currentSelection = text;
+        }
+
+        function toggleSettings() {
+            const settingsPanel = utils.createElement('div', 'settings-panel');
+            settingsPanel.innerHTML = `
+            <div class="settings-header">
+                <h2 class="translate" data-translate-key="settings">${translations.settings}</h2>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section">
+                <h3 class="translate" data-translate-key="language">${translations.language}</h3>
+                <select id="languageSelect" onchange="updateLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="de">Deutsch</option>
+                </select>
+                </div>
+                <div class="settings-section">
+                <h3>GitHub Repository</h3>
+                <div class="repo-container">
+                    <input type="text" id="repoInput" placeholder="e.g. newZeug/aud-summary" value="newZeug/aud-summary">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoLoadToggle" ${CONFIG.loadFromGithub ? 'checked' : ''}>
+                        <span class="toggle-slider"></span>
+                        Auto Load
+                    </label>
+                </div>
+                </div>
+                <div class="settings-section">
+                <h3 class="translate" data-translate-key="aiProvider">${translations.aiProvider}</h3>
+                <select id="providerSelect" onchange="updateProvider(this.value)">
+                    <option value="google">Google Gemini</option>
+                    <option value="openai">OpenAI ChatGPT</option>
+                    <option value="anthropic">Anthropic Claude</option>
+                    <option value="llama">Llama</option>
+                </select>
+                </div>
+            </div>
+            <div class="settings-section" id="modelSection">
+                <h3>${translations.model}</h3>
+                <select id="modelSelect"></select>
+                </select>
+            </div>
+            <div class="settings-section">
+                <h3>${translations.apiKey}</h3>
+                <input type="password" id="apiKeyInput" placeholder="${translations.enterApiKey}">
+                <button onclick="saveApiKey()" class="save-key-btn">${translations.saveKey}</button>
+            </div>
+            `;
+
+            popupManager.create(settingsPanel, {
+            closeOnBackdropClick: true,
+            backdropBlur: true,
+            closeButtonPosition: 'top-right',
+            customClass: 'settings-popup',
+            width: '500px',
+            onClose: () => {
+                saveSettings();
+            },
+            cacheKey: 'settingsPanel'
+            });
+
+            loadSettings();
+        }
+
+        function updateProvider(provider) {
+            const modelSelect = document.getElementById('modelSelect');
+            modelSelect.innerHTML = '';
+
+            CONFIG.providers[provider].models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+
+            modelSelect.value = CONFIG.providers[provider].models[0];
+            localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
+        }
+
+        function updateLanguage(language) {
+            localStorage.setItem('mdv_language', language);
+        }
+
+        function saveApiKey() {
+            const provider = document.getElementById('providerSelect').value;
+            const apiKey = document.getElementById('apiKeyInput').value;
+
+            if (apiKey) {
+                localStorage.setItem(`mdv_${provider}_api_key`, apiKey);
+                alert('API key saved successfully!');
+            }
+        }
+
+        function loadSettings() {
+            const language = localStorage.getItem('mdv_language') || 'en';
+            const provider = localStorage.getItem('mdv_provider') || 'google';
+            const savedModel = localStorage.getItem('mdv_model');
+            const repoLink = localStorage.getItem('mdv_repo') || 'newZeug/aud-summary';
+            const autoLoad = localStorage.getItem('mdv_autoload') === 'true';
+
+            document.getElementById('languageSelect').value = language;
+            document.getElementById('providerSelect').value = provider;
+            document.getElementById('repoInput').value = repoLink;
+            document.getElementById('autoLoadToggle').checked = autoLoad;
+
+            const modelSelect = document.getElementById('modelSelect');
+            modelSelect.innerHTML = '';
+            CONFIG.providers[provider].models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model;
+            option.textContent = model;
+            modelSelect.appendChild(option);
+            });
+
+            if (savedModel && CONFIG.providers[provider].models.includes(savedModel.trim())) {
+            modelSelect.value = savedModel.trim();
+            } else {
+            modelSelect.value = CONFIG.providers[provider].models[0];
+            localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
+            }
+
+            const apiKey = localStorage.getItem(`mdv_${provider}_api_key`) || '';
+            document.getElementById('apiKeyInput').value = apiKey;
+        }
+
+        function saveSettings() {
+            const provider = document.getElementById('providerSelect').value;
+            const model = document.getElementById('modelSelect').value;
+            const language = document.getElementById('languageSelect').value;
+            const repo = document.getElementById('repoInput').value;
+            const autoLoad = document.getElementById('autoLoadToggle').checked;
+
+            localStorage.setItem('mdv_provider', provider.trim());
+            localStorage.setItem('mdv_model', model.trim());
+            localStorage.setItem('mdv_language', language.trim());
+            localStorage.setItem('mdv_repo', repo.trim());
+            localStorage.setItem('mdv_autoload', autoLoad);
+
+            updateUILanguage(language.trim());
+        }
+
+        async function sendQuestion() {
+            const provider = localStorage.getItem('mdv_provider') || 'google';
+            const modelSelect = document.getElementById('modelSelect');
+            const model = modelSelect ? modelSelect.value : (localStorage.getItem('mdv_model') || CONFIG.providers[provider].models[0]);
+            const apiKey = localStorage.getItem(`mdv_${provider}_api_key`);
+
+            const cleanModel = model.trim();
+
+            if (!apiKey) {
+                alert('Please set up your API key in the settings first!');
+                toggleSettings();
+                return;
+            }
+
+            const popup = document.getElementById('chatContainer');
+            const textarea = popup.querySelector('textarea');
+            const question = textarea.value.trim();
+            const messages = popup.querySelector('.chat-messages');
+
+            if (!question || !currentSelection) return;
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-message user';
+            userMsg.textContent = question;
+            messages.appendChild(userMsg);
+
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'chat-message system loading';
+            messages.appendChild(loadingMsg);
+
+            let apiUrl;
+            let requestBody;
+
+            switch (provider) {
+                case 'google':
+                    apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModel}:generateContent`;
+                    requestBody = {
+                        contents: [{
+                            role: "user",
+                            parts: [{
+                                text: `You are a helpful assistant and answer in the language the question was asked using markdown format. Math should be formated as $mathExp$ or $$mathExp$$. Answer based on this context:\n${currentSelection}\n\nThe quesion was: "${question}"`
+                            }]
+                        }],
+                        generationConfig: {
+                            "temperature": 0.6,
+                            "topK": 40,
+                            "topP": 0.95,
+                            "maxOutputTokens": 8192
+                        }
+                    };
+                    break;
+
+                case 'openai':
+                    apiUrl = 'https://api.openai.com/v1/chat/completions';
+                    requestBody = {
+                        model: cleanModel,
+                        messages: [{
+                            role: "system",
+                            content: "You are a helpful assistant that answers in markdown format. Math should be formatted as $mathExp$ or $$mathExp$$."
+                        }, {
+                            role: "user",
+                            content: `Context:\n${currentSelection}\n\nQuestion: ${question}`
+                        }],
+                        temperature: 0.6,
+                        max_tokens: 2000
+                    };
+                    break;
+
+                case 'anthropic':
+                    apiUrl = 'https://api.anthropic.com/v1/messages';
+                    requestBody = {
+                        model: cleanModel,
+                        messages: [{
+                            role: "user",
+                            content: `Context:\n${currentSelection}\n\nQuestion: ${question}`
+                        }],
+                        system: "You are a helpful assistant that answers in markdown format. Math should be formatted as $mathExp$ or $$mathExp$$.",
+                        max_tokens: 2000
+                    };
+                    break;
+
+                case 'llama':
+                    apiUrl = 'https://api.meta.ai/v1/chat/completions';
+                    requestBody = {
+                        model: cleanModel,
+                        messages: [{
+                            role: "system",
+                            content: "You are a helpful assistant that answers in markdown format. Math should be formatted as $mathExp$ or $$mathExp$$."
+                        }, {
+                            role: "user",
+                            content: `Context:\n${currentSelection}\n\nQuestion: ${question}`
+                        }],
+                        temperature: 0.7,
+                        max_tokens: 2000,
+                        frequency_penalty: 0,
+                        presence_penalty: 0
+                    };
+                    break;
+
+                default:
+                    loadingMsg.className = 'chat-message system error';
+                    loadingMsg.textContent = 'Unsupported provider';
+                    return;
+            }
+
+            if (CONFIG.useServer) {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                // Add provider-specific headers
+                switch (provider) {
+                    case 'google':
+                        headers['x-goog-api-key'] = apiKey;
+                        break;
+                    case 'openai':
+                        headers['Authorization'] = `Bearer ${apiKey}`;
+                        break;
+                    case 'anthropic':
+                        headers['x-api-key'] = apiKey;
+                        headers['anthropic-version'] = '2023-06-01';
+                        break;
+                    case 'llama':
+                        headers['Authorization'] = `Bearer ${apiKey}`;
+                        break;
+                }
+
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(requestBody)
+                })
+                    .then(response => {
+                        if (response.status === 401) {
+                            throw new Error('Invalid API key. Please check the key in the settings.');
+                        }
+                        else if (response.status === 404) {
+                            throw new Error('The API endpoint was not found. Please check the URL.');
+                        }
+                        else if (response.status === 429) {
+                            throw new Error('You have reached the API quota limit. Please try again later.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let generatedText;
+
+                        // Extract response based on provider
+                        switch (provider) {
+                            case 'google':
+                                generatedText = data.candidates[0].content.parts[0].text;
+                                break;
+                            case 'openai':
+                                generatedText = data.choices[0].message.content;
+                                break;
+                            case 'anthropic':
+                                generatedText = data.content[0].text;
+                                break;
+                            case 'llama':
+                                generatedText = data.choices[0].message.content;
+                                break;
+                        }
+
+                        if (generatedText) {
+                            loadingMsg.className = 'chat-message system collapsed';
+                            loadingMsg.innerHTML = `
+                <div class="context-header non-selectable" onclick="toggleContext(this)">
+                <span class="toggle material-symbols-rounded">expand_more</span>
+                Context
+                </div>
+                <div class="context-content">${currentSelection}</div>
+                ${renderMarkdown(generatedText)}
+                            `;
+
+                            renderMathIn(loadingMsg);
+                            MathJax.typeset([loadingMsg]);
+                        } else {
+                            throw new Error('Could not extract generated text from the response.');
+                        }
+                    })
+                    .catch(error => {
+                        loadingMsg.className = 'chat-message system error';
+                        loadingMsg.textContent = error.message || 'Sorry, I had trouble analyzing that. Please try again.';
+                        console.error(error);
+                    });
+            } else {
+                // Demo mode response
+                const generatedText = `Demo response: Your selection was "${currentSelection.substring(0, 100)}...
+Here is some code: 
+
+\`\`\`python
+def hello_world():
+    print('Hello, World!')
+\`\`\`
+
+And here is some math: $x^2 + y^2 = z^2$
+
+- What you should know? But here is some inline code: \`\`return me\`\`. See?
+- What can we do with this?
+
+1. Lets see
+    - Try out
+        - even this works
+2. Try out
+`;
+                loadingMsg.className = 'chat-message system collapsed';
+                loadingMsg.innerHTML = `
+                <div class="context-header non-selectable" onclick="toggleContext(this)">
+                <span class="toggle material-symbols-rounded">expand_more</span>
+                Context
+                </div>
+                <div class="context-content">${currentSelection}</div>
+                ${renderMarkdown(generatedText)}
+                `;
+                
+                renderMathIn(loadingMsg);
+                MathJax.typeset([loadingMsg]);
+            }
+
+            textarea.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function renderMarkdownInput(markdownInput) {
+            const markdownText = markdownInput.value.trim();
+            if (markdownText) {
+                showPreview(markdownText, 'Direct Input');
+                markdownInput.value = '';
+            } else {
+                alert('Please enter some Markdown text first.');
+            }
+        }
+
+        function init() {
+            initEventListeners();
+            initThemeDetection();
+            handleResize();
+
+            const storedLanguage = localStorage.getItem('mdv_language');
+            if (storedLanguage) {
+                updateUILanguage(storedLanguage);
+            }
+
+            document.querySelector('.chat-input textarea').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendQuestion();
+            }
+            });
+
+            const autoLoad = localStorage.getItem('mdv_autoload');
+            if (autoLoad === 'true') {
+                loadFromGithub();
+            } else {
+                DOM.mainView.classList.remove('hidden');
+                DOM.initialLoader.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+
+    </script>
+
+</body>
+
+</html>
