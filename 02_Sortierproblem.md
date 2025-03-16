@@ -42,7 +42,7 @@ Beschränkt eine Funktion $f$ asymptotisch nach oben und unten.
 
 $$\Theta(g)=\{f : \exists c_1, c_2 \in \mathbb{R}_{>0}, n_0 \in \mathbb{N}, \forall{n \geq n_0}, 0 \leq c_1g(n)\leq f(n) \leq c_2g(n)\}$$
 
-![Theta-Notation Beispiel\label{fig:theta-notation}](utils/theta-notation.png){ height=20% }
+![Theta-Notation Beispiel\label{fig:theta-notation}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/theta-notation.png){ width=12rem }
 
 ### O-Notation - Big-O-Notation
 
@@ -53,7 +53,7 @@ Beschränkt eine Funktion $f$ asymptotisch nach oben. Wird vor allem deshalb in 
 
 $$O(g)=\{f : \exists c \in \mathbb{R}_{>0},n_0 \in \mathbb{N},\forall{n\geq n_0,0 \leq f(n) \leq cg(n)}\}$$
 
-![O-Notation Beispiel](utils/o-notation.png){ height=20% }
+![O-Notation Beispiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/o-notation.png){ width=12rem }
 
 #### Rechenregeln
 
@@ -71,7 +71,7 @@ Beschränkt eine Funktion $f$ asymptotisch nach unten.
 
 $$\Omega(g)=\{f : \exists c \in \mathbb{R}_{>0},n_0 \in \mathbb{N}, \forall{n\geq n_0}, 0\leq cg(n) \leq f(n)\}$$
 
-![Omega-Notation Beispiel](utils/omega-notation.png){ height=20% }
+![Omega-Notation Beispiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/omega-notation.png){ width=12rem }
 
 ### $\omega$-Notation
 
@@ -139,6 +139,7 @@ Ein Sortierverfahren ist dann stabil, wenn es die ursprüngliche Reihenfolge der
 Insertionsort ist ein [stabiler](#stabilität) Sortieralgorithmus.
 
 ### Algorithmus
+
 ```
 insertionSort(A):
     FOR i=1 TO A.length-1 DO
@@ -209,11 +210,11 @@ Mit korrekter Anwendung kann die Laufzeit auch $\leq T(n)=O(n^2)$ sein.
 Der Comparator von Insertion-Sort vergleicht hier die Strings nach ihrer Länge.
 Je länger ein String, desto weiter vorne in der sortierten Liste befindet er sich. 
 
-![Initialarray](utils/insertion_sort_initial.png)
+![Initialarray](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/insertion_sort_initial.png)
 
-![Insertion-Sort Schritte](utils/insertion_sort_steps.png)
+![Insertion-Sort Schritte](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/insertion_sort_steps.png)
 
-\newpage
+
 
 ## Bubble Sort
 
@@ -228,7 +229,7 @@ bubbleSort(A):
             IF A[j]>A[j+1] THEN SWAP(A[j], A[j+1]);
 ```
 
-\textbf{Laufzeit}: $O(n^2)$
+**Laufzeit**: $O(n^2)$
 
 #### Herleitung
 In der ersten `FOR`-Schleife wird eine Variable $i$ mit `A.length-1` initiiert und stetig dekrementiert. Die zweite `FOR`-Schleife wird $i-1$ Male durchlaufen. Somit werden für jeden `FOR`-Schleifen Durchlauf $1+i-1=i$ Schritte benötigt. Dies entspricht dann:
@@ -254,8 +255,6 @@ Mergesort ist ein [stabiler](#stabilität) Sortieralgorithmus.
 
 ### Algorithmen
 
-\begin{minipage}[t]{.7\linewidth}
-\vspace{0pt}
 ```
 merge(A,l,m,r):
     pl = l;
@@ -269,9 +268,6 @@ merge(A,l,m,r):
             pr = pr+1;
     FOR i = 0 TO r-l DO A[i+l] = B[i];
 ```
-\end{minipage}
-\begin{minipage}[t]{.3\linewidth}
-\vspace{0pt}
 
 ```
 mergeSort(A,l,r):
@@ -281,9 +277,8 @@ mergeSort(A,l,r):
         mergeSort(A,m+1,r);
         merge(A,l,m,r);
 ```
-\end{minipage}
 
-\textbf{Laufzeit}: $O(n \log {n})$
+**Laufzeit**: $O(n \log {n})$
 
 ### Korrektheit
 
@@ -316,13 +311,13 @@ Ferner gilt: $B[i-1] \leq A[pl],A[pr]$
     - Nach Ende der FOR-Schleife (`i=right-left+1`) folgt aus `i=p-left+q-(mid+1)` und `p=<mid+1, q=<right+1`, dass `q=right+1` und `p=mid+1`
     - Also besteht `B[0...right-left]` aus `A[left...mid]`,`A[mid+1...right]` und ist sortiert
 
-\newpage
+
 
 ### Beispiel
 
-![Beispiel Mergesort\label{fig:merge-sort}](utils/mergesort.png){ width=80%}
+![Beispiel Mergesort\label{fig:merge-sort}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/mergesort.png){ width="80%", max-width="min(35rem, 90%)"}
 
-\newpage
+
 
 ## Quicksort
 
@@ -343,8 +338,6 @@ Quicksort ist **kein** [stabiler](#stabilität) Sortieralgorithmus
 
 ### Algorithmen
 
-\begin{minipage}[t]{.5\linewidth}
-\vspace{0pt}
 ```
 quicksort(A,left,right):
     IF left < right THEN
@@ -353,12 +346,10 @@ quicksort(A,left,right):
         quicksort(A,q+1,right);
 ```
 
-\textbf{Laufzeit} - Worst Case: $\Theta(n^2)$
+**Laufzeit** - Worst Case: $\Theta(n^2)$
 
-\textbf{Laufzeit} - Randomisiert: $\Theta(n \log n)$
+**Laufzeit** - Randomisiert: $\Theta(n \log n)$
 \end{minipage}
-\begin{minipage}[t]{.5\linewidth}
-\vspace{0pt}
 
 ```
 partition(A,left,right):
@@ -370,7 +361,6 @@ partition(A,left,right):
         IF p < q THEN Swap(A[p],A[q]);
     return q
 ```
-\end{minipage}
 
 ### Korrektheit von `partition`
 
@@ -382,7 +372,7 @@ Beim Eintritt in die `WHILE`-Schleife enthalten `A[left...p]` nur Elemente $\leq
 
 Siehe Abbildung \ref{fig:quick-sort}
 
-![Beispiel Quicksort\label{fig:quick-sort}](utils/quicksort.jpg){ width=70%}
+![Beispiel Quicksort\label{fig:quick-sort}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/quicksort.jpg){ width="70%", max-width="min(40rem, 90%)"}
 
 ## Radix Sort
 
@@ -390,8 +380,6 @@ Radix Sort ist ein [stabiler](#stabilität) Sortieralgorithmus
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.7\linewidth}
-\vspace{0pt}
 ```
 radixSort(A):
 // keys: d digits in range [0,D-1]
@@ -407,10 +395,7 @@ radixSort(A):
             B[k].size=0; // clear bucket again
     return A
 ```
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.3\linewidth}
-\vspace{0pt}
+
 ```
 putBucket(A,B,i,j):
     z=A[j].digit[i];
@@ -418,7 +403,6 @@ putBucket(A,B,i,j):
     B[z][b]=A[j];
     B[z].size=B[z].size+1;
 ```
-\end{minipage}
 
 ### Korrektheit
 
@@ -428,7 +412,7 @@ Nach Eintritt in die erste Schleife ist der Array gemäß der letzten `i` Ziffer
 
 #### Induktion
 
-&nbsp;
+
 
 **Induktionsanfang** $i=1$: Gilt nach erster Iteration, weil nach letzter Ziffer sortiert wird
 
@@ -457,7 +441,7 @@ Wenn $(i+1)$-te Ziffer gleich, dann steht nach Induktionsvoraussetzung der auf l
 
 Siehe Abbildung \ref{fig:radix-sort}
 
-![Beispiel Radix Sort\label{fig:radix-sort}](utils/radix-sort-example.png){ width=70% }
+![Beispiel Radix Sort\label{fig:radix-sort}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/radix-sort-example.png){ width="70%", max-width="min(25rem, 90%)"}
 
 ## Mastertheorem
 
@@ -484,5 +468,3 @@ Daraus folgt $\log_{b}{(a)} < 1,59 < 2$. Wir sind also im Fall 3 des Mastertheor
 
 > Es sind $a = \sqrt{2} \geq 1$ und $b = 2 > 1$ konstant, und es
 gilt $f(n) = \log{(n)} \geq 0$ für alle $n \in N$. Daraus folgt $\log_{b}{(a)} = \frac{1}{2}$. Wir sind also im Fall 1 des Mastertheorems denn $f(n) \in O(n^{1/2-\varepsilon})$ für ein $\varepsilon > 0$ (z. B. mit $\varepsilon = 1/10$), und wir erhalten $T(n) \in \Theta(\sqrt{n})$
-
-\newpage

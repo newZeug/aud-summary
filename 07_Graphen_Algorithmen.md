@@ -6,9 +6,6 @@
 
 ### Beispiel
 
-\begin{minipage}[c]{0.5\linewidth}
-\vspace{0pt}
-
 \begin{tikzpicture}[auto, node distance=3cm, every loop/.style={},
                     thick,main node/.style={circle,draw,font=\normalsize}]
     \node[main node] (1) {A};
@@ -25,25 +22,21 @@
     \draw (4) -- (5);
 \end{tikzpicture}
     
-\end{minipage}
-\begin{minipage}[c]{0.5\linewidth}
-    \vspace{0pt}
-    $\texttt{adj(G,A)}=\begin{bmatrix}
-        0 \\
-        1 \\
-        0 \\
-        1 \\
-        0
-    \end{bmatrix},
-    ~\cdots,
-    ~\texttt{adj(G,E)}=\begin{bmatrix}
-        0 \\
-        0 \\
-        1 \\
-        1 \\
-        0
-    \end{bmatrix}$
-\end{minipage}
+$\texttt{adj(G,A)}=\begin{bmatrix}
+    0 \\
+    1 \\
+    0 \\
+    1 \\
+    0
+\end{bmatrix},
+~\cdots,
+~\texttt{adj(G,E)}=\begin{bmatrix}
+    0 \\
+    0 \\
+    1 \\
+    1 \\
+    0
+\end{bmatrix}$
 
 ## Graphen
 
@@ -119,7 +112,7 @@ Eine mögliche topologische Sortierung für den Graph $S$ lautet dann $G \righta
 Graph $G=(V,E)$ ist ein Baum, wenn $V$ leer ist oder es einen Knoten $r \in V$ ("Wurzel") gibt, so dass jeder Knoten $v$ von der Wurzel aus per eindeutigem Pfad erreichbar ist.
 
 ### Darstellung als Matrix
-Für einen Graphen $G=(V,E)$ wobei $V=\{1,2,3,4,5,6\}$, $E=\{(1,4),(1,5),(2,1),(2,2),(4,2),(5,6),(6,4)\}$ gilt, sieht die Matrix wie folgt aus:
+Für einen Graphen $G=(V,E)$ wobei $$V=\{1,2,3,4,5,6\}$$, $$E=\{(1,4),(1,5),(2,1),(2,2),(4,2),(5,6),(6,4)\}$$ gilt, sieht die Matrix wie folgt aus:<>
 
 $A=\begin{bmatrix}
     0 & 0 & 0 & 1 & 1 & 0 \\
@@ -139,7 +132,7 @@ Eine starke Zusammenhangskomponente eines gerichteten Graphen $G=(V,E)$ ist eine
 (a) es zwischen je zwei Knoten $u,v \in C$ einen Pfad von $u$ nach $v$ gibt, und 
 (b) es keine Menge $D \subseteq V$ mit $C \subsetneq D$ gibt, für die (a) auch gilt
 
-![Beispiel](utils/starke-zusammenhangskomponente.png){ height=10% }
+![Beispiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/starke-zusammenhangskomponente.png){ max-width="min(15rem, 90%)"}
 
 ## Breadth-First Search (BFS)
 
@@ -155,8 +148,6 @@ Besuche zuerst alle unmittelbaren Nachbarn, danach deren Nachbarn, usw.
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 BFS(G,s):
     FOREACH u in V-{s} DO
@@ -176,10 +167,8 @@ BFS(G,s):
                 enqueue(Q,v);
         u.color=BLACK;
 ```
-\textbf{Laufzeit}: $O(|V|+|E|)$
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $O(|V|+|E|)$
+
 ```
 SHORTEST-PATH(G,s,v):
     IF v==s THEN
@@ -191,8 +180,7 @@ SHORTEST-PATH(G,s,v):
             SHORTEST-PATH(G,s,v.pred);
             return v;
 ```
-\textbf{Laufzeit}: $O(|V|)$
-\end{minipage}
+**Laufzeit**: $O(|V|)$
 
 ### Korrektheit
 
@@ -207,9 +195,9 @@ d.h. enthält alle von $s$ aus erreichbaren Knoten in $G$ und für jeden Knoten 
 
 ### Beispiel
 
-![Graph $G$](utils/bfs_graph.png){ width=80% }
+![Graph $G$](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/bfs_graph.png){ width=80% }
 
-![](utils/bfs_table.png){ width=50% } ![](utils/bfs_table_as_graph.png){ width=50% }
+![](utils/bfs_table.png){ width=50% } ![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/bfs_table_as_graph.png){ width=20rem }
 
 ## Depth-First Search (DFS)
 
@@ -217,8 +205,6 @@ Besuche zuerst alle noch nicht besuchten Nachfolgeknoten ("Laufe so weit wie mö
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 DFS(G):
     // G=(V,E)
@@ -231,10 +217,8 @@ DFS(G):
         IF u.color==WHITE THEN
             DFS-VISIT(G,u)
 ```
-\textbf{Laufzeit}: $O(|V|+|E|)$
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $O(|V|+|E|)$
+
 ```
 DFS-VISIT(G,u):
     time=time+1;
@@ -248,21 +232,20 @@ DFS-VISIT(G,u):
     time=time+1;
     u.finish=time;
 ```
-\end{minipage}
 
 ### Beispiel
 
 Erste Ausführung von DFS:
 
-![](utils/dfs_graph.png){ width=50% } ![](utils/dfs_table.png){ width=50% }
+![](utils/dfs_graph.png){ width=50% } ![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/dfs_table.png){ width=20rem }
 
 Zweite Ausführung von DFS mit umgekehrten Kanten:
 
-![](utils/dfs_graph_t.png){ width=50% } ![](utils/dfs_table_t.png){ width=50% }
+![](utils/dfs_graph_t.png){ width=50% } ![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/dfs_table_t.png){ width=20rem }
 
 Somit sind die Zusammenhangskomponenten:
 
-![](utils/dfs_zsmhk.png){ width=50% }
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/dfs_zsmhk.png){ width=20rem }
 
 ### Kanten
 
@@ -309,21 +292,19 @@ minimal für alle Spannbäume von $G$ ist.
 
 ### Terminologie
 
-![Graph](utils/graph.png){ width=80% }
+![Graph](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/graph.png){ width=80% }
 
 - **Schnitt** partitioniert Knoten des Graphen in zwei Mengen
-
     - Hier: $S=\{4,5\}$ und $S=\{1,2,3\}$
 
 - **überbrückender Schnitt**, wenn $u \in S$ und $v \in V-S$
-
     - Hier: Kanten $\{2,5\}$ und $\{2,4\}$, wobei $\{2,5\}$ eine **leichte** Kante ist
 
 - **Schnitt respektiert $A \subseteq E$**, wenn keine Kante $\{u,v\}$ aus **$A$** den Schnitt überbrückt
 
 ### Beispiel
 
-![Minimaler Spannbaum](utils/minimal_spanning_tree.png){ width=30% }
+![Minimaler Spannbaum](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/minimal_spanning_tree.png){ width=30% }
 
 ### Generic-Algorithmus
 
@@ -336,7 +317,7 @@ genericMST(G,w):
     return A
 ```
 
-&nbsp;
+
 
 #### Terminierung
 
@@ -365,8 +346,6 @@ Da in jeder Iteration nur sichere Kanten hinzugefügt werden (für die $A \cup \
 
 #### Algorithmus
 
-&nbsp;
-
 ```
 MST-Prim(G,w,r):
     // r root in V, MST given through v.pred values
@@ -380,10 +359,9 @@ MST-Prim(G,w,r):
                 v.key=w({u,v}); 
                 v.pred=u;
 ```
-
 **Laufzeit**: $O(E+|V| \cdot \log{|V|})$
 
-![](utils/prim_graph.png){ width=35% } ![](utils/prim_table.png){ width=65% }
+![](utils/prim_graph.png){ width=35% } ![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/prim_table.png){ max-width="min(40rem, 90%)"}
 
 
 ### Kruskal-Algorithmus
@@ -401,10 +379,8 @@ MST-Prim(G,w,r):
 1. **Minimaler Spannbaum:**
     - Stoppe, wenn alle Knoten im minimalen Spannbaum enthalten sind.
 
-\newpage
-
 #### Algorithmus
-&nbsp;
+
 ```
 MST-Kruskal(G,w):
     A=$emptySet
@@ -416,12 +392,11 @@ MST-Kruskal(G,w):
             UNION(G,u,v);
     return A
 ```
-
 **Laufzeit**: $O(|E|+\log{|V|})$
 
 **Laufzeit mit Optimierung**: $O(|E|+\log{|E|})$
 
-![](utils/kruskal_graph.png){ width=35% } ![](utils/kruskal_table.png){ width=65% }
+![](utils/kruskal_graph.png){ max-height=15rem } ![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/kruskal_table.png){ width=80%, max-width="min(35rem, 90%)"}
 
 ### Sichere Kante
 
@@ -432,19 +407,14 @@ Dann ist $\{u, v\}$ sicher für $A$.
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 relax(G,u,v,w):
     IF v.dist > u.dist + w((u,v)) THEN
         v.dist=u.dist + w((u,v));
         v.pred=u;
 ```
-\textbf{Idee}: Verringere aktuelle Distanz von Knoten $v$, wenn durch Kante {(u, v)} kürzere Distanz erreichbar. 
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.4\linewidth}
-\vspace{0pt}
+**Idee**: Verringere aktuelle Distanz von Knoten $v$, wenn durch Kante {(u, v)} kürzere Distanz erreichbar. 
+
 ```
 initSSSP(G,s,w):
     FOREACH v in V DO
@@ -452,7 +422,6 @@ initSSSP(G,s,w):
         v.pred=nil;
     s.dist=0;
 ```
-\end{minipage}
 
 ### Bellman-Ford
 
@@ -469,7 +438,7 @@ Der Bellman-Ford-Algorithmus löst das Problem, den kürzesten Weg von einem Sta
 **Wichtig:** Achte darauf, Zyklen mit negativem Gewicht auszuschließen.
 
 #### Algorithmus
-&nbsp;
+
 ```
 Bellman-Ford-SSSP(G,s,w):
     initSSSP(G,s,w);
@@ -488,8 +457,6 @@ Bellman-Ford-SSSP(G,s,w):
 
 #### Algorithmus
 
-&nbsp;
-
 ```
 TopoSort-SSSP(G,s,w):
     // G dag
@@ -500,10 +467,7 @@ TopoSort-SSSP(G,s,w):
         FOREACH v in adj(u) DO
             relax(G,u,v,w)
 ```
-
 **Laufzeit**: $O(|V| + |E|)$
-
-\newpage
 
 ### Dijkstra
 
@@ -518,8 +482,6 @@ TopoSort-SSSP(G,s,w):
 1. Fortsetzen, bis die Distanz zum Zielknoten berechnet wurde (single-pair shortest path) oder die Distanzen aller Knoten zum Startknoten bekannt sind (single-source shortest path).
 
 #### Algorithmus
-
-&nbsp;
 
 ```
 Dijkstra-SSSP(G,s,w):
@@ -540,8 +502,6 @@ Dijkstra-SSSP(G,s,w):
 #### Vorgehen
 
 #### Algorithmus
-
-&nbsp;
 
 ```
 A*(G,s,t,w):
@@ -596,9 +556,7 @@ $G_f=(V,E_f) ~ \text{mit} ~ E_f=\{(u,v)\in V \times V ~|~c_f(u,v)>0\}$
 
 Siehe Abbildung \ref{fig:restkapazitaets-graph}
 
-![Beispiel Restkapazitäts-Graph\label{fig:restkapazitaets-graph}](utils/restkapazitaets_graph.png){ width=70% }
-
-\newpage
+![Beispiel Restkapazitäts-Graph\label{fig:restkapazitaets-graph}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/restkapazitaets_graph.png){ max-width="min(30rem, 90%)"}
 
 #### Vorgehen
 
@@ -616,8 +574,6 @@ Siehe Abbildung \ref{fig:restkapazitaets-graph}
 
 #### Algorithmus
 
-&nbsp;
-
 ```
 Ford-Fulkerson(G,s,t,c):
     FOREACH e in E DO e.flow=0;
@@ -629,7 +585,6 @@ Ford-Fulkerson(G,s,t,c):
             ELSE
                 e.flow=e.flow - c_flow(p)
 ```
-
 **Laufzeit mit Edmonds-Karb Verbesserung**: $O(|V| \cdot |E|^2)$
 
 **Laufzeit mit maximalem Fluss $f^*$**: $O(|E| \cdot u \cdot |f^*|)$
@@ -638,11 +593,9 @@ Ford-Fulkerson(G,s,t,c):
 #### Beispiel
 Siehe Abbildung \ref{fig:ford-fulkerson} für ein Beispiel welches zur Pfadsuche [DFS](#depth-first-search-dfs) verwendet und immer den kleinsten Knoten zuerst bzw. Knoten $t$ vor allen anderen Knoten wählt.
 
-![Initialzustand](utils/ford_fulkerson-init.png){ width=25% }
+![Initialzustand](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/ford_fulkerson-init.png){ width=25% }
 
-![Beispiel Ford-Fulkerson\label{fig:ford-fulkerson}](utils/ford_fulkerson.png){ width=85% }
-
-\newpage
+![Beispiel Ford-Fulkerson\label{fig:ford-fulkerson}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/ford_fulkerson.png){ width=85% }
 
 ### Max-Flow Min-Cut Theorem
 
@@ -653,5 +606,3 @@ Sei $f: V \times V \rightarrow \mathbb{R}$ Fluss für ein Flussnetzwerk $G=(V,E)
 3. $|f| = \min{(c(S,V-S))}$ mit $s \in S$ und $t \in V-S$,
 
 wobei $c(S,V-S) = \sum_{u \in S}{\sum_{v \in V-S}{c(u,v)}}$ für $s \in S$ und $t \in V-S$ die **Kapazität eines Schnitts $(S,V-S)$** ist.
-
-\newpage

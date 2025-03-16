@@ -39,8 +39,6 @@ search(L,k):
 ```
 **Beachte**: Im schlimmsten Fall wird Suche in ursprünglicher Liste beendet.
 
-&nbsp;
-
 ```
 insert(L,k):
     // Folge Suchpfad von k
@@ -63,7 +61,7 @@ Im Durchschnitt $\frac{n}{1-p}$
 
 ### Beispiel
 
-![Beispiel Skip List](utils/skip_list.png)
+![Beispiel Skip List](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/skip_list.png){ max-width="min(45rem, 90%)"}
 
 ## Bloom-Filter
 
@@ -79,8 +77,6 @@ Im Durchschnitt $\frac{n}{1-p}$
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 initBloom(X,BF,H):
     // H array of functions H[j]
@@ -90,9 +86,7 @@ initBloom(X,BF,H):
         FOR j=0 TO H.length-1 DO
             BF[H[j](X[i])]=1;
 ```
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+
 ```
 searchBloom(BF,H,y):
     // H array of functions H[j]
@@ -102,10 +96,7 @@ searchBloom(BF,H,y):
         result=result AND BF[H[j](y)];
     return result;
 ```
-\textbf{Laufzeit}: $O(1)$
-\end{minipage}
-
-&nbsp;
+**Laufzeit**: $O(1)$
 
 ```
 bloomUnion(BF1, BF2):
@@ -117,9 +108,6 @@ bloomUnion(BF1, BF2):
             BF[i] = 0;
     return BF;
 ```
-
-&nbsp;
-
 
 ### Löschproblem
 
@@ -152,5 +140,3 @@ Operation | Laufzeit
 Einfügen | $\Theta(\log{1})$ - Sogar Worst-Case
 Löschen | $\Theta(\log{1})$
 Suchen | $\Theta(\log{1})$
-
-\newpage

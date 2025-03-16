@@ -14,4 +14,4 @@ $\Theta(n!)$ |Faktoriell|Permutation
 
 *wenn der Algorithmus geschickt implementiert ist
 
-\newpage
+

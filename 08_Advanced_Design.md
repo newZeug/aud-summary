@@ -32,8 +32,6 @@ PolyEval(p,n,w):
 ```
 **Laufzeit**: $\Theta (n)$
 
-&nbsp;
-
 #### Polynommultiplikation
 
 Durch die Verwendung der Fourier-Transformation kann die Multiplikation von Polynomen effizienter durchgeführt werden.
@@ -101,7 +99,7 @@ für alle $i=0,1,...,\frac{m}{2}-1$.
 
 Ferner ist $\omega_m^2$ eine $\frac{m}{2}$-te primitive Einheitswurzel, da $\left(\omega_m^2\right)^{m/2}=\omega_m^m=1$ und $\left(\omega_m^2\right)^i=\omega_m^{2i}\neq 1$ für $i=1,2,...,\frac{m}{2}-1$ (und somit $2i=2,4,...,m-2$)
 
-![$m$-te Einheitswurzel](utils/n-te-einheitswurzel.png)
+![$m$-te Einheitswurzel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/n-te-einheitswurzel.png){ max-width="min(25rem, 90%)"}
 
 ### DFT
 
@@ -128,8 +126,6 @@ Wir benötigen $2n-1$ Punkt/Werte-Paare. Die Auswertung des Polynoms nach Horner
 Damit wurde die Problemgröße halbiert und somit ist Divide and Conquer anwendbar.
 
 #### Algorithmen
-
-&nbsp;
 
 ```
 FFTWrap(p,n):
@@ -187,11 +183,9 @@ Es gilt $V^{-1}=(\frac{\omega^{-ij}}{m})_{ij}$, denn:
                     \end{cases} &
 \end{flalign*}
 
-\newpage
+
 
 #### Algorithmen
-
-&nbsp;
 
 ```
 IFFTWrap(rVal,n):
@@ -228,7 +222,7 @@ IFFT(rVal,n,w)
 
 Ergänzen Sie die folgende Tabelle zum Aufruf von FFT für das Polynom $x+2x^2+3x^3$.
 
-![FFT-Aufruf](utils/fft_example.png){ width=80% }
+![FFT-Aufruf](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/fft_example.png){ max-width="min(35rem, 90%)"}
 
 ## Backtracking
 
@@ -244,7 +238,7 @@ Probiere alle Möglichkeiten aus, um am Ende zur Gesamtlösung zu kommen. Dafür
 
 Der Aufwand kann je nach Problem exponentiell werden
 
-![Backtracking Beispiel](utils/backtracking.png)
+![Backtracking Beispiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/backtracking.png){ max-width="min(40rem, 90%)"}
 
 ### Backtracking vs DFS
 
@@ -265,7 +259,7 @@ Backtracking kann man als "intelligentere" erschöpfende Suche ansehen, die auss
 
 Speichert sich die Werte vom Vor-Vorgänger, muss demzufolge weniger Berechnungen durchführen und erspart damit womöglich viel Zeit aber vor allem Leistung.
 
-![Fibonacci Overlap](utils/fibonacci.png){ width=50% }
+![Fibonacci Overlap](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/fibonacci.png){ max-width="min(20rem, 90%)"}
 
 ### Minimum Edit Distance - Levenshtein-Distanz
 
@@ -295,7 +289,7 @@ MinEditDist(X,Y,m,n):
 
 Siehe Abbildung \ref{fig:minimum-edit-distance}
 
-![Minimum Edit Distance Bespiel\label{fig:minimum-edit-distance}](utils/minimum_edit_distance.png)
+![Minimum Edit Distance Bespiel\label{fig:minimum-edit-distance}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/minimum_edit_distance.png){ max-width="min(50rem, 90%)"}
 
 ## Greedy Algorithmen
 
@@ -307,7 +301,7 @@ Greedy-Algorithmen sind in der Informatik einfache Entscheidungsmethoden, bei de
 
 Der Algorithmus funktioniert zwar oft, manchmal ist er aber zu "gierig". Ein Beispiel dafür ist folgendes:
 
-![Beispiel Dijkstra Limitierung\label{fig:dijkstra-limitation}](utils/dijkstra_limitation.png){ width=30% }
+![Beispiel Dijkstra Limitierung\label{fig:dijkstra-limitation}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/dijkstra_limitation.png){ max-width="min(15rem, 90%)"}
 
 Hierbei wäre der kosteneffizienteste Weg $1\rightarrow 2 \rightarrow 4 \rightarrow 3 \rightarrow 5$ mit Gewicht $6+2-5+0=3$. Allerdings wählt der Dijkstra Algorithmus den Weg $1 \rightarrow 5$ mit Gewicht $5$. (Abbildung \ref{fig:dijkstra-limitation})
 
@@ -370,5 +364,3 @@ SimulatedAnnealing(P):
 - Bilde durch Überkreuzungen und Mutationen der besten Lösungen
 neue Lösungen
 - Ersetze schlechteste Lösungen durch diese neue Lösungen
-
-\newpage

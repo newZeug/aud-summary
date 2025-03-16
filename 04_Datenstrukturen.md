@@ -38,18 +38,18 @@ Sei ein Stack `S` wie folgt initialisiert:
 
 \tilerow{3,5,4,}
 
-&nbsp;
+
 
 **Operationen auf** `S`:
 
 \begin{tabular}{lll}
-    1) & \texttt{pop(S)} & \tilerow{3,5,,} \\
+    1) & ``pop(S)`` & \tilerow{3,5,,} \\
     \\[-0.7em]
-    2) & \texttt{pop(S)} & \tilerow{3,,,} \\
+    2) & ``pop(S)`` & \tilerow{3,,,} \\
     \\[-0.7em]
-    3) & \texttt{push(S,1)} & \tilerow{3,1,,} \\
+    3) & ``push(S,1)`` & \tilerow{3,1,,} \\
     \\[-0.7em]
-    4) & \texttt{push(S,7)} & \tilerow{3,1,7,} \\
+    4) & ``push(S,7)`` & \tilerow{3,1,7,} \\
 \end{tabular}
 
 ## Queues
@@ -74,18 +74,16 @@ Sei eine Queue `Q` wie folgt initialisiert:
 
 \tilerow{1,2,5,}
 
-&nbsp;
-
 **Operationen auf** `Q`:
 
 \begin{tabular}{lll}
-    1) & \texttt{dequeue(Q)} & \tilerow{,2,5,} \\
+    1) & ``dequeue(Q)`` & \tilerow{,2,5,} \\
     \\[-0.7em]
-    2) & \texttt{enqueue(Q,3)} & \tilerow{,2,5,3} \\
+    2) & ``enqueue(Q,3)`` & \tilerow{,2,5,3} \\
     \\[-0.7em]
-    3) & \texttt{enqueue(Q,4)} & \tilerow{4,2,5,3} \\
+    3) & ``enqueue(Q,4)`` & \tilerow{4,2,5,3} \\
     \\[-0.7em]
-    4) & \texttt{dequeue(Q)} & \tilerow{4,,5,3} \\
+    4) & ``dequeue(Q)`` & \tilerow{4,,5,3} \\
 \end{tabular}
 
 ## Verkettete Listen
@@ -128,8 +126,6 @@ Das Löschen eines Elementes befindet sich - wenn der Zeiger auf dem zu löschen
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.7\linewidth}
-\vspace{0pt}
 ```
 search(L,k):
     current=L.head;
@@ -137,10 +133,8 @@ search(L,k):
         current=current.next;
     return current;
 ```
-\textbf{Laufzeit}: $\Theta (n)$
-\end{minipage}
-\begin{minipage}[t]{0.3\linewidth}
-\vspace{0pt}
+**Laufzeit**: $\Theta (n)$
+
 ```
 insert(L,x):
     x.next=L.head;
@@ -149,13 +143,8 @@ insert(L,x):
         L.head.prev=x;
     L.head=x;
 ```
-\textbf{Laufzeit}: $\Theta (1)$
-\end{minipage}
+**Laufzeit**: $\Theta (1)$
 
-&nbsp;
-
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 delete(L,x):
     IF x.prev != nil THEN
@@ -165,28 +154,23 @@ delete(L,x):
     IF x.next != nil THEN
         x.next.prev=x.prev;
 ```
-\textbf{Laufzeit}: $\Theta (1)$
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $\Theta (1)$
+
 ```
 deleteSent(L,x):
     x.prev.next=x.next;
     x.next.prev=x.prev;
 ```
-\textbf{Laufzeit}: $\Theta (1)$  
-\end{minipage}
+**Laufzeit**: $\Theta (1)$  
 
 ## Binärer Baum
 
 ### Begrifflichkeiten
 
-![Begrifflichkeiten](utils/b-tree-begrifflichkeiten.png){ width=70% }
+![Begrifflichkeiten](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/b-tree-begrifflichkeiten.png){ width="70%", max-width="min(30rem, 90%)"}
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 search(x,k):
     IF x==nil THEN 
@@ -198,26 +182,18 @@ search(x,k):
         return y;
     return search(x.right,k);
 ```
-\textbf{Laufzeit}: $\Theta (n)$  
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $\Theta (n)$  
+
 ```insert(T,x):
     IF T.root != nil THEN
         T.root.parent=x;
         x.left=T.root;
     T.root=x;
 ```
-\textbf{Laufzeit}: $\Theta (1)$
-\newline
-\newline
-\textbf{Vorgehen}: \texttt{x} wird die neue Wurzel und die vorherige Wurzel wird linkes Kind von \texttt{x}
-\end{minipage}
+**Laufzeit**: $\Theta (1)$
 
-&nbsp;
+**Vorgehen**: ``x`` wird die neue Wurzel und die vorherige Wurzel wird linkes Kind von ``x``
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 transplant(T,y,w):
     v=y.parent;
@@ -231,10 +207,8 @@ transplant(T,y,w):
     IF w != nil THEN
         w.parent=v;
 ```
-\textbf{Laufzeit}: $\Theta (1)$  
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $\Theta (1)$
+
 ```
 delete(T,x):
     y=T.rooz; 
@@ -250,22 +224,16 @@ delete(T,x):
             x.right.parent=y;
         transplant(T,x,y);
 ```
-\textbf{Laufzeit}: $\Theta (h)$, wobei h Höhe des Baumes
-\newline
-\newline
-\textbf{Vorgehen}: 
-\newline 
-Nehme rechtesten Knoten von Wurzel \texttt{r}, verbinde Kinder von \texttt{r} mit \texttt{r.parent} und ersetze \texttt{x} durch \texttt{r}.
-\end{minipage}
+**Laufzeit**: $\Theta (h)$, wobei h Höhe des Baumes
 
-&nbsp;
+**Vorgehen**: 
+ 
+Nehme rechtesten Knoten von Wurzel ``r``, verbinde Kinder von ``r`` mit ``r.parent`` und ersetze ``x`` durch ``r``.
 
 ## Binärer Suchbaum
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 search(x,k):
     // 1.Aufruf x=root
@@ -277,10 +245,8 @@ search(x,k):
     ELSE
         return search(x.right,k);
 ```
-\textbf{Laufzeit}: $\Theta (h)$, wobei h Höhe des Baumes  
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $\Theta (h)$, wobei h Höhe des Baumes
+
 ```
 iterative-search(x,k):
     // Aufruf x=root
@@ -292,13 +258,8 @@ iterative-search(x,k):
             x=x.right;
     return x;
 ```
-\textbf{Laufzeit}: $\Theta (h)$, wobei h Höhe des Baumes  
-\end{minipage}
+**Laufzeit**: $\Theta (h)$, wobei h Höhe des Baumes
 
-&nbsp;
-
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 insert(T,z):
     // may insert z again
@@ -321,10 +282,8 @@ insert(T,z):
         ELSE
             px.right=z;
 ```
-\textbf{Laufzeit}: $\Theta (h)$, wobei h Höhe des Baumes  
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $\Theta (h)$, wobei h Höhe des Baumes
+
 ```
 transplant(T,u,v):
     IF u.parent==nil THEN
@@ -337,13 +296,8 @@ transplant(T,u,v):
     IF v != nil THEN
         v.parent=u.parent;
 ```
-\textbf{Laufzeit}: $\Theta (1)$
-\end{minipage}
+**Laufzeit**: $\Theta (1)$
 
-&nbsp;
-
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 delete(T,z):
     IF z.left==nil THEN
@@ -363,27 +317,18 @@ delete(T,z):
             y.left=z.left;
             y.left.parent=y;
 ```
-\textbf{Laufzeit}: $O(h)$ 
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
-\textbf{Vorgehen}:
+**Laufzeit**: $O(h)$
 
-\begin{enumerate}
-\item Knoten \texttt{z} hat nur ein Kind: Ersetze \texttt{z} durch sein Kind.
-\item Knoten \texttt{z} ist ein Blatt: Knoten \texttt{z} löschen.
-\item Knoten \texttt{z} hat zwei Kinder:
-    \begin{enumerate}
-        \item \texttt{z.right} hat kein linkes Kind: \texttt{z} durch \texttt{z.right} ersetzen
-        \item Andernfalls: Ersetze \texttt{y}, den linkesten Knoten von \texttt{z.right}, durch \texttt{y.right} und \texttt{z} durch \texttt{y}.
-    \end{enumerate}
-\end{enumerate}
-\end{minipage}
+**Vorgehen**:
+
+- Knoten ``z`` hat nur ein Kind: Ersetze ``z`` durch sein Kind.
+- Knoten ``z`` ist ein Blatt: Knoten ``z`` löschen.
+- Knoten ``z`` hat zwei Kinder:
+    - ``z.right`` hat kein linkes Kind: ``z`` durch ``z.right`` ersetzen
+    - Andernfalls: Ersetze ``y``, den linkesten Knoten von ``z.right``, durch ``y.right`` und ``z`` durch ``y``.
 
 ### Beispiel
 
 Der binären Suchbaum mit $BS=\{14,24,20,23,21,22\}$, sieht wie folgt aus:
 
-![Binärer Suchbaum Beispiel](utils/binary_searchtree.png){ width=90% }
-
-\newpage
+![Binärer Suchbaum Beispiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/binary_searchtree.png){ width=90% }

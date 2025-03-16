@@ -7,8 +7,8 @@ Ein Rot-Schwarz-Baum ist ein binärer Suchbaum, so dass gilt:
 
 1. Jeder Knoten hat die Farbe rot oder schwarz,
 2. Die Wurzel ist schwarz (sofern der Baum nicht leer),
-3. Wenn ein Knoten rot ist, sind seine Kinder schwarz („Nicht-Rot-Rot“-Regel),
-4. Für jeden Knoten hat jeder Pfad im Teilbaum zu einem Blatt oder Halbblatt die gleiche Anzahl von schwarzen Knoten („gleiche Anzahl schwarz“)
+3. Wenn ein Knoten rot ist, sind seine Kinder schwarz ("Nicht-Rot-Rot"-Regel),
+4. Für jeden Knoten hat jeder Pfad im Teilbaum zu einem Blatt oder Halbblatt die gleiche Anzahl von schwarzen Knoten ("gleiche Anzahl schwarz")
 
 Außerdem gilt, dass
 
@@ -17,7 +17,7 @@ Außerdem gilt, dass
 
 ### Beispiel
 
-![Rot-Schwarz Baum Beispiel](utils/rot_schwarz_baum.png)
+![Rot-Schwarz Baum Beispiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rot_schwarz_baum.png){ max-width="min(40rem, 90%)"}
 
 ### Schwarzhöhe
 
@@ -32,8 +32,6 @@ Ein Rot-Schwarz-Baum mit $n$ Knoten hat maximale Höhe $h \leq 2 \cdot \log_2 {(
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 insert(T,z):
     x=T.root; px=T.sent;
@@ -54,23 +52,13 @@ insert(T,z):
     z.color=red;
     fixColorsAfterInsertion(T,z);
 ```
-\textbf{Laufzeit}: $\Theta (h)=O(\log{n})$
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
-\textbf{Vorgehen}:
-\begin{enumerate}
-    \item Finde Elternknoten $y$ wie im BST
-    \item Färbe neuen Knoten $z$ rot
-    \item Stelle RS-Baum-Bedingungen wieder her
-\end{enumerate}
-\end{minipage}
+**Laufzeit**: $\Theta (h)=O(\log{n})$
 
-&nbsp;
+**Vorgehen**:
+- Finde Elternknoten $y$ wie im BST
+- Färbe neuen Knoten $z$ rot
+- Stelle RS-Baum-Bedingungen wieder her
 
-\noindent
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 rotateRight(T,x):
     y=x.left;
@@ -88,25 +76,17 @@ rotateRight(T,x):
     y.right=x;
     x.parent=y;
 ```
-\textbf{Laufzeit}: $\Theta(1)$
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $\Theta(1)$
+
 ```
 rotateLeft(T,x):
     // Analog zu rotateRight(T,x)
     // Tausche links und rechts
 ```
-\textbf{Laufzeit}: $\Theta(1)$
-\hfill
-\vfill
-\includegraphics[width=\textwidth]{utils/rbt_rotate.png}
-\end{minipage}
+**Laufzeit**: $\Theta(1)$
 
-&nbsp;
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rbt_rotate.png){ max-width="min(25rem, 90%)"}
 
-\begin{minipage}[t]{0.55\linewidth}
-\vspace{0pt}
 ```
 fixColorsAfterInsertion(T,z):
     WHILE z.parent.color==red DO
@@ -129,55 +109,33 @@ fixColorsAfterInsertion(T,z):
             // Tausche links und rechts
     T.root.color=black
 ```
-\textbf{Laufzeit}: $O(h)=O(\log{n})$
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.45\linewidth}
-\vspace{0pt}
-\textbf{Vorgehen}:
-\begin{enum}
-    \item \texttt{z.parent} ist rot:
-    \begin{enum}
-        \item \texttt{z.parent} ist linker Knoten:
-        \begin{enum}
-            \item Bruder \texttt{y} von \texttt{z.parent} ist rot:
-            \begin{enum}
-                \item Farben entsprechend Z. 5-7 anpassen
-                \item \texttt{z} auf \texttt{z.parent.parent} setzen
-            \end{enum}
-            \item Andernfalls:
-            \begin{enum}
-                \item \texttt{z} ist rechter Knoten:
-                \begin{enum}
-                    \item \texttt{z} auf Elternknoten setzen
-                    \item \texttt{z} nach links rotieren
-                \end{enum}
-                \item Farben entsprechend Z. 13-14 anpassem
-                \item \texttt{z.parent.parent} nach rechts rotieren
-            \end{enum}
-        \end{enum}
-        \item Andernfalls:
-        \begin{enum}
-            \item Tausche "links" und "rechts"
-        \end{enum}
-    \end{enum}
-    \item Wurzel schwarz einfärben
-\end{enum}
-\end{minipage}
+**Laufzeit**: $O(h)=O(\log{n})$
+
+**Vorgehen**:
+- ``z.parent`` ist rot:
+    - ``z.parent`` ist linker Knoten:
+        - Bruder ``y`` von ``z.parent`` ist rot:
+            - Farben entsprechend Z. 5-7 anpassen
+            - ``z`` auf ``z.parent.parent`` setzen
+        - Andernfalls:
+            - ``z`` ist rechter Knoten:
+                - ``z`` auf Elternknoten setzen
+                - ``z`` nach links rotieren
+            - Farben entsprechend Z. 13-14 anpassem
+            - ``z.parent.parent`` nach rechts rotieren
+    - Andernfalls:
+        - Tausche "links" und "rechts"
+- Wurzel schwarz einfärben
 
 **Hinweis**: Der Einfachheit halber solltest du ``z`` immer im Baum einzeichnen/markieren!
 
-&nbsp;
-
-![](utils/rbt_fixColorsAfterInsertion.png)
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rbt_fixColorsAfterInsertion.png){ width=100%, max-height=50rem }
 
 **Schleifeninvariante**
 
 1. `z.color==red`
 2. Wenn `z.parent` Wurzel, dann `z.parent.color==black`
-3. Wenn der aktuelle Baum kein Rot-Schwarz-Baum ist, dann weil `z` als Wurzel die Farbe rot hat, oder weil „Nicht-Rot-Rot-Regel“ für `z`, `z.parent` verletzt ist.
-
-&nbsp;
+3. Wenn der aktuelle Baum kein Rot-Schwarz-Baum ist, dann weil `z` als Wurzel die Farbe rot hat, oder weil "Nicht-Rot-Rot-Regel" für `z`, `z.parent` verletzt ist.
 
 ```
 delete(T,z):
@@ -210,12 +168,10 @@ delete(T,z):
         y.color=z.color;
     IF dsh!=nil THEN fixColorsAfterDeletion(T,a,dsh);
 ```
-
 **Laufzeit**: $O(h)=O(\log{n})$
 
 **Vorgehen**: Beim Löschen der Wurzel wird das kleinste Element aus dem rechten Teilbaum bzw. das größte Element aus dem linken Teilbaum zur neuen Wurzel.
 
-&nbsp;
 
 ```
 transplant(T,u,v):
@@ -230,8 +186,6 @@ transplant(T,u,v):
         v.parent=u.parent;
 ```
 **Laufzeit**: $\Theta (1)$  
-
-&nbsp;
 
 ```
 fixColorsAfterDeletion(T,a,dsh):
@@ -268,44 +222,20 @@ fixColorsAfterDeletion(T,a,dsh):
 
 **Fälle**:
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
-\text{$a$ schwarz, $b$ rot}
+$a$ schwarz, $b$ rot
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rbt_fixColorsAfterDeletion_case1.png){ max-width="min(25rem, 90%)"}
 
-\includegraphics[width=\textwidth]{utils/rbt_fixColorsAfterDeletion_case1.png}
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
-\text{$a$ rot, $b$ schwarz, $c, d$ nicht rot}
+$a$ rot, $b$ schwarz, $c, d$ nicht rot
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rbt_fixColorsAfterDeletion_case2a.png){ max-width="min(25rem, 90%)"}
 
-\includegraphics[width=\textwidth]{utils/rbt_fixColorsAfterDeletion_case2a.png}
-\end{minipage}
+$a$ schwarz, $b$ schwarz, $c, d$ nicht rot
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rbt_fixColorsAfterDeletion_case2b.png){ max-width="min(25rem, 90%)"}
 
-&nbsp;
+$a$ beliebig, $b$ schwarz, $c$ rot, $d$ nicht rot
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rbt_fixColorsAfterDeletion_case3.png){ max-width="min(25rem, 90%)"}
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
-\text{$a$ schwarz, $b$ schwarz, $c, d$ nicht rot}
-
-\includegraphics[width=\textwidth]{utils/rbt_fixColorsAfterDeletion_case2b.png}
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
-\text{$a$ beliebig, $b$ schwarz, $c$ rot, $d$ nicht rot}
-
-\includegraphics[width=\textwidth]{utils/rbt_fixColorsAfterDeletion_case3.png}
-\end{minipage}
-
-&nbsp;
-
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
-\text{$a$ beliebig, $b$ schwarz, $c$ beliebig, $d$ rot}
-
-\includegraphics[width=\textwidth]{utils/rbt_fixColorsAfterDeletion_case4.png}
-\end{minipage}
-
-&nbsp;
+$a$ beliebig, $b$ schwarz, $c$ beliebig, $d$ rot
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rbt_fixColorsAfterDeletion_case4.png){ max-width="min(25rem, 90%)"}
 
 ### Worst-Case Laufzeiten
 
@@ -365,60 +295,34 @@ insert(T,z):
             px.right=z;
     fixBalanceAfterInsertion(T,z);
 ```
-
 **Laufzeit**: $O(h)=O(\log{n})$
-
-&nbsp;
-
-\newpage
 
 ``fixBalanceAfterInsertion(T,z)``
 
-\begin{minipage}[c]{0.5\linewidth}
 1. Fall: $z$ ist ein rechtes Kind von $y$, und $y$ ist ein rechtes Kind von $x$ (Rechts-Rechts-Fall). Dann rotiere einmal nach rechts um den Knoten $x$.
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.2\linewidth}
-\includegraphics[width=\textwidth]{utils/rebalance_case1.png}
-\end{minipage}
-\hrule
-\begin{minipage}[c]{0.5\linewidth}
+
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rebalance_case1.png){ max-height=15rem }
+
 2. Fall: $z$ ist ein linkes Kind von $y$, und $y$ ist ein rechtes Kind von $x$ (Links-Rechts-Fall). Dann wird eine Doppelrotation durchgeführt: Zuerst wird einmal nach links um den Knoten $y$, und anschließend einmal nach rechts um den Knoten $x$ rotiert.
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.4\linewidth}
-\includegraphics[width=\textwidth]{utils/rebalance_case2.png}
-\end{minipage}
-\hrule
-\begin{minipage}[c]{0.5\linewidth}
+
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rebalance_case2.png){ width=20rem }
+
 3. Fall: $z$ ist ein linkes Kind von $y$, und $y$ ist ein linkes Kind von $x$ (Links-Links-Fall). Dann rotiere einmal nach
 rechts um den Knoten $x$.
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.2\linewidth}
-\includegraphics[width=\textwidth]{utils/rebalance_case3.png}
-\end{minipage}
-\hrule
-\begin{minipage}[c]{0.5\linewidth}
-4. Fall: $z$ ist ein rechtes Kind von $y$, und $y$ ist ein linkes Kind von $x$ (Rechts-Links-Fall). Dann wird wieder eine Doppelrotation durchgeführt: Zuerst wird einmal nach rechts um den Knoten $y$, und anschließend einmal nach links um den Knoten $x$ rotiert.
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.2\linewidth}
-\includegraphics[width=\textwidth]{utils/rebalance_case4.png}
-\end{minipage}
 
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rebalance_case3.png){ max-height=15rem }
+
+4. Fall: $z$ ist ein rechtes Kind von $y$, und $y$ ist ein linkes Kind von $x$ (Rechts-Links-Fall). Dann wird wieder eine Doppelrotation durchgeführt: Zuerst wird einmal nach rechts um den Knoten $y$, und anschließend einmal nach links um den Knoten $x$ rotiert.
+
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/rebalance_case4.png){ max-height=15rem }
 
 **Laufzeit**: $O(h)$, weil Rebalancieren nur einmal nötig
-
-\newpage
-
 
 ```
 delete(T,z):
     // analog zum binaeren Suchbaum
     // rebalancieren (je nachdem aufsteigend)
 ```
-
 **Laufzeit**: $O(h)=O(\log{n})$
 
 ### Worst-Case Laufzeiten
@@ -484,9 +388,9 @@ FSMMatching(T,func,lenPat):
 
 Existiere ein Automat mit Alphabet $\Sigma =\{a,e,m,r\}$ und Textmuster $P=[m,e,e,r]$.
 
-![Automat](utils/String_matching_automate.png)
+![Automat](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/String_matching_automate.png){ max-width="min(40rem, 90%)"}
 
-Nun sei $T=[a, m, e, r, m, e, m, e, e, r, m, a, m, e, e, r, a]$. Genau dann sieht eine Zustandstabelle wie folgt aus:
+Nun sei $$T=[a, m, e, r, m, e, m, e, e, r, m, a, m, e, e, r, a]$$. Genau dann sieht eine Zustandstabelle wie folgt aus:
 
 $i$ | $T[i]$ | Zustand | L
 --- | ------ | ------- | -
@@ -521,10 +425,7 @@ insert(T,z):
     // 1. Suche analog zum Einfuegen bei BST Einfuegepunkt
     // 2. Spuele neu eingefuegten Knoten per Splay-Operation an die Wurzel
 ```
-
 **Laufzeit**: $O(h)$
-
-&nbsp;
 
 ```
 search(T,k):
@@ -541,14 +442,9 @@ search(T,k):
         splay(T,x);
         return T.root
 ```
-
 **Laufzeit**: $O(h)$
-
 **Vorgehen**: Spüle gesuchte Knoten an die Wurzel
 
-&nbsp;
-
-\begin{minipage}[c]{0.6\linewidth}
 ```
 zigZig(T,z):
     IF z==z.parent.left THEN
@@ -558,46 +454,25 @@ zigZig(T,z):
         rotateLeft(T,z.parent.parent);
         rotateLeft(T,z.parent);
 ```
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.4\linewidth}
-\includegraphics[width=\textwidth]{utils/splay_tree_zigZig.png}
-\end{minipage}
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/splay_tree_zigZig.png){ max-width="min(30rem, 90%)"}
 
 ist eine **Rechts-Rechts-** bzw. **Links-Links-Rotation**
 
-\newpage
-
-\begin{minipage}[c]{0.6\linewidth}
 ```
 zigZag(T,z):
     // analog zu zigZig
 ```
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.4\linewidth}
-\includegraphics[width=\textwidth]{utils/splay_tree_zigZag.png}
-\end{minipage}
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/splay_tree_zigZag.png){ max-width="min(30rem, 90%)"}
 
 Ist eine **Rechts-Links-** bzw. **Links-Rechts-Rotation**
 
-
-&nbsp;
-
-\begin{minipage}[c]{0.6\linewidth}
 ```
 zig(T,z):
     // analog zu zigZig
 ```
-\end{minipage}
-\hfill
-\begin{minipage}[c]{0.4\linewidth}
-\includegraphics[width=\textwidth]{utils/splay_tree_zig.png}
-\end{minipage}
+![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/splay_tree_zig.png){ max-width="min(30rem, 90%)"}
 
 ist eine **einfach Links-** bzw. **Rechts-Rotation**
-
-&nbsp;
 
 ```
 splay(T,z):
@@ -610,10 +485,7 @@ splay(T,z):
             ELSE
                 zigZag(T,z);
 ```
-
 **Laufzeit**: $O(h)$
-
-&nbsp;
 
 ```
 delete(T,z)
@@ -622,14 +494,11 @@ delete(T,z)
 // 3. Spuele groessten Knoten y im linken Teilbaum per Splay-Operation an die Wurzel
 // 4. Haenge rechten Teilbaum rechts an y an
 ```
-
 **Laufzeit**: $O(h)$
 
 ### Laufzeit
 
 Für $m \geq n$ Operationen auf einem Splay-Baum mit maximal $n$ Knoten ist die Worst-Case-Laufzeit $O(m \cdot \log_2{n})$, also $O(\log_2{n})$ pro Operation.
-
-\newpage
 
 ## Heaps
 
@@ -648,12 +517,10 @@ Bei **Min-Heaps** sind die Werte in den Elternknoten jeweils kleiner.
 
 ### Darstellung
 
-![Array](utils/heap1.png){ width=45% } ![Baum](utils/heap2.png){ width=40% }
+![Array](utils/heap1.png){ width="45%", max-width="min(30rem, 90%)"} ![Baum](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/heap2.png){ width="40%", max-width="min(25rem, 90%)"}
 
 ### Algorithmen
 
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
 ```
 insert(H,k):
     H.size=H.size+1;
@@ -664,10 +531,8 @@ insert(H,k):
         SWAP(H.A,i,i.parent);
         i=i.parent;
 ```
-\textbf{Laufzeit}: $O(h)=O(\log{n})$
-\end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-\vspace{0pt}
+**Laufzeit**: $O(h)=O(\log{n})$
+
 ```
 extract-max(H):
     IF isEmpty(H) THEN
@@ -679,10 +544,7 @@ extract-max(H):
         heapify(H,0);
         return max;
 ```
-\textbf{Laufzeit}: $O(h)=O(\log{n})$
-\end{minipage}
-
-&nbsp;
+**Laufzeit**: $O(h)=O(\log{n})$
 
 ```
 heapify(H,i):
@@ -696,10 +558,7 @@ heapify(H,i):
         SWAP(H.A,i,maxind);
         heapify(H,maxind);
 ```
-
 **Laufzeit**: $O(h)=O(\log{n})$
-
-&nbsp;
 
 ```
 buildHeap(H):
@@ -709,14 +568,11 @@ buildHeap(H):
     FOR i = ceil((H.size-1)/2)-1 DOWNTO 0 DO
         heapify(H,i);
 ```
-
 **Laufzeit**: $O(n \cdot h)=O(n \cdot \log{n})$
 
 **Beispiel**
 
-![Anwendung von buildHeap](utils/heap3.png)
-
-&nbsp;
+![Anwendung von buildHeap](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/heap3.png)
 
 ```
 heapSort(H):
@@ -724,7 +580,6 @@ heapSort(H):
     WHILE !isEmpty(H) DO 
         PRINT extract-max(H);
 ```
-
 **Laufzeit**: $O(n \cdot h)=O(n \cdot \log{n})$
 
 ## Priority Queue
@@ -754,7 +609,7 @@ Ein B-Baum (vom Grad $t$) ist ein Baum, bei dem
 3. die Blätter alle die gleiche Höhe haben, und
 4. jeder innerer Knoten mit $n$ Werten $n+1$ Kinder hat, so dass für alle 
 Werte $k_j$ aus dem $j$-ten Kind gilt:
-$$k_0 \leq \texttt{key[0]} \leq k_1 \leq \texttt{key[1]} \leq \cdots \leq k_n-1 \leq \texttt{key[n-1]} \leq k_n$$
+$$k_0 \leq ``key[0]`` \leq k_1 \leq ``key[1]`` \leq \cdots \leq k_n-1 \leq ``key[n-1]`` \leq k_n$$
 
 ### Höhe B-Baum
 
@@ -774,10 +629,7 @@ search(x,k):
             x=x.child[i];
     return nil;
 ```
-
 **Laufzeit**: $O(t \cdot h)=O(\log_t{n})$
-
-&nbsp;
 
 ```
 insert(T,z)
@@ -786,12 +638,9 @@ insert(T,z)
     // Wenn zu besuchendes Kind k 2t-1 Werte, dann split(T,k)
 // Fuege z in Blatt ein
 ```
-
 **Laufzeit**: $O(t \cdot h)=O(\log_t{n})$
 
 **Wichtig**: Denke an die Rekursion. Wenn durch Einfügen Elternknoten mehr als $2t-1$, dann rekursiv nach oben!
-
-&nbsp;
 
 ```
 split(T,i):
@@ -799,15 +648,11 @@ split(T,i):
     // Fuege mittleren Wert in Elternknoten von Blatt i ein
 ```
 
-\newpage
-
 **Beispiel**
 
-![B-Baum](utils/b_tree-insert1.png)
+![B-Baum](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/b_tree-insert1.png){ width=45rem }
 
-![B-Baum nach Hinzufügen von 45](utils/b_tree-insert2.png)
-
-&nbsp;
+![B-Baum nach Hinzufügen von 45](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/b_tree-insert2.png){ width=45rem }
 
 ```
 delete(T,k):
@@ -819,9 +664,9 @@ delete(T,k):
 
 **Beispiel**
 
-![B-Baum](utils/b_tree-delete1.png)
+![B-Baum](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/b_tree-delete1.png){ width=45rem }
 
-![B-Baum nach Löschen von 4](utils/b_tree-delete2.png)
+![B-Baum nach Löschen von 4](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/b_tree-delete2.png){ width=45rem }
 
 ### Worst-Case Laufzeiten
 
@@ -847,5 +692,3 @@ Somit nur vorteilhaft, wenn blockweises einlesen
 ### Postorder
 
 **Schema**: linker Teilbaum, rechter Teilbaum, Wurzel
-
-\newpage
