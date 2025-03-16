@@ -1716,6 +1716,19 @@
             opacity: .5;
         }
 
+        .settings-section #apiKeyLink {
+            color: var(--highlight-text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            font-size: .8rem;
+        }
+
+        .settings-section #apiKeyLink:hover {
+            background-color: var(--highlight-bg);
+        }
+
         html.dark-mode {
             * {
                 --highlight-color: #619dcc;
@@ -2616,20 +2629,14 @@
             providers: {
                 google: {
                     name: "Google Gemini",
-                    models: [" gemini-2.0-pro-exp-02-05", "gemini-2.0-flash", "gemma-3-27b-it"]
+                    models: [" gemini-2.0-pro-exp-02-05", "gemini-2.0-flash", "gemma-3-27b-it"],
+                    apiLink: "https://aistudio.google.com/app/apikey"
                 },
                 openai: {
-                    name: "OpenAI ChatGPT",
-                    models: ["gpt-4o", "gpt-o3-mini", "gpt-3.5-turbo"]
+                    name: "OpenAI ChatGPT", 
+                    models: ["gpt-4o", "gpt-o3-mini", "gpt-3.5-turbo"],
+                    apiLink: "https://platform.openai.com/api-keys"
                 },
-                anthropic: {
-                    name: "Anthropic Claude",
-                    models: ["claude-3.7-sonnet", "claude-3.5-sonnet", "claude-3-haiku"]
-                },
-                llama: {
-                    name: "Llama",
-                    models: ["llama-2-70b-chat", "llama-2-13b-chat", "llama-2-7b-chat"]
-                }
             }
         };
 
@@ -4516,21 +4523,20 @@
                 <select id="providerSelect" onchange="updateProvider(this.value)">
                     <option value="google">Google Gemini</option>
                     <option value="openai">OpenAI ChatGPT</option>
-                    <option value="anthropic">Anthropic Claude</option>
-                    <option value="llama">Llama</option>
                 </select>
                 </div>
-            </div>
-            <div class="settings-section" id="modelSection">
-                <h3 class="translate" data-translate-key="model">${translations.model}</h3>
-                <select id="modelSelect"></select>
-                </select>
-            </div>
-            <div class="settings-section">
-                <h3 class="translate" data-translate-key="apiKey">${translations.apiKey}</h3>
-                <input class="translate" data-translate-key="enterApiKey" type="password" id="apiKeyInput" placeholder="${translations.enterApiKey}">
-                <button class="save-key-btn translate" data-translate-key="saveKey" onclick="saveApiKey()">${translations.saveKey}</button>
-            </div>
+                </div>
+                <div class="settings-section" id="modelSection">
+                    <h3 class="translate" data-translate-key="model">${translations.model}</h3>
+                    <select id="modelSelect"></select>
+                    </select>
+                </div>
+                <div class="settings-section">
+                    <h3 class="translate" data-translate-key="apiKey">${translations.apiKey}</h3>
+                    <input class="translate" data-translate-key="enterApiKey" type="password" id="apiKeyInput" placeholder="${translations.enterApiKey}">
+                    <button class="save-key-btn translate" data-translate-key="saveKey" onclick="saveApiKey()">${translations.saveKey}</button>
+                    <a class="hidden" href="" id="apiKeyLink" target="_blank">Get API key</a>
+                </div>
             `;
 
             popupManager.create(settingsPanel, {
@@ -4550,6 +4556,7 @@
 
         function updateProvider(provider) {
             const modelSelect = document.getElementById('modelSelect');
+            const apiKeyLink = document.getElementById('apiKeyLink');
             modelSelect.innerHTML = '';
 
             CONFIG.providers[provider].models.forEach(model => {
@@ -4561,6 +4568,11 @@
 
             modelSelect.value = CONFIG.providers[provider].models[0];
             localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
+
+            // Update API key link
+            apiKeyLink.href = CONFIG.providers[provider].apiLink;
+            apiKeyLink.textContent = `Get ${CONFIG.providers[provider].name} API key`;
+            apiKeyLink.classList.remove('hidden');
         }
 
         function updateLanguage(language) {
@@ -4616,6 +4628,7 @@
             const apiKey = localStorage.getItem(`mdv_${provider}_api_key`) || '';
             document.getElementById('apiKeyInput').value = apiKey;
             updateRepoSettings();
+            updateProvider(provider);
         }
 
         function saveSettings() {
@@ -4699,37 +4712,6 @@
                         }],
                         temperature: 0.6,
                         max_tokens: 2000
-                    };
-                    break;
-
-                case 'anthropic':
-                    apiUrl = 'https://api.anthropic.com/v1/messages';
-                    requestBody = {
-                        model: cleanModel,
-                        messages: [{
-                            role: "user",
-                            content: `Context:\n${currentSelection}\n\nQuestion: ${question}`
-                        }],
-                        system: "You are a helpful assistant that answers in markdown format. Math should be formatted as $mathExp$ or $$mathExp$$.",
-                        max_tokens: 2000
-                    };
-                    break;
-
-                case 'llama':
-                    apiUrl = 'https://api.meta.ai/v1/chat/completions';
-                    requestBody = {
-                        model: cleanModel,
-                        messages: [{
-                            role: "system",
-                            content: "You are a helpful assistant that answers in markdown format. Math should be formatted as $mathExp$ or $$mathExp$$."
-                        }, {
-                            role: "user",
-                            content: `Context:\n${currentSelection}\n\nQuestion: ${question}`
-                        }],
-                        temperature: 0.7,
-                        max_tokens: 2000,
-                        frequency_penalty: 0,
-                        presence_penalty: 0
                     };
                     break;
 
