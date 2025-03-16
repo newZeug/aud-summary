@@ -1433,15 +1433,11 @@
         .save-key-btn {
             margin-top: 0.5rem;
             padding: 0.5rem 1rem;
-            background: var(--highlight-color);
+            background: var(--secondary-highlight-bg);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-        }
-
-        .save-key-btn:hover {
-            background: var(--secondary-highlight-bg);
         }
 
         .hidden {
@@ -1679,7 +1675,7 @@
         }
         
         .toggle-switch input:checked + .toggle-slider {
-            background-color: var(--highlight-color);
+            background-color: var(--secondary-highlight-bg);
         }
         
         .toggle-switch input:checked + .toggle-slider:before {
@@ -1694,6 +1690,11 @@
 
         #repoInput {
             flex: 1;
+            transition: ease-out 0.2s;
+        }
+
+        #repoInput:disabled {
+            opacity: .5;
         }
 
         html.dark-mode {
@@ -2617,62 +2618,66 @@
 
         const TRANSLATIONS = {
             de: {
-                dragDropText: "Ziehen Sie Ihre Markdown-Dateien hierher",
-                or: "oder",
-                chooseFiles: "Dateien auswählen",
-                inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
-                renderMarkdown: "Markdown anzeigen",
-                createdOn: "Erstellt am",
-                noResults: "Keine Ergebnisse gefunden",
-                searchPlaceholder: "Dokumente durchsuchen...",
-                chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
-                askMe: "Fragen",
-                selectedText: "Ausgewählter Text",
-                chatHeader: "Stelle Fragen zum ausgewählten Text",
-                noHeaders: "Keine Überschriften in diesem Abschnitt gefunden",
-                settings: "Einstellungen",
-                language: "Sprache",
-                aiProvider: "KI-Anbieter",
-                model: "Modell",
-                apiKey: "API-Schlüssel",
-                enterApiKey: "API-Schlüssel eingeben",
-                saveKey: "Schlüssel speichern",
-                close: "Schließen",
-                keySaved: "API-Schlüssel erfolgreich gespeichert!",
-                active: "Aktiv",
-                howToUseChat: "Chat Anleitung",
-                chatHelperText: "Um den Chat zu nutzen, markieren Sie zuerst Text im Dokument. Dies setzt den Kontext für die KI, um Ihre Fragen zu beantworten.",
-                iUnderstand: "Ich verstehe",
-                remindLater: "Später erinnern"
+            dragDropText: "Ziehen Sie Ihre Markdown-Dateien hierher",
+            or: "oder",
+            chooseFiles: "Dateien auswählen",
+            inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
+            renderMarkdown: "Markdown anzeigen",
+            createdOn: "Erstellt am",
+            noResults: "Keine Ergebnisse gefunden",
+            searchPlaceholder: "Dokumente durchsuchen...",
+            chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
+            askMe: "Fragen",
+            selectedText: "Ausgewählter Text",
+            chatHeader: "Stelle Fragen zum ausgewählten Text",
+            noHeaders: "Keine Überschriften in diesem Abschnitt gefunden",
+            settings: "Einstellungen",
+            language: "Sprache",
+            aiProvider: "KI-Anbieter",
+            model: "Modell",
+            apiKey: "API-Schlüssel",
+            enterApiKey: "API-Schlüssel eingeben",
+            saveKey: "Schlüssel speichern",
+            close: "Schließen",
+            keySaved: "API-Schlüssel erfolgreich gespeichert!",
+            active: "Aktiv",
+            howToUseChat: "Chat Anleitung",
+            chatHelperText: "Um den Chat zu nutzen, markiere zuerst Text im Dokument. Dies setzt den Kontext für die KI, welcher notwendig ist, um Ihre Fragen zu beantworten. Ist der Kontext nicht gesetzt, wird die Anfrage nicht abgeschickt.",
+            iUnderstand: "Ich verstehe",
+            remindLater: "Später erinnern",
+            autoLoad: "Automatisch laden",
+            enterRepo: "z.B. newZeug/aud-summary"
             },
             en: {
-                dragDropText: "Drag and drop your Markdown files here",
-                or: "or",
-                chooseFiles: "Choose Files",
-                inputPlaceholder: "Enter or paste your Markdown text here...",
-                renderMarkdown: "Render Markdown",
-                createdOn: "Created on",
-                noResults: "No results found",
-                searchPlaceholder: "Search in documents...",
-                chatPlaceholder: "Ask a question about the selected text...",
-                askMe: "Ask me",
-                chatHeader: "Ask about the selection",
-                selectedText: "Selected Text",
-                noHeaders: "No headers found in this section",
-                settings: "Settings",
-                language: "Language",
-                aiProvider: "AI Provider",
-                model: "Model",
-                apiKey: "API Key",
-                enterApiKey: "Enter API key",
-                saveKey: "Save Key",
-                close: "Close",
-                keySaved: "API key saved successfully!",
-                active: "Active",
-                howToUseChat: "How to use Chat",
-                chatHelperText: "To use the chat feature, first select some text in the document. This will set the context for the AI to answer your questions.",
-                iUnderstand: "I understand",
-                remindLater: "Remind me later"
+            dragDropText: "Drag and drop your Markdown files here",
+            or: "or",
+            chooseFiles: "Choose Files",
+            inputPlaceholder: "Enter or paste your Markdown text here...",
+            renderMarkdown: "Render Markdown",
+            createdOn: "Created on",
+            noResults: "No results found",
+            searchPlaceholder: "Search in documents...",
+            chatPlaceholder: "Ask a question about the selected text...",
+            askMe: "Ask me",
+            chatHeader: "Ask about the selection",
+            selectedText: "Selected Text",
+            noHeaders: "No headers found in this section",
+            settings: "Settings",
+            language: "Language",
+            aiProvider: "AI Provider",
+            model: "Model",
+            apiKey: "API Key",
+            enterApiKey: "Enter API key",
+            saveKey: "Save Key",
+            close: "Close",
+            keySaved: "API key saved successfully!",
+            active: "Active",
+            howToUseChat: "How to use Chat",
+            chatHelperText: "To use the chat feature, first select text in the document. This will set the context for the AI which is neccessary to answer your questions. If the context is not set the request will not be submitted.",
+            iUnderstand: "I understand",
+            remindLater: "Remind me later",
+            autoLoad: "Auto Load",
+            enterRepo: "e.g. newZeug/aud-summary"
             }
         }
 
@@ -2724,14 +2729,15 @@
 
             create(content, options = {}) {
                 const settings = { ...this.defaultOptions, ...options };
-
+                
+                document.body.style.overflow = 'hidden';
+                
                 // Check if popup is cached and should be reused
                 if (settings.cacheKey && this.cachedPopups.has(settings.cacheKey)) {
                     const cachedPopup = this.cachedPopups.get(settings.cacheKey);
                     if (!this.activePopups.has(cachedPopup)) {
                         document.body.appendChild(cachedPopup);
                         this.activePopups.add(cachedPopup);
-                        document.body.style.overflow = 'hidden';
                         requestAnimationFrame(() => {
                             cachedPopup.classList.add('active');
                         });
@@ -2784,7 +2790,6 @@
 
                 this.activePopups.add(popupContainer);
                 document.body.appendChild(popupContainer);
-                document.body.style.overflow = 'hidden';
 
                 requestAnimationFrame(() => {
                     popupContainer.classList.add('active');
@@ -2816,25 +2821,35 @@
 
             clearCache() {
                 this.cachedPopups.clear();
+            },
+
+            translate() {
+                this.cachedPopups.forEach(popup => {
+                    const content = popup.querySelector('.popup-content-wrapper');
+                    if (content) {
+                        content.querySelectorAll('.translate').forEach(translate);
+                    }
+                });
             }
         };
+
+        function translate(element) {
+            const key = element.getAttribute('data-translate-key');
+            if (key && translations[key]) {
+                if (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'textarea') {
+                    element.placeholder = translations[key];
+                } else {
+                    element.textContent = translations[key];
+                }
+            }
+        }
 
         function updateUILanguage(lang) {
             translations = TRANSLATIONS[lang] || TRANSLATIONS['en'];
 
-            // Update all elements with translate class
-            document.querySelectorAll('.translate').forEach(element => {
-                const key = element.getAttribute('data-translate-key');
-                if (key && translations[key]) {
-                    if (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'textarea') {
-                        element.placeholder = translations[key];
-                    } else {
-                        element.textContent = translations[key];
-                    }
-                }
-            });
+            document.querySelectorAll('.translate').forEach(translate);
+            popupManager.translate();
 
-            // Update timestamp text if it exists
             const timestamp = document.getElementById('timestamp');
             if (timestamp && timestamp.textContent) {
                 const date = new Date();
@@ -3470,7 +3485,7 @@
 
         function showPreview(markdownText, fileName = '') {
             // Only hide mainView if it's not in popup mode
-            if (!DOM.mainView.classList.contains('popup')) {
+            if (DOM.mainView && !DOM.mainView.classList.contains('popup')) {
                 DOM.mainView.classList.add('hidden');
             }
             document.body.style.overflow = '';
@@ -3494,7 +3509,7 @@
 
             section.appendChild(content);
             DOM.markdownContent.appendChild(section);
-            DOM.mainView.classList.add('hidden');
+            if (DOM.mainView) DOM.mainView.classList.add('hidden');
             DOM.previewView.classList.remove('hidden');
 
             const timestamp = document.getElementById('timestamp');
@@ -3589,26 +3604,25 @@
         }
 
         function addMarkdownContent() {
-            const popup = DOM.mainView.cloneNode(true);
-            popup.classList.remove('hidden');
-            popup.classList.add('popup');
+            const mainViewPopup = DOM.mainView.cloneNode(true);
+            mainViewPopup.classList.remove('hidden');
+            mainViewPopup.classList.add('popup');
 
             // Add event listeners
-            popup.addEventListener('keydown', (e) => {
+            mainViewPopup.addEventListener('keydown', (e) => {
                 if (e.ctrlKey && e.key === 'Enter') {
                     renderMarkdownInput(e.target);
                 }
             });
-            popup.querySelector('#dropzone').addEventListener('dragover', handleDragOver);
-            popup.querySelector('#dropzone').addEventListener('dragleave', handleDragLeave);
-            popup.querySelector('#dropzone').addEventListener('drop', handleDrop);
-            popup.querySelector('#fileInput').addEventListener('change', handleFile);
+            mainViewPopup.querySelector('#dropzone').addEventListener('dragover', handleDragOver);
+            mainViewPopup.querySelector('#dropzone').addEventListener('dragleave', handleDragLeave);
+            mainViewPopup.querySelector('#dropzone').addEventListener('drop', handleDrop);
+            mainViewPopup.querySelector('#fileInput').addEventListener('change', handleFile);
 
-            popupManager.create(popup, {
+            popupManager.create(mainViewPopup, {
                 customClass: 'add-content-popup',
                 closeButtonPosition: 'top-right',
                 width: 'fit-content',
-                maxWidth: '600px',
                 cacheKey: 'addContent',
                 onClose: () => {
                     document.body.style.overflow = '';
@@ -3623,11 +3637,11 @@
 
             const content = `
                 <div class="chat-help-content">
-                    <h3>${translations.howToUseChat}</h3>
-                    <p>${translations.chatHelperText}</p>
+                    <h3 class="translate" data-translate-key="howToUseChat">${translations.howToUseChat}</h3>
+                    <p class="translate" data-translate-key="chatHelperText">${translations.chatHelperText}</p>
                     <div class="chat-help-buttons">
-                        <button class="understood-btn" onclick="removeChatHelpPopup(true)">${translations.iUnderstand}</button>
-                        <button class="remind-btn" onclick="removeChatHelpPopup(false)">${translations.remindLater}</button>
+                        <button class="understood-btn translate" data-translate-key="iUnderstand" onclick="removeChatHelpPopup(true)">${translations.iUnderstand}</button>
+                        <button class="remind-btn translate" data-translate-key="remindLater" onclick="removeChatHelpPopup(false)">${translations.remindLater}</button>
                     </div>
                 </div>
             `;
@@ -3636,7 +3650,6 @@
                 customClass: 'chat-help-popup',
                 closeButtonPosition: 'top-right',
                 width: 'max(40%, 20rem)',
-                maxWidth: '400px',
                 cacheKey: 'chatHelper'
             });
         }
@@ -3929,14 +3942,17 @@
             const activeItems = document.querySelectorAll(`.toc-item[data-header-id="${header.id}"]`);
             activeItems.forEach(item => {
                 item.classList.add('active');
-                const container = item.closest('.file-name-content, .toc-content');
-                scrollTocToItem(container, item);
+                scrollTocToItem(item);
             });
         }
+        
+        function scrollTocToItem(item) {
+            const container = item.closest('.file-name-content, .toc-content');
+            const isFileName = container.classList.contains('file-name-content');
+            const section = item.closest('.toc-section');
 
-        function scrollTocToItem(container, item) {
             container.scrollTo({
-                top: item.offsetTop - (!container.classList.contains('toc') ? container.offsetTop : 0),
+                top: item.offsetTop + (isFileName ? 0 : section.offsetTop) - container.offsetTop,
                 behavior: 'smooth'
             });
         }
@@ -4470,11 +4486,11 @@
                 <div class="settings-section">
                 <h3>GitHub Repository</h3>
                 <div class="repo-container">
-                    <input type="text" id="repoInput" placeholder="e.g. newZeug/aud-summary" value="newZeug/aud-summary">
+                    <input class="translate" data-translate-key="enterRepo" type="text" id="repoInput" placeholder="${translations.enterRepo}" value="newZeug/aud-summary" disabled>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="autoLoadToggle" ${CONFIG.loadFromGithub ? 'checked' : ''}>
+                        <input type="checkbox" id="autoLoadToggle" onclick="updateRepoSettings()">
                         <span class="toggle-slider"></span>
-                        Auto Load
+                        <span class="translate" data-translate-key="autoLoad">${translations.autoLoad}</span>
                     </label>
                 </div>
                 </div>
@@ -4489,27 +4505,27 @@
                 </div>
             </div>
             <div class="settings-section" id="modelSection">
-                <h3>${translations.model}</h3>
+                <h3 class="translate" data-translate-key="model">${translations.model}</h3>
                 <select id="modelSelect"></select>
                 </select>
             </div>
             <div class="settings-section">
-                <h3>${translations.apiKey}</h3>
-                <input type="password" id="apiKeyInput" placeholder="${translations.enterApiKey}">
-                <button onclick="saveApiKey()" class="save-key-btn">${translations.saveKey}</button>
+                <h3 class="translate" data-translate-key="apiKey">${translations.apiKey}</h3>
+                <input class="translate" data-translate-key="enterApiKey" type="password" id="apiKeyInput" placeholder="${translations.enterApiKey}">
+                <button class="save-key-btn translate" data-translate-key="saveKey" onclick="saveApiKey()">${translations.saveKey}</button>
             </div>
             `;
 
             popupManager.create(settingsPanel, {
-            closeOnBackdropClick: true,
-            backdropBlur: true,
-            closeButtonPosition: 'top-right',
-            customClass: 'settings-popup',
-            width: '500px',
-            onClose: () => {
-                saveSettings();
-            },
-            cacheKey: 'settingsPanel'
+                closeOnBackdropClick: true,
+                backdropBlur: true,
+                closeButtonPosition: 'top-right',
+                customClass: 'settings-popup',
+                width: '30rem',
+                onClose: () => {
+                    saveSettings();
+                },
+                cacheKey: 'settingsPanel'
             });
 
             loadSettings();
@@ -4544,6 +4560,14 @@
             }
         }
 
+        function updateRepoSettings() {
+            if (!document.getElementById('autoLoadToggle').checked) {
+                document.getElementById('repoInput').disabled = true;
+            } else {
+                document.getElementById('repoInput').disabled = false;
+            }
+        }
+
         function loadSettings() {
             const language = localStorage.getItem('mdv_language') || 'en';
             const provider = localStorage.getItem('mdv_provider') || 'google';
@@ -4574,6 +4598,7 @@
 
             const apiKey = localStorage.getItem(`mdv_${provider}_api_key`) || '';
             document.getElementById('apiKeyInput').value = apiKey;
+            updateRepoSettings();
         }
 
         function saveSettings() {
@@ -4845,7 +4870,7 @@ And here is some math: $x^2 + y^2 = z^2$
             const autoLoad = localStorage.getItem('mdv_autoload');
             if (autoLoad === 'true') {
                 loadFromGithub();
-            } else {
+            } else if (DOM.mainView) {
                 DOM.mainView.classList.remove('hidden');
                 DOM.initialLoader.classList.add('hidden');
             }
