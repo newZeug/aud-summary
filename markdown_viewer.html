@@ -1431,7 +1431,6 @@
         }
 
         .save-key-btn {
-            margin-top: 0.5rem;
             padding: 0.5rem 1rem;
             background: var(--secondary-highlight-bg);
             color: white;
@@ -1716,6 +1715,13 @@
             opacity: .5;
         }
 
+        .api-key-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
         .settings-section #apiKeyLink {
             color: var(--highlight-text-color);
             text-decoration: none;
@@ -1723,6 +1729,7 @@
             border-radius: 4px;
             transition: background-color 0.2s ease;
             font-size: .8rem;
+            border: 1px solid var(--highlight-color);
         }
 
         .settings-section #apiKeyLink:hover {
@@ -4534,8 +4541,10 @@
                 <div class="settings-section">
                     <h3 class="translate" data-translate-key="apiKey">${translations.apiKey}</h3>
                     <input class="translate" data-translate-key="enterApiKey" type="password" id="apiKeyInput" placeholder="${translations.enterApiKey}">
-                    <button class="save-key-btn translate" data-translate-key="saveKey" onclick="saveApiKey()">${translations.saveKey}</button>
-                    <a class="hidden" href="" id="apiKeyLink" target="_blank">Get API key</a>
+                    <div class="api-key-actions">
+                        <button class="save-key-btn translate" data-translate-key="saveKey" onclick="saveApiKey()">${translations.saveKey}</button>
+                        <a class="hidden" href="" id="apiKeyLink" target="_blank">Get API key</a>
+                    </div>
                 </div>
             `;
 
