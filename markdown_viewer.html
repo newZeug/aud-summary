@@ -1624,34 +1624,53 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(180deg); }
+
+            0%,
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(1.2) rotate(180deg);
+            }
         }
 
         @keyframes fade {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         .toggle-switch {
             position: relative;
             cursor: pointer;
-            display: inline-flex; 
-            align-items: center; 
+            display: inline-flex;
+            align-items: center;
             gap: 8px;
         }
-        
+
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .toggle-slider {
             position: relative;
             display: inline-block;
@@ -1661,7 +1680,7 @@
             border-radius: 20px;
             transition: .3s;
         }
-        
+
         .toggle-slider:before {
             position: absolute;
             content: "";
@@ -1673,18 +1692,18 @@
             border-radius: 50%;
             transition: .3s;
         }
-        
-        .toggle-switch input:checked + .toggle-slider {
+
+        .toggle-switch input:checked+.toggle-slider {
             background-color: var(--secondary-highlight-bg);
         }
-        
-        .toggle-switch input:checked + .toggle-slider:before {
+
+        .toggle-switch input:checked+.toggle-slider:before {
             transform: translateX(16px);
         }
 
         .repo-container {
-            display: flex; 
-            align-items: center; 
+            display: flex;
+            align-items: center;
             gap: 8px;
         }
 
@@ -2459,7 +2478,7 @@
         <div class="loader-spinner"></div>
         <div class="loader-text">Loading...</div>
     </div>
-    
+
     <div id="mainView" class="container hidden">
         <h1>Markdown Viewer</h1>
         <input type="file" id="fileInput" accept=".md, .txt" multiple>
@@ -2594,8 +2613,6 @@
             indentSize: 0.2,
             observerMargin: '-5px 0px -85% 0px',
             minToggleWidth: 768,
-            useServer: true,
-            loadFromGithub: true,
             providers: {
                 google: {
                     name: "Google Gemini",
@@ -2618,66 +2635,66 @@
 
         const TRANSLATIONS = {
             de: {
-            dragDropText: "Ziehen Sie Ihre Markdown-Dateien hierher",
-            or: "oder",
-            chooseFiles: "Dateien auswählen",
-            inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
-            renderMarkdown: "Markdown anzeigen",
-            createdOn: "Erstellt am",
-            noResults: "Keine Ergebnisse gefunden",
-            searchPlaceholder: "Dokumente durchsuchen...",
-            chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
-            askMe: "Fragen",
-            selectedText: "Ausgewählter Text",
-            chatHeader: "Stelle Fragen zum ausgewählten Text",
-            noHeaders: "Keine Überschriften in diesem Abschnitt gefunden",
-            settings: "Einstellungen",
-            language: "Sprache",
-            aiProvider: "KI-Anbieter",
-            model: "Modell",
-            apiKey: "API-Schlüssel",
-            enterApiKey: "API-Schlüssel eingeben",
-            saveKey: "Schlüssel speichern",
-            close: "Schließen",
-            keySaved: "API-Schlüssel erfolgreich gespeichert!",
-            active: "Aktiv",
-            howToUseChat: "Chat Anleitung",
-            chatHelperText: "Um den Chat zu nutzen, markiere zuerst Text im Dokument. Dies setzt den Kontext für die KI, welcher notwendig ist, um Ihre Fragen zu beantworten. Ist der Kontext nicht gesetzt, wird die Anfrage nicht abgeschickt.",
-            iUnderstand: "Ich verstehe",
-            remindLater: "Später erinnern",
-            autoLoad: "Automatisch laden",
-            enterRepo: "z.B. newZeug/aud-summary"
+                dragDropText: "Ziehen Sie Ihre Markdown-Dateien hierher",
+                or: "oder",
+                chooseFiles: "Dateien auswählen",
+                inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
+                renderMarkdown: "Markdown anzeigen",
+                createdOn: "Erstellt am",
+                noResults: "Keine Ergebnisse gefunden",
+                searchPlaceholder: "Dokumente durchsuchen...",
+                chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
+                askMe: "Fragen",
+                selectedText: "Ausgewählter Text",
+                chatHeader: "Stelle Fragen zum ausgewählten Text",
+                noHeaders: "Keine Überschriften in diesem Abschnitt gefunden",
+                settings: "Einstellungen",
+                language: "Sprache",
+                aiProvider: "KI-Anbieter",
+                model: "Modell",
+                apiKey: "API-Schlüssel",
+                enterApiKey: "API-Schlüssel eingeben",
+                saveKey: "Schlüssel speichern",
+                close: "Schließen",
+                keySaved: "API-Schlüssel erfolgreich gespeichert!",
+                active: "Aktiv",
+                howToUseChat: "Chat Anleitung",
+                chatHelperText: "Um den Chat zu nutzen, markiere zuerst Text im Dokument. Dies setzt den Kontext für die KI, welcher notwendig ist, um Ihre Fragen zu beantworten. Ist der Kontext nicht gesetzt, wird die Anfrage nicht abgeschickt.",
+                iUnderstand: "Ich verstehe",
+                remindLater: "Später erinnern",
+                autoLoad: "Automatisch laden",
+                enterRepo: "z.B. newZeug/aud-summary"
             },
             en: {
-            dragDropText: "Drag and drop your Markdown files here",
-            or: "or",
-            chooseFiles: "Choose Files",
-            inputPlaceholder: "Enter or paste your Markdown text here...",
-            renderMarkdown: "Render Markdown",
-            createdOn: "Created on",
-            noResults: "No results found",
-            searchPlaceholder: "Search in documents...",
-            chatPlaceholder: "Ask a question about the selected text...",
-            askMe: "Ask me",
-            chatHeader: "Ask about the selection",
-            selectedText: "Selected Text",
-            noHeaders: "No headers found in this section",
-            settings: "Settings",
-            language: "Language",
-            aiProvider: "AI Provider",
-            model: "Model",
-            apiKey: "API Key",
-            enterApiKey: "Enter API key",
-            saveKey: "Save Key",
-            close: "Close",
-            keySaved: "API key saved successfully!",
-            active: "Active",
-            howToUseChat: "How to use Chat",
-            chatHelperText: "To use the chat feature, first select text in the document. This will set the context for the AI which is neccessary to answer your questions. If the context is not set the request will not be submitted.",
-            iUnderstand: "I understand",
-            remindLater: "Remind me later",
-            autoLoad: "Auto Load",
-            enterRepo: "e.g. newZeug/aud-summary"
+                dragDropText: "Drag and drop your Markdown files here",
+                or: "or",
+                chooseFiles: "Choose Files",
+                inputPlaceholder: "Enter or paste your Markdown text here...",
+                renderMarkdown: "Render Markdown",
+                createdOn: "Created on",
+                noResults: "No results found",
+                searchPlaceholder: "Search in documents...",
+                chatPlaceholder: "Ask a question about the selected text...",
+                askMe: "Ask me",
+                chatHeader: "Ask about the selection",
+                selectedText: "Selected Text",
+                noHeaders: "No headers found in this section",
+                settings: "Settings",
+                language: "Language",
+                aiProvider: "AI Provider",
+                model: "Model",
+                apiKey: "API Key",
+                enterApiKey: "Enter API key",
+                saveKey: "Save Key",
+                close: "Close",
+                keySaved: "API key saved successfully!",
+                active: "Active",
+                howToUseChat: "How to use Chat",
+                chatHelperText: "To use the chat feature, first select text in the document. This will set the context for the AI which is neccessary to answer your questions. If the context is not set the request will not be submitted.",
+                iUnderstand: "I understand",
+                remindLater: "Remind me later",
+                autoLoad: "Auto Load",
+                enterRepo: "e.g. newZeug/aud-summary"
             }
         }
 
@@ -2729,9 +2746,9 @@
 
             create(content, options = {}) {
                 const settings = { ...this.defaultOptions, ...options };
-                
+
                 document.body.style.overflow = 'hidden';
-                
+
                 // Check if popup is cached and should be reused
                 if (settings.cacheKey && this.cachedPopups.has(settings.cacheKey)) {
                     const cachedPopup = this.cachedPopups.get(settings.cacheKey);
@@ -2887,10 +2904,10 @@
             // Load stored dimensions
             const storedWidth = localStorage.getItem('mdv_chat_width');
             const storedHeight = localStorage.getItem('mdv_chat_height');
-            
+
             if (storedWidth && storedHeight) {
-            chatContainer.style.width = storedWidth;
-            chatContainer.style.height = storedHeight;
+                chatContainer.style.width = storedWidth;
+                chatContainer.style.height = storedHeight;
             }
 
             const resizeHandle = chatContainer.querySelector('.resize-handle');
@@ -3468,19 +3485,19 @@
         function loadFromGithub() {
             const repo = localStorage.getItem('mdv_repo') || 'newZeug/aud-summary';
             fetch(`https://api.github.com/repos/${repo}/contents`)
-            .then(response => response.json())
-            .then(fileList => {
-                const fileFetchList = fileList.filter((f) => f.name.endsWith('.md') && !f.name.includes('README'));
-                for (f in fileFetchList) {
-                    const fileName = fileList[f].name
-                    const fileUrl = fileList[f].download_url;
-                    fetch(fileUrl)
-                    .then(response => response.text())
-                    .then(content => showPreview(content, fileName));
-                }
-                DOM.initialLoader.classList.add('hidden');
-            })
-            .catch(error => console.error('Error:', error));
+                .then(response => response.json())
+                .then(fileList => {
+                    const fileFetchList = fileList.filter((f) => f.name.endsWith('.md') && !f.name.includes('README'));
+                    for (f in fileFetchList) {
+                        const fileName = fileList[f].name
+                        const fileUrl = fileList[f].download_url;
+                        fetch(fileUrl)
+                            .then(response => response.text())
+                            .then(content => showPreview(content, fileName));
+                    }
+                    DOM.initialLoader.classList.add('hidden');
+                })
+                .catch(error => console.error('Error:', error));
         }
 
         function showPreview(markdownText, fileName = '') {
@@ -3695,10 +3712,10 @@
 
             dragHandle.addEventListener('dragend', (e) => {
                 e.target.closest('.toc-section').classList.remove('dragging');
-                
+
                 const tocSections = Array.from(document.querySelectorAll('.toc-section'));
                 const markdownContent = document.getElementById('markdownContent');
-                
+
                 tocSections.forEach(tocSection => {
                     const fileId = tocSection.querySelector('span').id.slice('fileHeader-'.length);
                     const markdownSection = document.getElementById(fileId).closest('.markdown-section');
@@ -3710,12 +3727,12 @@
                 e.preventDefault();
                 const tocSection = fileHeaderContainer.closest('.toc-section');
                 const draggingSection = document.querySelector('.toc-section.dragging');
-                
+
                 if (!draggingSection || tocSection === draggingSection) return;
 
                 const box = tocSection.getBoundingClientRect();
                 const isAboveMiddle = e.clientY < box.top + box.height / 2;
-                
+
                 if (isAboveMiddle) {
                     tocSection.parentNode.insertBefore(draggingSection, tocSection);
                 } else if (tocSection.nextSibling) {
@@ -3945,7 +3962,7 @@
                 scrollTocToItem(item);
             });
         }
-        
+
         function scrollTocToItem(item) {
             const container = item.closest('.file-name-content, .toc-content');
             const isFileName = container.classList.contains('file-name-content');
@@ -4583,17 +4600,17 @@
             const modelSelect = document.getElementById('modelSelect');
             modelSelect.innerHTML = '';
             CONFIG.providers[provider].models.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            modelSelect.appendChild(option);
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
             });
 
             if (savedModel && CONFIG.providers[provider].models.includes(savedModel.trim())) {
-            modelSelect.value = savedModel.trim();
+                modelSelect.value = savedModel.trim();
             } else {
-            modelSelect.value = CONFIG.providers[provider].models[0];
-            localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
+                modelSelect.value = CONFIG.providers[provider].models[0];
+                localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
             }
 
             const apiKey = localStorage.getItem(`mdv_${provider}_api_key`) || '';
@@ -4722,119 +4739,85 @@
                     return;
             }
 
-            if (CONFIG.useServer) {
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
+            const headers = {
+                'Content-Type': 'application/json'
+            };
 
-                // Add provider-specific headers
-                switch (provider) {
-                    case 'google':
-                        headers['x-goog-api-key'] = apiKey;
-                        break;
-                    case 'openai':
-                        headers['Authorization'] = `Bearer ${apiKey}`;
-                        break;
-                    case 'anthropic':
-                        headers['x-api-key'] = apiKey;
-                        headers['anthropic-version'] = '2023-06-01';
-                        break;
-                    case 'llama':
-                        headers['Authorization'] = `Bearer ${apiKey}`;
-                        break;
-                }
-
-                fetch(apiUrl, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(requestBody)
-                })
-                    .then(response => {
-                        if (response.status === 401) {
-                            throw new Error('Invalid API key. Please check the key in the settings.');
-                        }
-                        else if (response.status === 404) {
-                            throw new Error('The API endpoint was not found. Please check the URL.');
-                        }
-                        else if (response.status === 429) {
-                            throw new Error('You have reached the API quota limit. Please try again later.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        let generatedText;
-
-                        // Extract response based on provider
-                        switch (provider) {
-                            case 'google':
-                                generatedText = data.candidates[0].content.parts[0].text;
-                                break;
-                            case 'openai':
-                                generatedText = data.choices[0].message.content;
-                                break;
-                            case 'anthropic':
-                                generatedText = data.content[0].text;
-                                break;
-                            case 'llama':
-                                generatedText = data.choices[0].message.content;
-                                break;
-                        }
-
-                        if (generatedText) {
-                            loadingMsg.className = 'chat-message system collapsed';
-                            loadingMsg.innerHTML = `
-                <div class="context-header non-selectable" onclick="toggleContext(this)">
-                <span class="toggle material-symbols-rounded">expand_more</span>
-                Context
-                </div>
-                <div class="context-content">${currentSelection}</div>
-                ${renderMarkdown(generatedText)}
-                            `;
-
-                            renderMathIn(loadingMsg);
-                            MathJax.typeset([loadingMsg]);
-                        } else {
-                            throw new Error('Could not extract generated text from the response.');
-                        }
-                    })
-                    .catch(error => {
-                        loadingMsg.className = 'chat-message system error';
-                        loadingMsg.textContent = error.message || 'Sorry, I had trouble analyzing that. Please try again.';
-                        console.error(error);
-                    });
-            } else {
-                // Demo mode response
-                const generatedText = `Demo response: Your selection was "${currentSelection.substring(0, 100)}...
-Here is some code: 
-
-\`\`\`python
-def hello_world():
-    print('Hello, World!')
-\`\`\`
-
-And here is some math: $x^2 + y^2 = z^2$
-
-- What you should know? But here is some inline code: \`\`return me\`\`. See?
-- What can we do with this?
-
-1. Lets see
-    - Try out
-        - even this works
-2. Try out
-`;
-                loadingMsg.className = 'chat-message system collapsed';
-                loadingMsg.innerHTML = `
-                <div class="context-header non-selectable" onclick="toggleContext(this)">
-                <span class="toggle material-symbols-rounded">expand_more</span>
-                Context
-                </div>
-                <div class="context-content">${currentSelection}</div>
-                ${renderMarkdown(generatedText)}
-                `;
-                
-                renderMathIn(loadingMsg);
-                MathJax.typeset([loadingMsg]);
+            // Add provider-specific headers
+            switch (provider) {
+                case 'google':
+                    headers['x-goog-api-key'] = apiKey;
+                    break;
+                case 'openai':
+                    headers['Authorization'] = `Bearer ${apiKey}`;
+                    break;
+                case 'anthropic':
+                    headers['x-api-key'] = apiKey;
+                    headers['anthropic-version'] = '2023-06-01';
+                    break;
+                case 'llama':
+                    headers['Authorization'] = `Bearer ${apiKey}`;
+                    break;
             }
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(requestBody)
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        throw new Error('Invalid API key. Please check the key in the settings.');
+                    }
+                    else if (response.status === 404) {
+                        throw new Error('The API endpoint was not found. Please check the URL.');
+                    }
+                    else if (response.status === 429) {
+                        throw new Error('You have reached the API quota limit. Please try again later.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    let generatedText;
+
+                    // Extract response based on provider
+                    switch (provider) {
+                        case 'google':
+                            generatedText = data.candidates[0].content.parts[0].text;
+                            break;
+                        case 'openai':
+                            generatedText = data.choices[0].message.content;
+                            break;
+                        case 'anthropic':
+                            generatedText = data.content[0].text;
+                            break;
+                        case 'llama':
+                            generatedText = data.choices[0].message.content;
+                            break;
+                    }
+
+                    if (generatedText) {
+                        loadingMsg.className = 'chat-message system collapsed';
+                        loadingMsg.innerHTML = `
+                    <div class="context-header non-selectable" onclick="toggleContext(this)">
+                        <span class="toggle material-symbols-rounded">expand_more</span>
+                        Context
+                    </div>
+                    <div class="context-content">${currentSelection}</div>
+                    ${renderMarkdown(generatedText)}
+                    `;
+
+                        renderMathIn(loadingMsg);
+                        MathJax.typeset([loadingMsg]);
+                    } else {
+                        throw new Error('Could not extract generated text from the response.');
+                    }
+                })
+                .catch(error => {
+                    loadingMsg.className = 'chat-message system error';
+                    loadingMsg.textContent = error.message || 'Sorry, I had trouble analyzing that. Please try again.';
+                    console.error(error);
+                });
 
             textarea.value = '';
             messages.scrollTop = messages.scrollHeight;
@@ -4861,10 +4844,10 @@ And here is some math: $x^2 + y^2 = z^2$
             }
 
             document.querySelector('.chat-input textarea').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendQuestion();
-            }
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendQuestion();
+                }
             });
 
             const autoLoad = localStorage.getItem('mdv_autoload');
