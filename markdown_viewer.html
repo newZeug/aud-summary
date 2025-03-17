@@ -1706,12 +1706,12 @@
             gap: 8px;
         }
 
-        #repoInput {
+        #sourceInput {
             flex: 1;
             transition: ease-out 0.2s;
         }
 
-        #repoInput:disabled {
+        #sourceInput:disabled {
             opacity: .5;
         }
 
@@ -2677,7 +2677,9 @@
                 iUnderstand: "Ich verstehe",
                 remindLater: "Später erinnern",
                 autoLoad: "Automatisch laden",
-                enterRepo: "z.B. newZeug/aud-summary"
+                enterRepo: "z.B. newZeug/aud-summary",
+                sourceLocation: "Quellort",
+                sourceProvider: "Quellanbieter",
             },
             en: {
                 dragDropText: "Drag and drop your Markdown files here",
@@ -2708,7 +2710,9 @@
                 iUnderstand: "I understand",
                 remindLater: "Remind me later",
                 autoLoad: "Auto Load",
-                enterRepo: "e.g. newZeug/aud-summary"
+                enterRepo: "e.g. newZeug/aud-summary",
+                sourceLocation: "Source Location",
+                sourceProvider: "Source Provider",
             }
         }
 
@@ -3496,22 +3500,234 @@
             return html
         }
 
-        function loadFromGithub() {
-            const repo = localStorage.getItem('mdv_repo') || 'newZeug/aud-summary';
-            fetch(`https://api.github.com/repos/${repo}/contents`)
-                .then(response => response.json())
-                .then(fileList => {
-                    const fileFetchList = fileList.filter((f) => f.name.endsWith('.md') && !f.name.includes('README'));
-                    for (f in fileFetchList) {
-                        const fileName = fileList[f].name
-                        const fileUrl = fileList[f].download_url;
-                        fetch(fileUrl)
-                            .then(response => response.text())
-                            .then(content => showPreview(content, fileName));
+        async function loadFromSource() {
+            const sourceProvider = localStorage.getItem('mdv_source_provider') || 'github';
+            const sourcePath = localStorage.getItem('mdv_source') || 'newZeug/aud-summary';
+            
+            function createLoadingPreview(path) {
+                const loadingContent = `# Loading ${path}...\n\n<div class="loader-spinner"></div>`;
+                showPreview(loadingContent, path);
+            }
+
+            async function fetchWithCorsProxy(url, retries = 2) {
+                const proxies = [
+                    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                    (url) => `https://cors-anywhere.herokuapp.com/${url}`
+                ];
+                
+                let lastError;
+                
+                for (let i = 0; i < Math.min(retries, proxies.length); i++) {
+                    try {
+                        const proxyUrl = proxies[i](url);
+                        const response = await fetch(proxyUrl);
+                        
+                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                        
+                        return await response.text();
+                    } catch (error) {
+                        console.warn(`CORS proxy attempt ${i+1} failed:`, error);
+                        lastError = error;
                     }
-                    DOM.initialLoader.classList.add('hidden');
-                })
-                .catch(error => console.error('Error:', error));
+                }
+                
+                throw lastError || new Error('All CORS proxies failed');
+            }
+
+            async function loadFromGitHub(path = '') {
+                try {
+                    const response = await fetch(`https://api.github.com/repos/${sourcePath}/contents/${path}`);
+                    const contents = await response.json();
+                    
+                    if (!Array.isArray(contents)) {
+                        throw new Error('Invalid response from GitHub API');
+                    }
+                    
+                    const markdownFiles = contents.filter(item => 
+                        item.type === 'file' && 
+                        item.name.endsWith('.md') && 
+                        !item.name.includes('README')
+                    );
+                    
+                    markdownFiles.forEach(file => createLoadingPreview(file.path));
+
+                    const promises = contents.map(async item => {
+                        if (item.type === 'dir') {
+                            return loadFromGitHub(item.path);
+                        } else if (item.type === 'file' && 
+                                 item.name.endsWith('.md') && 
+                                 !item.name.includes('README')) {
+                            try {
+                                const fileContent = await fetch(item.download_url).then(r => r.text());
+                                const loadingSection = Array.from(document.querySelectorAll('.markdown-section')).find(
+                                    section => section.querySelector('.file-name-text').textContent === item.path
+                                );
+                                if (loadingSection) loadingSection.remove();
+                                showPreview(fileContent, item.path);
+                            } catch (err) {
+                                console.error('Error loading file:', item.path, err);
+                            }
+                        }
+                    });
+
+                    await Promise.all(promises);
+                } catch (error) {
+                    console.error('Error fetching from GitHub:', path, error);
+                }
+            }
+
+            async function fetchWithCorsProxy(url, retries = 2) {
+                const proxies = [
+                    (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                    (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                    (url) => `https://cors-anywhere.herokuapp.com/${url}`
+                ];
+                
+                let lastError;
+                
+                for (let i = 0; i < Math.min(retries, proxies.length); i++) {
+                    try {
+                        const proxyUrl = proxies[i](url);
+                        const response = await fetch(proxyUrl);
+                        
+                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                        
+                        return await response.text();
+                    } catch (error) {
+                        console.warn(`CORS proxy attempt ${i+1} failed:`, error);
+                        lastError = error;
+                    }
+                }
+                
+                throw lastError || new Error('All CORS proxies failed');
+            }
+
+            async function loadFromGDrive(sharedLink) {
+                try {
+                    // Better regex to extract file ID from various Google Drive link formats
+                    const fileIdMatch = sharedLink.match(/[-\w]{25,}|id=([^&]+)/);
+                    const fileId = fileIdMatch ? (fileIdMatch[1] || fileIdMatch[0]) : sharedLink;
+                    
+                    // Use Google Drive's direct export link for viewing
+                    const publicUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    
+                    const content = await fetchWithCorsProxy(publicUrl);
+                    
+                    if (content.includes('Google Drive - Error') || content.includes('404') || content.trim() === '') {
+                        throw new Error('File not accessible or empty');
+                    }
+                    
+                    showPreview(content, 'Google Drive Document');
+                } catch (error) {
+                    console.error('Error fetching from Google Drive:', error);
+                    showPreview('# Error Loading Document\nFailed to load the document from Google Drive. Please check if:\n1. The link is correct\n2. The file is publicly accessible with "Anyone with the link" permissions\n3. The file is a markdown document', 'Error');
+                }
+            }
+
+            async function loadFromOneDrive(sharedLink) {
+                try {
+                    // For OneDrive, we need to handle both personal and business accounts
+                    let downloadUrl;
+                    
+                    if (sharedLink.includes('1drv.ms')) {
+                        // Short links need to be resolved first
+                        const text = await fetchWithCorsProxy(sharedLink);
+                        
+                        const embedMatch = text.match(/src=["']([^"']+)["']/);
+                        if (embedMatch && embedMatch[1]) {
+                            downloadUrl = embedMatch[1].replace('/embed', '/download');
+                        } else {
+                            // Try to extract from any redirect info in the response
+                            const fileIdMatch = text.match(/resid=([^&"']+)/);
+                            if (fileIdMatch && fileIdMatch[1]) {
+                                downloadUrl = `https://api.onedrive.com/v1.0/shares/u!${encodeURIComponent(fileIdMatch[1])}/root/content`;
+                            }
+                        }
+                    } else {
+                        // Regular sharing links
+                        const fileIdMatch = sharedLink.match(/resid=([^&]+)/) || 
+                                        sharedLink.match(/id=([^&]+)/) || 
+                                        sharedLink.match(/([A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12})/i);
+                                        
+                        if (fileIdMatch && fileIdMatch[1]) {
+                            downloadUrl = `https://api.onedrive.com/v1.0/shares/u!${encodeURIComponent(fileIdMatch[1])}/root/content`;
+                        } else {
+                            // Try direct link approach
+                            downloadUrl = sharedLink.replace('view.aspx', 'download.aspx');
+                        }
+                    }
+                    
+                    if (!downloadUrl) {
+                        throw new Error('Could not determine download URL');
+                    }
+                    
+                    const content = await fetchWithCorsProxy(downloadUrl);
+                    showPreview(content, 'OneDrive Document');
+                } catch (error) {
+                    console.error('Error fetching from OneDrive:', error);
+                    showPreview('# Error Loading Document\nFailed to load the document from OneDrive. Please check if:\n1. The link is correct\n2. The file is publicly accessible with "Anyone with the link" permissions\n3. The file is a markdown document', 'Error');
+                }
+            }
+
+            async function loadFromDropbox(sharedLink) {
+                try {
+                    // Handle various Dropbox URL formats
+                    let downloadUrl = sharedLink;
+                    
+                    if (sharedLink.includes('dropbox.com')) {
+                        // Convert www links to dl links and ensure dl=1
+                        downloadUrl = sharedLink
+                            .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+                            .replace('?dl=0', '')
+                            .replace('&dl=0', '')
+                            .replace(/\/$/, ''); // Remove trailing slash if present
+                            
+                        // Make sure we're requesting the raw file
+                        if (!downloadUrl.includes('?raw=1') && !downloadUrl.includes('&raw=1')) {
+                            downloadUrl += (downloadUrl.includes('?') ? '&' : '?') + 'raw=1';
+                        }
+                    }
+                    
+                    const content = await fetchWithCorsProxy(downloadUrl);
+                    
+                    if (content.includes('Error') || content.includes('<html') || content.trim() === '') {
+                        throw new Error('Invalid response or empty content');
+                    }
+                    
+                    showPreview(content, 'Dropbox Document');
+                } catch (error) {
+                    console.error('Error fetching from Dropbox:', error);
+                    showPreview('# Error Loading Document\nFailed to load the document from Dropbox. Please check if:\n1. The link is correct\n2. The file is publicly accessible with "Anyone with the link" permissions\n3. The file is a markdown document', 'Error');
+                }
+            }
+
+            try {
+                DOM.mainView.classList.add('hidden');
+                DOM.previewView.classList.remove('hidden');
+
+                switch(sourceProvider) {
+                    case 'github':
+                        await loadFromGitHub();
+                        break;
+                    case 'gdrive':
+                        await loadFromGDrive(sourcePath);
+                        break;
+                    case 'onedrive':
+                        await loadFromOneDrive(sourcePath);
+                        break;
+                    case 'dropbox':
+                        await loadFromDropbox(sourcePath);
+                        break;
+                    default:
+                        console.error('Unknown source provider');
+                }
+
+                DOM.initialLoader.classList.add('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                DOM.initialLoader.classList.add('hidden');
+            }
         }
 
         function showPreview(markdownText, fileName = '') {
@@ -3552,7 +3768,7 @@
                 hour: '2-digit',
                 minute: '2-digit'
             };
-            timestamp.textContent = `Created on ${now.toLocaleDateString(undefined, options)}`;
+            timestamp.textContent = `${translations.createdOn} ${now.toLocaleDateString(undefined, options)}`;
 
             buildTOC();
 
@@ -4515,15 +4731,26 @@
                 </select>
                 </div>
                 <div class="settings-section">
-                <h3>GitHub Repository</h3>
-                <div class="repo-container">
-                    <input class="translate" data-translate-key="enterRepo" type="text" id="repoInput" placeholder="${translations.enterRepo}" value="newZeug/aud-summary" disabled>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="autoLoadToggle" onclick="updateRepoSettings()">
-                        <span class="toggle-slider"></span>
-                        <span class="translate" data-translate-key="autoLoad">${translations.autoLoad}</span>
-                    </label>
+                <h3 class="translate" data-translate-key="sourceProvider">${translations.sourceProvider}</h3>
+                <div class="source-container">
+                    <select id="sourceSelect" onchange="updateSourceProvider(this.value)">
+                        <option value="github">GitHub</option> 
+                        <option value="gdrive">Google Drive</option>
+                        <option value="onedrive">Microsoft OneDrive</option>
+                        <option value="dropbox">Dropbox</option>
+                    </select>
                 </div>
+                </div>
+                <div class="settings-section" id="sourceSettings">
+                    <h3 class="translate" data-translate-key="sourceLocation">${translations.sourceLocation}</h3>
+                    <div class="repo-container">
+                        <input class="translate" data-translate-key="enterRepo" type="text" id="sourceInput" placeholder="${translations.enterRepo}" value="newZeug/aud-summary" disabled>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoLoadToggle" onclick="updateRepoSettings()">
+                            <span class="toggle-slider"></span>
+                            <span class="translate" data-translate-key="autoLoad">${translations.autoLoad}</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="settings-section">
                 <h3 class="translate" data-translate-key="aiProvider">${translations.aiProvider}</h3>
@@ -4563,6 +4790,26 @@
             loadSettings();
         }
 
+        function updateSourceProvider(provider) {
+            const sourceSettings = document.getElementById('sourceSettings');
+            const sourceInput = document.getElementById('sourceInput');
+            const autoLoadToggle = document.getElementById('autoLoadToggle');
+
+            sourceInput.value = '';
+            sourceInput.disabled = !autoLoadToggle.checked;
+
+            switch(provider) {
+            case 'github':
+            sourceInput.placeholder = translations.enterRepo || 'e.g. newZeug/aud-summary';
+            break;
+            case 'gdrive':
+            case 'onedrive':
+            case 'dropbox':
+            sourceInput.placeholder = 'Enter shared link';
+            break;
+            }
+        }
+
         function updateProvider(provider) {
             const modelSelect = document.getElementById('modelSelect');
             const apiKeyLink = document.getElementById('apiKeyLink');
@@ -4600,9 +4847,9 @@
 
         function updateRepoSettings() {
             if (!document.getElementById('autoLoadToggle').checked) {
-                document.getElementById('repoInput').disabled = true;
+                document.getElementById('sourceInput').disabled = true;
             } else {
-                document.getElementById('repoInput').disabled = false;
+                document.getElementById('sourceInput').disabled = false;
             }
         }
 
@@ -4610,47 +4857,51 @@
             const language = localStorage.getItem('mdv_language') || 'en';
             const provider = localStorage.getItem('mdv_provider') || 'google';
             const savedModel = localStorage.getItem('mdv_model');
-            const repoLink = localStorage.getItem('mdv_repo') || 'newZeug/aud-summary';
+            const sourceProvider = localStorage.getItem('mdv_source_provider') || 'github';
+            const repoLink = localStorage.getItem('mdv_source') || 'newZeug/aud-summary';
             const autoLoad = localStorage.getItem('mdv_autoload') === 'true';
 
             document.getElementById('languageSelect').value = language;
             document.getElementById('providerSelect').value = provider;
-            document.getElementById('repoInput').value = repoLink;
+            document.getElementById('sourceSelect').value = sourceProvider;
+            document.getElementById('sourceInput').value = repoLink;
             document.getElementById('autoLoadToggle').checked = autoLoad;
 
             const modelSelect = document.getElementById('modelSelect');
             modelSelect.innerHTML = '';
             CONFIG.providers[provider].models.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model;
-                option.textContent = model;
-                modelSelect.appendChild(option);
+            const option = document.createElement('option');
+            option.value = model;
+            option.textContent = model;
+            modelSelect.appendChild(option);
             });
 
             if (savedModel && CONFIG.providers[provider].models.includes(savedModel.trim())) {
-                modelSelect.value = savedModel.trim();
+            modelSelect.value = savedModel.trim();
             } else {
-                modelSelect.value = CONFIG.providers[provider].models[0];
-                localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
+            modelSelect.value = CONFIG.providers[provider].models[0];
+            localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
             }
 
             const apiKey = localStorage.getItem(`mdv_${provider}_api_key`) || '';
             document.getElementById('apiKeyInput').value = apiKey;
             updateRepoSettings();
-            updateProvider(provider);
+            updateProvider(provider); 
         }
 
         function saveSettings() {
             const provider = document.getElementById('providerSelect').value;
             const model = document.getElementById('modelSelect').value;
             const language = document.getElementById('languageSelect').value;
-            const repo = document.getElementById('repoInput').value;
+            const sourceProvider = document.getElementById('sourceSelect').value;
+            const source = document.getElementById('sourceInput').value;
             const autoLoad = document.getElementById('autoLoadToggle').checked;
 
             localStorage.setItem('mdv_provider', provider.trim());
             localStorage.setItem('mdv_model', model.trim());
             localStorage.setItem('mdv_language', language.trim());
-            localStorage.setItem('mdv_repo', repo.trim());
+            localStorage.setItem('mdv_source_provider', sourceProvider.trim());
+            localStorage.setItem('mdv_source', source.trim());
             localStorage.setItem('mdv_autoload', autoLoad);
 
             updateUILanguage(language.trim());
@@ -4843,7 +5094,7 @@
 
             const autoLoad = localStorage.getItem('mdv_autoload');
             if (autoLoad === 'true') {
-                loadFromGithub();
+                loadFromSource();
             } else if (DOM.mainView) {
                 DOM.mainView.classList.remove('hidden');
                 DOM.initialLoader.classList.add('hidden');
