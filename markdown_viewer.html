@@ -1515,10 +1515,17 @@
             margin: 20px;
             max-width: 90%;
             max-height: 90vh;
-            overflow: auto;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             transform: scale(0.95);
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .popup-content-wrapper {
+            overflow-y: auto;
+            padding-top: 20px;
+            flex: 1;
         }
 
         .popup-container.active .popup-content {
@@ -1526,9 +1533,9 @@
         }
 
         .popup-close-button {
-            position: absolute;
+            position: fixed;
             border: none;
-            background: none;
+            background: var(--primary-bg-color);
             cursor: pointer;
             padding: 8px;
             border-radius: 50%;
@@ -1537,6 +1544,7 @@
             justify-content: center;
             color: var(--text-color);
             transition: background-color 0.2s;
+            z-index: 1;
         }
 
         .popup-close-button:hover {
@@ -1734,6 +1742,65 @@
 
         .settings-section #apiKeyLink:hover {
             background-color: var(--highlight-bg);
+        }
+
+        .settings {
+            display: flex;
+            height: 100%;
+        }
+
+        .settings-sidebar {
+            width: 200px;
+            border-right: 1px solid var(--border-color);
+            padding: 1rem;
+        }
+
+        .settings-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .settings-category-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            background: none;
+            color: var(--text-color);
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            transition: background-color 0.2s;
+        }
+
+        .settings-category-btn:hover {
+            background-color: var(--secondary-bg-color);
+        }
+
+        .settings-category-btn.active {
+            background-color: var(--highlight-bg);
+            color: var(--highlight-text-color);
+        }
+
+        .settings-category-btn .material-symbols-rounded {
+            font-size: 1.2rem;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
         }
 
         html.dark-mode {
@@ -2265,6 +2332,52 @@
                 max-width: min(100%, 25rem);
             }
 
+            .settings {
+                flex-direction: column;
+            }
+
+            .settings-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 0.5rem;
+            }
+
+            .settings-categories {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+
+            .settings-category-btn {
+                flex: 1;
+                min-width: 100px;
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .settings-content {
+                padding: 0.75rem;
+            }
+
+            .settings-section {
+                margin-bottom: 1rem;
+            }
+
+            .settings-section h3 {
+                font-size: 1rem;
+            }
+
+            .api-key-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            #apiKeyLink {
+                width: 100%;
+                text-align: center;
+            }
+
         }
 
         @media print {
@@ -2613,6 +2726,84 @@
         </div>
     </div>
 
+    <div class="settings hidden">
+        <div class="settings-sidebar">
+            <div class="settings-categories">
+                <button class="settings-category-btn active" data-category="general">
+                    <span class="material-symbols-rounded">settings</span>
+                    <span class="translate" data-translate-key="general">General</span>
+                </button>
+                <button class="settings-category-btn" data-category="chat">
+                    <span class="material-symbols-rounded">chat</span>
+                    <span class="translate" data-translate-key="chat">Chat</span>
+                </button>
+                <button class="settings-category-btn" data-category="source">
+                    <span class="material-symbols-rounded">cloud</span>
+                    <span class="translate" data-translate-key="source">Source</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="settings-content">
+            <div class="settings-panel active" data-panel="general">
+                <div class="settings-section">
+                    <h3 class="translate" data-translate-key="language">Language</h3>
+                    <select id="languageSelect" onchange="updateLanguage(this.value)">
+                        <option value="en">English</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-panel" data-panel="chat">
+                <div class="settings-section">
+                    <h3 class="translate" data-translate-key="aiProvider">AI Provider</h3>
+                    <select id="providerSelect" onchange="updateProvider(this.value)">
+                        <option value="google">Google Gemini</option>
+                        <option value="openai">OpenAI ChatGPT</option>
+                    </select>
+                </div>
+                <div class="settings-section" id="modelSection">
+                    <h3 class="translate" data-translate-key="model">Model</h3>
+                    <select id="modelSelect"></select>
+                </div>
+                <div class="settings-section">
+                    <h3 class="translate" data-translate-key="apiKey">API Key</h3>
+                    <input class="translate" data-translate-key="enterApiKey" type="password" id="apiKeyInput"
+                        placeholder="Enter API key">
+                    <div class="api-key-actions">
+                        <button class="save-key-btn translate" data-translate-key="saveKey" onclick="saveApiKey()">Save
+                            Key</button>
+                        <a class="hidden" href="" id="apiKeyLink" target="_blank">Get API key</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-panel" data-panel="source">
+                <div class="settings-section">
+                    <h3 class="translate" data-translate-key="sourceProvider">Source Provider</h3>
+                    <div class="source-container">
+                        <select id="sourceSelect" onchange="updateSourceProvider(this.value)">
+                            <option value="github">GitHub</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-section" id="sourceSettings">
+                    <h3 class="translate" data-translate-key="sourceLocation">Source Location</h3>
+                    <div class="repo-container">
+                        <input class="translate" data-translate-key="enterRepo" type="text" id="sourceInput"
+                            placeholder="e.g. newZeug/aud-summary" value="newZeug/aud-summary" disabled>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoLoadToggle" onclick="updateRepoSettings()">
+                            <span class="toggle-slider"></span>
+                            <span class="translate" data-translate-key="autoLoad">Auto Load</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
 
     <script>
@@ -2649,70 +2840,76 @@
 
         const TRANSLATIONS = {
             de: {
-                dragDropText: "Ziehen Sie Ihre Markdown-Dateien hierher",
-                or: "oder",
-                chooseFiles: "Dateien auswählen",
-                inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
-                renderMarkdown: "Markdown anzeigen",
-                createdOn: "Erstellt am",
-                noResults: "Keine Ergebnisse gefunden",
-                searchPlaceholder: "Dokumente durchsuchen...",
-                chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
-                askMe: "Fragen",
-                selectedText: "Ausgewählter Text",
-                chatHeader: "Stelle Fragen zum ausgewählten Text",
-                noHeaders: "Keine Überschriften in diesem Abschnitt gefunden",
-                settings: "Einstellungen",
-                language: "Sprache",
-                aiProvider: "KI-Anbieter",
-                model: "Modell",
-                apiKey: "API-Schlüssel",
-                enterApiKey: "API-Schlüssel eingeben",
-                saveKey: "Schlüssel speichern",
-                close: "Schließen",
-                keySaved: "API-Schlüssel erfolgreich gespeichert!",
-                active: "Aktiv",
-                howToUseChat: "Chat Anleitung",
-                chatHelperText: "Um den Chat zu nutzen, markiere zuerst Text im Dokument. Dies setzt den Kontext für die KI, welcher notwendig ist, um Ihre Fragen zu beantworten. Ist der Kontext nicht gesetzt, wird die Anfrage nicht abgeschickt.",
-                iUnderstand: "Ich verstehe",
-                remindLater: "Später erinnern",
-                autoLoad: "Automatisch laden",
-                enterRepo: "z.B. newZeug/aud-summary",
-                sourceLocation: "Quellort",
-                sourceProvider: "Quellanbieter",
+            dragDropText: "Ziehen Sie Ihre Markdown-Dateien hierher",
+            or: "oder",
+            chooseFiles: "Dateien auswählen",
+            inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
+            renderMarkdown: "Markdown anzeigen",
+            createdOn: "Erstellt am",
+            noResults: "Keine Ergebnisse gefunden",
+            searchPlaceholder: "Dokumente durchsuchen...",
+            chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
+            askMe: "Fragen",
+            selectedText: "Ausgewählter Text",
+            chatHeader: "Stelle Fragen zum ausgewählten Text",
+            noHeaders: "Keine Überschriften in diesem Abschnitt gefunden",
+            settings: "Einstellungen",
+            language: "Sprache",
+            aiProvider: "KI-Anbieter",
+            model: "Modell",
+            apiKey: "API-Schlüssel",
+            enterApiKey: "API-Schlüssel eingeben",
+            saveKey: "Schlüssel speichern",
+            close: "Schließen",
+            keySaved: "API-Schlüssel erfolgreich gespeichert!",
+            active: "Aktiv",
+            howToUseChat: "Chat Anleitung",
+            chatHelperText: "Um den Chat zu nutzen, markiere zuerst Text im Dokument. Dies setzt den Kontext für die KI, welcher notwendig ist, um Ihre Fragen zu beantworten. Ist der Kontext nicht gesetzt, wird die Anfrage nicht abgeschickt.",
+            iUnderstand: "Ich verstehe",
+            remindLater: "Später erinnern",
+            autoLoad: "Automatisch laden",
+            enterRepo: "z.B. newZeug/aud-summary",
+            sourceLocation: "Quellort",
+            sourceProvider: "Quellanbieter",
+            general: "Allgemein",
+            chat: "Chat",
+            source: "Quelle",
             },
             en: {
-                dragDropText: "Drag and drop your Markdown files here",
-                or: "or",
-                chooseFiles: "Choose Files",
-                inputPlaceholder: "Enter or paste your Markdown text here...",
-                renderMarkdown: "Render Markdown",
-                createdOn: "Created on",
-                noResults: "No results found",
-                searchPlaceholder: "Search in documents...",
-                chatPlaceholder: "Ask a question about the selected text...",
-                askMe: "Ask me",
-                chatHeader: "Ask about the selection",
-                selectedText: "Selected Text",
-                noHeaders: "No headers found in this section",
-                settings: "Settings",
-                language: "Language",
-                aiProvider: "AI Provider",
-                model: "Model",
-                apiKey: "API Key",
-                enterApiKey: "Enter API key",
-                saveKey: "Save Key",
-                close: "Close",
-                keySaved: "API key saved successfully!",
-                active: "Active",
-                howToUseChat: "How to use Chat",
-                chatHelperText: "To use the chat feature, first select text in the document. This will set the context for the AI which is neccessary to answer your questions. If the context is not set the request will not be submitted.",
-                iUnderstand: "I understand",
-                remindLater: "Remind me later",
-                autoLoad: "Auto Load",
-                enterRepo: "e.g. newZeug/aud-summary",
-                sourceLocation: "Source Location",
-                sourceProvider: "Source Provider",
+            dragDropText: "Drag and drop your Markdown files here",
+            or: "or",
+            chooseFiles: "Choose Files",
+            inputPlaceholder: "Enter or paste your Markdown text here...",
+            renderMarkdown: "Render Markdown",
+            createdOn: "Created on",
+            noResults: "No results found",
+            searchPlaceholder: "Search in documents...",
+            chatPlaceholder: "Ask a question about the selected text...",
+            askMe: "Ask me",
+            chatHeader: "Ask about the selection",
+            selectedText: "Selected Text",
+            noHeaders: "No headers found in this section",
+            settings: "Settings",
+            language: "Language",
+            aiProvider: "AI Provider",
+            model: "Model",
+            apiKey: "API Key",
+            enterApiKey: "Enter API key",
+            saveKey: "Save Key",
+            close: "Close",
+            keySaved: "API key saved successfully!",
+            active: "Active",
+            howToUseChat: "How to use Chat",
+            chatHelperText: "To use the chat feature, first select text in the document. This will set the context for the AI which is neccessary to answer your questions. If the context is not set the request will not be submitted.",
+            iUnderstand: "I understand",
+            remindLater: "Remind me later",
+            autoLoad: "Auto Load",
+            enterRepo: "e.g. newZeug/aud-summary",
+            sourceLocation: "Source Location",
+            sourceProvider: "Source Provider",
+            general: "General",
+            chat: "Chat",
+            source: "Source",
             }
         }
 
@@ -3004,6 +3201,7 @@
             });
 
             document.addEventListener('selectionchange', () => {
+                const chatContainer = document.getElementById('chatContainer');
                 const selection = window.getSelection();
                 const markdownContent = document.getElementById('markdownContent');
 
@@ -4613,67 +4811,44 @@
         }
 
         function toggleSettings() {
-            const settingsPanel = utils.createElement('div', 'settings-panel');
-            settingsPanel.innerHTML = `
-            <div class="settings-header">
-                <h2 class="translate" data-translate-key="settings">${translations.settings}</h2>
-            </div>
-            <div class="settings-content">
-                <div class="settings-section">
-                <h3 class="translate" data-translate-key="language">${translations.language}</h3>
-                <select id="languageSelect" onchange="updateLanguage(this.value)">
-                    <option value="en">English</option>
-                    <option value="de">Deutsch</option>
-                </select>
-                </div>
-                <div class="settings-section">
-                <h3 class="translate" data-translate-key="sourceProvider">${translations.sourceProvider}</h3>
-                <div class="source-container">
-                    <select id="sourceSelect" onchange="updateSourceProvider(this.value)">
-                        <option value="github">GitHub</option> 
-                    </select>
-                </div>
-                </div>
-                <div class="settings-section" id="sourceSettings">
-                    <h3 class="translate" data-translate-key="sourceLocation">${translations.sourceLocation}</h3>
-                    <div class="repo-container">
-                        <input class="translate" data-translate-key="enterRepo" type="text" id="sourceInput" placeholder="${translations.enterRepo}" value="newZeug/aud-summary" disabled>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="autoLoadToggle" onclick="updateRepoSettings()">
-                            <span class="toggle-slider"></span>
-                            <span class="translate" data-translate-key="autoLoad">${translations.autoLoad}</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="settings-section">
-                <h3 class="translate" data-translate-key="aiProvider">${translations.aiProvider}</h3>
-                <select id="providerSelect" onchange="updateProvider(this.value)">
-                    <option value="google">Google Gemini</option>
-                    <option value="openai">OpenAI ChatGPT</option>
-                </select>
-                </div>
-                </div>
-                <div class="settings-section" id="modelSection">
-                    <h3 class="translate" data-translate-key="model">${translations.model}</h3>
-                    <select id="modelSelect"></select>
-                    </select>
-                </div>
-                <div class="settings-section">
-                    <h3 class="translate" data-translate-key="apiKey">${translations.apiKey}</h3>
-                    <input class="translate" data-translate-key="enterApiKey" type="password" id="apiKeyInput" placeholder="${translations.enterApiKey}">
-                    <div class="api-key-actions">
-                        <button class="save-key-btn translate" data-translate-key="saveKey" onclick="saveApiKey()">${translations.saveKey}</button>
-                        <a class="hidden" href="" id="apiKeyLink" target="_blank">Get API key</a>
-                    </div>
-                </div>
-            `;
+            const settingsContent = document.querySelector('.settings');
+            
+            if (!settingsContent) return;
 
-            popupManager.create(settingsPanel, {
+            const settingsClone = settingsContent.cloneNode(true);
+            settingsClone.classList.remove('hidden');
+
+            // Add event listeners to category buttons in the clone
+            settingsClone.querySelectorAll('.settings-category-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const category = button.dataset.category;
+                    
+                    // Remove active class from all buttons and panels
+                    settingsClone.querySelectorAll('.settings-category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        // Hide all panels initially
+                        settingsClone.querySelector(`.settings-panel[data-panel="${btn.dataset.category}"]`).style.display = 'none';
+                    });
+                    
+                    button.classList.add('active');
+                    const activePanel = settingsClone.querySelector(`.settings-panel[data-panel="${category}"]`);
+                    activePanel.classList.add('active');
+                    activePanel.style.display = 'block';
+                });
+
+                // Initially hide non-active panels
+                if (!button.classList.contains('active')) {
+                    settingsClone.querySelector(`.settings-panel[data-panel="${button.dataset.category}"]`).style.display = 'none';
+                }
+            });
+
+            popupManager.create(settingsClone, {
                 closeOnBackdropClick: true,
                 backdropBlur: true,
                 closeButtonPosition: 'top-right',
                 customClass: 'settings-popup',
-                width: '30rem',
+                width: 'min(90%, 50rem)',
+                height: 'min(80%, 35rem)',
                 onClose: () => {
                     saveSettings();
                 },
@@ -4684,44 +4859,64 @@
         }
 
         function updateSourceProvider(provider) {
-            const sourceSettings = document.getElementById('sourceSettings');
-            const sourceInput = document.getElementById('sourceInput');
-            const autoLoadToggle = document.getElementById('autoLoadToggle');
+            const sourceSettings = document.querySelectorAll('#sourceSettings');
+            const sourceInputs = document.querySelectorAll('#sourceInput');
+            const autoLoadToggles = document.querySelectorAll('#autoLoadToggle');
 
-            sourceInput.value = '';
-            sourceInput.disabled = !autoLoadToggle.checked;
+            sourceInputs.forEach(input => {
+            input.value = '';
+            input.disabled = !autoLoadToggles[0].checked;
+            });
 
             switch (provider) {
-                case 'github':
-                    sourceInput.placeholder = translations.enterRepo || 'e.g. newZeug/aud-summary';
-                    break;
-                case 'gdrive':
-                case 'onedrive':
-                case 'dropbox':
-                    sourceInput.placeholder = 'Enter shared link';
-                    break;
+            case 'github':
+                sourceInputs.forEach(input => {
+                input.placeholder = translations.enterRepo || 'e.g. newZeug/aud-summary';
+                });
+                break;
+            case 'gdrive':
+            case 'onedrive':
+            case 'dropbox':
+                sourceInputs.forEach(input => {
+                input.placeholder = 'Enter shared link';
+                });
+                break;
             }
         }
 
         function updateProvider(provider) {
-            const modelSelect = document.getElementById('modelSelect');
-            const apiKeyLink = document.getElementById('apiKeyLink');
+            const modelSelects = document.querySelectorAll('#modelSelect');
+            const apiKeyLinks = document.querySelectorAll('#apiKeyLink');
+            
+            if (!modelSelects.length || !apiKeyLinks.length || !CONFIG.providers[provider]) {
+            console.error('Required elements not found or invalid provider');
+            return;
+            }
+
+            modelSelects.forEach(modelSelect => {
             modelSelect.innerHTML = '';
 
-            CONFIG.providers[provider].models.forEach(model => {
+            try {
+                CONFIG.providers[provider].models.forEach(model => {
                 const option = document.createElement('option');
                 option.value = model;
                 option.textContent = model;
                 modelSelect.appendChild(option);
+                });
+
+                modelSelect.value = CONFIG.providers[provider].models[0];
+                localStorage.setItem('mdv_provider', provider);
+                localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
+            } catch (error) {
+                console.error('Error updating provider:', error);
+            }
             });
 
-            modelSelect.value = CONFIG.providers[provider].models[0];
-            localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
-
-            // Update API key link
-            apiKeyLink.href = CONFIG.providers[provider].apiLink;
-            apiKeyLink.textContent = `Get ${CONFIG.providers[provider].name} API key`;
-            apiKeyLink.classList.remove('hidden');
+            apiKeyLinks.forEach(link => {
+            link.href = CONFIG.providers[provider].apiLink;
+            link.textContent = `Get ${CONFIG.providers[provider].name} API key`;
+            link.classList.remove('hidden');
+            });
         }
 
         function updateLanguage(language) {
@@ -4729,21 +4924,25 @@
         }
 
         function saveApiKey() {
-            const provider = document.getElementById('providerSelect').value;
-            const apiKey = document.getElementById('apiKeyInput').value;
+            const providers = document.querySelectorAll('#providerSelect');
+            const apiKeys = document.querySelectorAll('#apiKeyInput');
+            
+            const provider = providers[0].value;
+            const apiKey = apiKeys[0].value;
 
             if (apiKey) {
-                localStorage.setItem(`mdv_${provider}_api_key`, apiKey);
-                alert('API key saved successfully!');
+            localStorage.setItem(`mdv_${provider}_api_key`, apiKey);
+            alert('API key saved successfully!');
             }
         }
 
         function updateRepoSettings() {
-            if (!document.getElementById('autoLoadToggle').checked) {
-                document.getElementById('sourceInput').disabled = true;
-            } else {
-                document.getElementById('sourceInput').disabled = false;
-            }
+            const autoLoadToggles = document.querySelectorAll('#autoLoadToggle');
+            const sourceInputs = document.querySelectorAll('#sourceInput');
+
+            sourceInputs.forEach((input, index) => {
+            input.disabled = !autoLoadToggles[index].checked;
+            });
         }
 
         function loadSettings() {
@@ -4754,13 +4953,13 @@
             const repoLink = localStorage.getItem('mdv_source') || 'newZeug/aud-summary';
             const autoLoad = localStorage.getItem('mdv_autoload') === 'true';
 
-            document.getElementById('languageSelect').value = language;
-            document.getElementById('providerSelect').value = provider;
-            document.getElementById('sourceSelect').value = sourceProvider;
-            document.getElementById('sourceInput').value = repoLink;
-            document.getElementById('autoLoadToggle').checked = autoLoad;
+            document.querySelectorAll('#languageSelect').forEach(select => select.value = language);
+            document.querySelectorAll('#providerSelect').forEach(select => select.value = provider);
+            document.querySelectorAll('#sourceSelect').forEach(select => select.value = sourceProvider);
+            document.querySelectorAll('#sourceInput').forEach(input => input.value = repoLink);
+            document.querySelectorAll('#autoLoadToggle').forEach(toggle => toggle.checked = autoLoad);
 
-            const modelSelect = document.getElementById('modelSelect');
+            document.querySelectorAll('#modelSelect').forEach(modelSelect => {
             modelSelect.innerHTML = '';
             CONFIG.providers[provider].models.forEach(model => {
                 const option = document.createElement('option');
@@ -4775,20 +4974,25 @@
                 modelSelect.value = CONFIG.providers[provider].models[0];
                 localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
             }
+            });
 
             const apiKey = localStorage.getItem(`mdv_${provider}_api_key`) || '';
-            document.getElementById('apiKeyInput').value = apiKey;
+            document.querySelectorAll('#apiKeyInput').forEach(input => input.value = apiKey);
+            
             updateRepoSettings();
             updateProvider(provider);
         }
 
         function saveSettings() {
-            const provider = document.getElementById('providerSelect').value;
-            const model = document.getElementById('modelSelect').value;
-            const language = document.getElementById('languageSelect').value;
-            const sourceProvider = document.getElementById('sourceSelect').value;
-            const source = document.getElementById('sourceInput').value;
-            const autoLoad = document.getElementById('autoLoadToggle').checked;
+            const settingsPopup = document.querySelector('.settings-popup');
+            if (!settingsPopup) return;
+
+            const provider = settingsPopup.querySelector('#providerSelect').value;
+            const model = settingsPopup.querySelector('#modelSelect').value;
+            const language = settingsPopup.querySelector('#languageSelect').value;
+            const sourceProvider = settingsPopup.querySelector('#sourceSelect').value;
+            const source = settingsPopup.querySelector('#sourceInput').value;
+            const autoLoad = settingsPopup.querySelector('#autoLoadToggle').checked;
 
             localStorage.setItem('mdv_provider', provider.trim());
             localStorage.setItem('mdv_model', model.trim());
