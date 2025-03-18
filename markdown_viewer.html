@@ -574,9 +574,17 @@
             align-items: center;
         }
 
-        #mainView.popup h1 {
+        #mainView .settings-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
+
+        #mainView.add-content-popup h1,
+        #mainView.add-content-popup .settings-button {
             display: none;
         }
+
 
         .toc-toggle {
             position: static;
@@ -1347,14 +1355,14 @@
             color: var(--highlight-color);
         }
 
-        .chat-help-buttons {
+        .help-buttons {
             display: flex;
             gap: 1rem;
             margin-top: 1.5rem;
             justify-content: flex-end;
         }
 
-        .chat-help-buttons button {
+        .help-buttons button {
             padding: 0.5rem 1rem;
             border-radius: 4px;
             border: none;
@@ -1527,7 +1535,7 @@
 
         .popup-content-wrapper {
             overflow-y: auto;
-            padding-top: 20px;
+            margin-top: 30px;
             flex: 1;
         }
 
@@ -1568,23 +1576,6 @@
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-        }
-
-        /* Animation variants */
-        .popup-container.slide .popup-content {
-            transform: translateY(20px);
-        }
-
-        .popup-container.slide.active .popup-content {
-            transform: translateY(0);
-        }
-
-        .popup-container.scale .popup-content {
-            transform: scale(0.7);
-        }
-
-        .popup-container.scale.active .popup-content {
-            transform: scale(1);
         }
 
         .toc-section.dragging {
@@ -1742,7 +1733,7 @@
 
         .settings-sidebar {
             width: 200px;
-            border-right: 1px solid var(--border-color);
+            border-right: 2px solid var(--secondary-bg-color);
             padding: 1rem;
         }
 
@@ -2330,7 +2321,7 @@
             .settings-sidebar {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 2px solid var(--secondary-bg-color);
                 padding: 0.5rem;
             }
 
@@ -2599,6 +2590,9 @@
 
 <body>
     <div id="mainView" class="container hidden">
+
+        <button class="settings-button control-button" onclick="toggleSettings()">settings</button>
+
         <h1>Markdown Viewer</h1>
         <input type="file" id="fileInput" accept=".md, .txt" multiple>
         <div class="dropzone" id="dropzone">
@@ -2713,15 +2707,15 @@
     <div class="settings hidden">
         <div class="settings-sidebar">
             <div class="settings-categories">
-                <button class="settings-category-btn active" data-category="general">
+                <button class="settings-category-btn active" data-category="general" onclick="changeSettingsPanel('general')">
                     <span class="material-symbols-rounded">settings</span>
                     <span class="translate" data-translate-key="general">General</span>
                 </button>
-                <button class="settings-category-btn" data-category="chat">
+                <button class="settings-category-btn" data-category="chat" onclick="changeSettingsPanel('chat')">
                     <span class="material-symbols-rounded">chat</span>
                     <span class="translate" data-translate-key="chat">Chat</span>
                 </button>
-                <button class="settings-category-btn" data-category="source">
+                <button class="settings-category-btn" data-category="source" onclick="changeSettingsPanel('source')">
                     <span class="material-symbols-rounded">cloud</span>
                     <span class="translate" data-translate-key="source">Source</span>
                 </button>
@@ -2866,6 +2860,36 @@
             chat: "Chat",
             source: "Quelle",
             darkMode: "Dunkler Modus",
+            readmeMd: `## Willkommen im Markdown Viewer!
+
+Mit diesem Tool können Sie Markdown-Dateien direkt in Ihrem Browser anzeigen. So verwenden Sie es:
+
+### 1. Hochladen von Dateien
+- **Drag & Drop:** Ziehen Sie Ihre \`.md\`- oder \`.txt\`-Dateien in den dafür vorgesehenen Bereich.
+- **Durchsuchen:** Klicken Sie auf die Schaltfläche "Dateien auswählen", um Dateien von Ihrem Computer auszuwählen.
+
+### 2. Manuelle Eingabe
+- **Textbereich:** Geben Sie Ihren Markdown-Text in den Textbereich ein oder fügen Sie ihn dort ein.
+- **Rendern:** Klicken Sie auf die Schaltfläche "Markdown anzeigen", um die gerenderte Ausgabe anzuzeigen.
+
+### 3. Einstellungen
+- **Sprache:** Ändern Sie die Sprache der Benutzeroberfläche in den Einstellungen.
+- **Theme:** Wechseln Sie zwischen hellem und dunklem Modus.
+- **KI-Anbieter:** Konfigurieren Sie den KI-Anbieter und den API-Schlüssel für die Chat-Funktion.
+
+### 4. Chat-Funktion
+- **Text auswählen:** Wählen Sie einen beliebigen Text im Dokument aus, um den Kontext für die KI festzulegen.
+- **Fragen stellen:** Geben Sie Ihre Frage in das Chat-Eingabefeld ein und drücken Sie die Eingabetaste.
+
+    ### 5. Laden von Quellen
+    - **GitHub:** Laden Sie Markdown-Dateien direkt aus einem GitHub-Repository.
+    - **Automatisches Laden:** Lädt automatisch Dateien aus der angegebenen Quelle.
+
+<div class="help-buttons">
+    <button class="understood-btn translate" data-translate-key="iUnderstand" onclick="localStorage.setItem('mdv_hasSeenReadme', 'true'); popupManager.closeAll();">Ich verstehe</button>
+    <button class="remind-btn translate" data-translate-key="remindLater" onclick="popupManager.closeAll()">Später erinnern</button>
+</div>
+`
             },
             en: {
             dragDropText: "Drag and drop your Markdown files here",
@@ -2903,6 +2927,36 @@
             chat: "Chat",
             source: "Source",
             darkMode: "Dark mode",
+            readmeMd: `## Welcome to the Markdown Viewer!
+
+This tool allows you to view Markdown files directly in your browser. Here's how to use it:
+
+### 1. Uploading Files
+- **Drag and Drop:** Drag and drop your \`.md\` or \`.txt\` files into the designated area.
+- **Browse:** Click the "Choose Files" button to select files from your computer.
+
+### 2. Manual Input
+- **Text Area:** Enter or paste your Markdown text into the text area.
+- **Render:** Click the "Render Markdown" button to view the rendered output.
+
+### 3. Settings
+- **Language:** Change the UI language in the settings.
+- **Theme:** Switch between light and dark mode.
+- **AI Provider:** Configure the AI provider and API key for the chat feature.
+
+### 4. Chat Feature
+- **Select Text:** Select any text in the document to set the context for the AI.
+- **Ask Questions:** Type your question in the chat input and press send.
+
+### 5. Source Loading
+- **GitHub:** Load markdown files directly from a GitHub repository.
+- **Auto Load:** Automatically load files from the specified source.
+
+<div class="help-buttons">
+    <button class="understood-btn" onclick="localStorage.setItem('mdv_hasSeenReadme', 'true'); popupManager.closeAll();">I understood</button>
+    <button class="remind-btn" onclick="popupManager.closeAll()">Remind me later</button>
+</div>
+`
             }
         }
 
@@ -3944,7 +3998,6 @@
         function addMarkdownContent() {
             const mainViewPopup = DOM.mainView.cloneNode(true);
             mainViewPopup.classList.remove('hidden');
-            mainViewPopup.classList.add('popup');
 
             // Add event listeners
             mainViewPopup.addEventListener('keydown', (e) => {
@@ -3977,7 +4030,7 @@
                 <div class="chat-help-content">
                     <h3 class="translate" data-translate-key="howToUseChat">${translations.howToUseChat}</h3>
                     <p class="translate" data-translate-key="chatHelperText">${translations.chatHelperText}</p>
-                    <div class="chat-help-buttons">
+                    <div class="help-buttons">
                         <button class="understood-btn translate" data-translate-key="iUnderstand" onclick="removeChatHelpPopup(true)">${translations.iUnderstand}</button>
                         <button class="remind-btn translate" data-translate-key="remindLater" onclick="removeChatHelpPopup(false)">${translations.remindLater}</button>
                     </div>
@@ -4769,7 +4822,17 @@
             currentSelection = text;
         }
 
-        function toggleSettings() {
+        function changeSettingsPanel(category) {
+            document.querySelectorAll(`.settings-popup .settings-panel, .settings-popup .settings-category-btn`).forEach((panel) => panel.classList.remove('active'));
+            
+            const activeButton = document.querySelector(`.settings-popup .settings-category-btn[data-category="${category}"]`);
+            activeButton.classList.add('active');
+            
+            const activePanel = document.querySelector(`.settings-popup .settings-panel[data-panel="${category}"]`);
+            activePanel.classList.add('active');
+        }
+
+        function toggleSettings(category) {
             const settingsContent = document.querySelector('.settings');
             
             if (!settingsContent) return;
@@ -4777,30 +4840,13 @@
             const settingsClone = settingsContent.cloneNode(true);
             settingsClone.classList.remove('hidden');
 
-            // Add event listeners to category buttons in the clone
             settingsClone.querySelectorAll('.settings-category-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const category = button.dataset.category;
-                    
-                    // Remove active class from all buttons and panels
-                    settingsClone.querySelectorAll('.settings-category-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                        // Hide all panels initially
-                        settingsClone.querySelector(`.settings-panel[data-panel="${btn.dataset.category}"]`).style.display = 'none';
-                    });
-                    
-                    button.classList.add('active');
-                    const activePanel = settingsClone.querySelector(`.settings-panel[data-panel="${category}"]`);
-                    activePanel.classList.add('active');
-                    activePanel.style.display = 'block';
-                });
-
-                if (!button.classList.contains('active')) {
-                    settingsClone.querySelector(`.settings-panel[data-panel="${button.dataset.category}"]`).style.display = 'none';
+                if (button.classList.contains('active')) {
+                    settingsClone.querySelector(`.settings-panel[data-panel="${button.dataset.category}"]`).classList.add('active');
                 }
             });
 
-            popupManager.create(settingsClone, {
+            const settingsPopup = popupManager.create(settingsClone, {
                 closeOnBackdropClick: true,
                 backdropBlur: true,
                 closeButtonPosition: 'top-right',
@@ -4814,52 +4860,54 @@
             });
 
             loadSettings();
+
+            if (category) changeSettingsPanel(category);
         }
 
         function updateSourceProvider(provider) {
-            const sourceSettings = document.querySelectorAll('#sourceSettings');
-            const sourceInputs = document.querySelectorAll('#sourceInput');
-            const autoLoadToggles = document.querySelectorAll('#autoLoadToggle');
+            const sourceInput = document.querySelector('.popup-content-wrapper #sourceInput');
 
-            sourceInputs.forEach(input => {
-            input.value = '';
-            input.disabled = !autoLoadToggles[0].checked;
-            });
+            sourceInput.value = '';
+            sourceInput.disabled = !autoLoadToggles[0].checked;
 
             switch (provider) {
             case 'github':
-                sourceInputs.forEach(input => {
-                input.placeholder = translations.enterRepo || 'e.g. newZeug/aud-summary';
-                });
+                sourceInput.placeholder = translations.enterRepo || 'e.g. newZeug/aud-summary';
                 break;
             case 'gdrive':
             case 'onedrive':
             case 'dropbox':
-                sourceInputs.forEach(input => {
-                input.placeholder = 'Enter shared link';
-                });
+                sourceInput.placeholder = 'Enter shared link';
                 break;
             }
         }
 
+        function updateApiLink(provider) {
+            const apiKeyLink = document.querySelector('.popup-content-wrapper #apiKeyLink');
+
+            apiKeyLink.href = CONFIG.providers[provider].apiLink;
+            apiKeyLink.textContent = `Get ${CONFIG.providers[provider].name} API key`;
+            apiKeyLink.classList.remove('hidden');
+        }
+
         function updateProvider(provider) {
-            const modelSelects = document.querySelectorAll('#modelSelect');
-            const apiKeyLinks = document.querySelectorAll('#apiKeyLink');
-            
-            if (!modelSelects.length || !apiKeyLinks.length || !CONFIG.providers[provider]) {
-            console.error('Required elements not found or invalid provider');
-            return;
+            const currentProvider = localStorage.getItem('mdv_provider');
+
+            if (provider === currentProvider) {
+                return;
             }
 
-            modelSelects.forEach(modelSelect => {
+            updateApiLink(provider);
+            
+            const modelSelect = document.querySelector('.popup-content-wrapper #modelSelect');
             modelSelect.innerHTML = '';
 
             try {
                 CONFIG.providers[provider].models.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model;
-                option.textContent = model;
-                modelSelect.appendChild(option);
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
                 });
 
                 modelSelect.value = CONFIG.providers[provider].models[0];
@@ -4868,18 +4916,11 @@
             } catch (error) {
                 console.error('Error updating provider:', error);
             }
-            });
-
-            apiKeyLinks.forEach(link => {
-            link.href = CONFIG.providers[provider].apiLink;
-            link.textContent = `Get ${CONFIG.providers[provider].name} API key`;
-            link.classList.remove('hidden');
-            });
         }
 
         function updateTheme() {
-            const themeToggles = document.querySelector('.popup-content-wrapper #themeToggle');
-            const isDark = themeToggles.checked;
+            const themeToggle = document.querySelector('.popup-content-wrapper #themeToggle');
+            const isDark = themeToggle.checked;
 
             document.documentElement.classList.remove('dark-mode', 'light-mode');
             document.documentElement.classList.add(isDark === true ? 'dark-mode' : 'light-mode');
@@ -4888,12 +4929,9 @@
         }
 
         function saveApiKey() {
-            const providers = document.querySelector('.popup-content-wrapper #providerSelect');
-            const apiKeys = document.querySelector('.popup-content-wrapper #apiKeyInput');
+            const provider = document.querySelector('.popup-content-wrapper #providerSelect').value;
+            const apiKey = document.querySelector('.popup-content-wrapper #apiKeyInput').value;
             
-            const provider = providers.value;
-            const apiKey = apiKeys.value;
-
             if (apiKey) {
             localStorage.setItem(`mdv_${provider}_api_key`, apiKey);
             alert('API key saved successfully!');
@@ -4943,7 +4981,7 @@
             document.querySelector('.popup-content-wrapper #apiKeyInput').value = apiKey;
             
             updateRepoSettings();
-            updateProvider(provider);
+            updateApiLink(provider);
         }
 
         function saveSettings() {
@@ -4965,8 +5003,34 @@
             localStorage.setItem('mdv_source', source.trim());
             localStorage.setItem('mdv_autoload', autoLoad);
             localStorage.setItem('mdv_theme', theme);
+        }
 
-            updateUILanguage(language.trim());
+        function showReadmePopup() {
+            const hasSeenReadme = localStorage.getItem('mdv_hasSeenReadme') === 'true';
+
+            if (hasSeenReadme) {
+            return;
+            }
+
+            const content = translations.readmeMd;
+
+            const popupContent = document.createElement('div');
+            popupContent.innerHTML = renderMarkdown(content);
+
+            popupManager.create(popupContent, {
+            customClass: 'readme-popup',
+            closeButtonPosition: 'top-right',
+            width: 'min(90%, 40rem)',
+            height: 'min(80%, 30rem)',
+            onClose: () => {
+                const readmeToggle = document.querySelector('.readme-popup #readmeToggle');
+                if (readmeToggle && readmeToggle.checked) {
+                localStorage.setItem('mdv_hasSeenReadme', 'true');
+                }
+            },
+            cacheKey: 'readmePanel'
+            });
+            renderMathIn(popupContent);
         }
 
         async function sendQuestion() {
@@ -4979,7 +5043,7 @@
 
             if (!apiKey) {
                 alert('Please set up your API key in the settings first!');
-                toggleSettings();
+                toggleSettings('chat');
                 return;
             }
 
@@ -5155,6 +5219,7 @@
         function init() {
             initEventListeners();
             applySettings();
+            showReadmePopup();
             handleResize();
         }
 
