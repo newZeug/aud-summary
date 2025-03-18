@@ -143,6 +143,9 @@
         #markdownContent h3 {
             margin-top: 1.5em;
             margin-bottom: 0.5em;
+            max-width: 100%;
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
 
         #markdownContent p {
@@ -1600,20 +1603,6 @@
             transform: translateZ(0);
         }
 
-        .initial-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: var(--primary-bg-color);
-            z-index: 9999;
-        }
-
         .loader-spinner {
             width: 50px;
             height: 50px;
@@ -2607,11 +2596,6 @@
 </head>
 
 <body>
-    <div id="initialLoader" class="initial-loader">
-        <div class="loader-spinner"></div>
-        <div class="loader-text">Loading...</div>
-    </div>
-
     <div id="mainView" class="container hidden">
         <h1>Markdown Viewer</h1>
         <input type="file" id="fileInput" accept=".md, .txt" multiple>
@@ -2816,7 +2800,6 @@
             markdownContent: document.getElementById('markdownContent'),
             tocContent: document.querySelector('.toc-content'),
             markdownInput: document.getElementById('markdownInput'),
-            initialLoader: document.getElementById('initialLoader'),
         };
 
         const CONFIG = {
@@ -3798,7 +3781,6 @@
             try {
                 DOM.mainView.classList.add('hidden');
                 DOM.previewView.classList.remove('hidden');
-                DOM.initialLoader.classList.remove('hidden');
 
                 switch (sourceProvider) {
                     case 'github':
@@ -3819,8 +3801,6 @@
             } catch (error) {
                 console.error('Error in loadFromSource:', error);
                 showErrorPreview(sourceProvider, error.message);
-            } finally {
-                DOM.initialLoader.classList.add('hidden');
             }
         }
 
@@ -4836,7 +4816,6 @@
                     activePanel.style.display = 'block';
                 });
 
-                // Initially hide non-active panels
                 if (!button.classList.contains('active')) {
                     settingsClone.querySelector(`.settings-panel[data-panel="${button.dataset.category}"]`).style.display = 'none';
                 }
@@ -5194,7 +5173,6 @@
                 loadFromSource();
             } else if (DOM.mainView) {
                 DOM.mainView.classList.remove('hidden');
-                DOM.initialLoader.classList.add('hidden');
             }
         }
 
