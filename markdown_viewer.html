@@ -1701,11 +1701,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         #sourceInput {
             flex: 1;
             transition: ease-out 0.2s;
+            min-width: 60%;
         }
 
         #sourceInput:disabled {
@@ -2641,7 +2643,6 @@
                         </button>
                     </div>
                 </div>
-                <button class="theme-toggle control-button" onclick="toggleTheme()">light_mode</button>
                 <button class="settings-button control-button" onclick="toggleSettings()">settings</button>
             </div>
             <div class="topbar-right">
@@ -2660,7 +2661,6 @@
             <div class="toc-controls">
                 <button class="back-arrow control-button mobile" onclick="showMainView()">arrow_back</button>
                 <button class="save-button control-button mobile" onclick="toggleSaveMenu(event)">save</button>
-                <button class="theme-toggle control-button mobile" onclick="toggleTheme()">light_mode</button>
                 <button class="settings-button control-button mobile" onclick="toggleSettings()">settings</button>
                 <button class="edit-button control-button" onclick="editMenu(this)">
                     <span>edit</span>
@@ -2732,10 +2732,18 @@
             <div class="settings-panel active" data-panel="general">
                 <div class="settings-section">
                     <h3 class="translate" data-translate-key="language">Language</h3>
-                    <select id="languageSelect" onchange="updateLanguage(this.value)">
+                    <select id="languageSelect" onchange="updateUILanguage(this.value)">
                         <option value="en">English</option>
                         <option value="de">Deutsch</option>
                     </select>
+                </div>
+                <div class="settings-section">
+                    <h3>Design</h3>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="themeToggle" onclick="updateTheme()">
+                        <span class="toggle-slider"></span>
+                        <span class="translate" data-translate-key="darkMode">Dark Mode</span>
+                    </label>
                 </div>
             </div>
 
@@ -2829,7 +2837,7 @@
             inputPlaceholder: "Geben Sie hier Ihren Markdown-Text ein oder fügen Sie ihn ein...",
             renderMarkdown: "Markdown anzeigen",
             createdOn: "Erstellt am",
-            noResults: "Keine Ergebnisse gefunden",
+            noResults: "Keine Ergebnisse gefunden", 
             searchPlaceholder: "Dokumente durchsuchen...",
             chatPlaceholder: "Stellen Sie eine Frage zum ausgewählten Text...",
             askMe: "Fragen",
@@ -2857,6 +2865,7 @@
             general: "Allgemein",
             chat: "Chat",
             source: "Quelle",
+            darkMode: "Dunkler Modus",
             },
             en: {
             dragDropText: "Drag and drop your Markdown files here",
@@ -2893,6 +2902,7 @@
             general: "General",
             chat: "Chat",
             source: "Source",
+            darkMode: "Dark mode",
             }
         }
 
@@ -3191,6 +3201,13 @@
                 if (selection.toString().trim() && markdownContent.contains(selection.anchorNode)) {
                     currentSelection = selection.toString();
                     updateChatContext(currentSelection);
+                }
+            });
+
+            document.querySelector('.chat-input textarea').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendQuestion();
                 }
             });
 
@@ -4529,44 +4546,6 @@
             });
         }
 
-        function initThemeDetection() {
-            const savedTheme = localStorage.getItem('mdv_theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            document.documentElement.classList.remove('dark-mode', 'light-mode');
-
-            if (savedTheme) {
-                document.documentElement.classList.add(savedTheme === 'dark' ? 'dark-mode' : 'light-mode');
-                updateThemeToggle(savedTheme === 'dark');
-            } else {
-                document.documentElement.classList.add(prefersDark ? 'dark-mode' : 'light-mode');
-                updateThemeToggle(prefersDark);
-            }
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                if (!localStorage.getItem('mdv_theme')) {
-                    document.documentElement.classList.remove('dark-mode', 'light-mode');
-                    document.documentElement.classList.add(e.matches ? 'dark-mode' : 'light-mode');
-                    updateThemeToggle(e.matches);
-                }
-            });
-        }
-
-        function toggleTheme() {
-            const isDark = !document.documentElement.classList.contains('dark-mode');
-            document.documentElement.classList.remove('dark-mode', 'light-mode');
-            document.documentElement.classList.add(isDark ? 'dark-mode' : 'light-mode');
-            localStorage.setItem('mdv_theme', isDark ? 'dark' : 'light');
-            updateThemeToggle(isDark);
-        }
-
-        function updateThemeToggle(isDark) {
-            document.querySelectorAll('.theme-toggle').forEach(toggle => {
-                toggle.textContent = isDark ? 'dark_mode' : 'light_mode';
-                toggle.title = `Switch to ${isDark ? 'light' : 'dark'} mode`;
-            });
-        }
-
         function copyCodeBlock(codeElement, button) {
             const tempElement = codeElement.cloneNode(true);
             const lineNumbers = tempElement.querySelectorAll('.line-number');
@@ -4898,16 +4877,22 @@
             });
         }
 
-        function updateLanguage(language) {
-            localStorage.setItem('mdv_language', language);
+        function updateTheme() {
+            const themeToggles = document.querySelector('.popup-content-wrapper #themeToggle');
+            const isDark = themeToggles.checked;
+
+            document.documentElement.classList.remove('dark-mode', 'light-mode');
+            document.documentElement.classList.add(isDark === true ? 'dark-mode' : 'light-mode');
+
+            localStorage.setItem('mdv_theme', isDark);
         }
 
         function saveApiKey() {
-            const providers = document.querySelectorAll('#providerSelect');
-            const apiKeys = document.querySelectorAll('#apiKeyInput');
+            const providers = document.querySelector('.popup-content-wrapper #providerSelect');
+            const apiKeys = document.querySelector('.popup-content-wrapper #apiKeyInput');
             
-            const provider = providers[0].value;
-            const apiKey = apiKeys[0].value;
+            const provider = providers.value;
+            const apiKey = apiKeys.value;
 
             if (apiKey) {
             localStorage.setItem(`mdv_${provider}_api_key`, apiKey);
@@ -4916,12 +4901,9 @@
         }
 
         function updateRepoSettings() {
-            const autoLoadToggles = document.querySelectorAll('#autoLoadToggle');
-            const sourceInputs = document.querySelectorAll('#sourceInput');
-
-            sourceInputs.forEach((input, index) => {
-            input.disabled = !autoLoadToggles[index].checked;
-            });
+            const autoLoadToggle = document.querySelector('.popup-content-wrapper #autoLoadToggle');
+            const sourceInput = document.querySelector('.popup-content-wrapper #sourceInput');
+            sourceInput.disabled = !autoLoadToggle.checked;
         }
 
         function loadSettings() {
@@ -4931,14 +4913,17 @@
             const sourceProvider = localStorage.getItem('mdv_source_provider') || 'github';
             const repoLink = localStorage.getItem('mdv_source') || 'newZeug/aud-summary';
             const autoLoad = localStorage.getItem('mdv_autoload') === 'true';
+            const theme = localStorage.getItem('mdv_theme') === 'true';
 
-            document.querySelectorAll('#languageSelect').forEach(select => select.value = language);
-            document.querySelectorAll('#providerSelect').forEach(select => select.value = provider);
-            document.querySelectorAll('#sourceSelect').forEach(select => select.value = sourceProvider);
-            document.querySelectorAll('#sourceInput').forEach(input => input.value = repoLink);
-            document.querySelectorAll('#autoLoadToggle').forEach(toggle => toggle.checked = autoLoad);
+            document.querySelector('.popup-content-wrapper #languageSelect').value = language;
+            document.querySelector('.popup-content-wrapper #providerSelect').value = provider;
+            document.querySelector('.popup-content-wrapper #sourceSelect').value = sourceProvider;
+            document.querySelector('.popup-content-wrapper #sourceInput').value = repoLink;
+            document.querySelector('.popup-content-wrapper #autoLoadToggle').checked = autoLoad;
+            document.querySelector('.popup-content-wrapper #themeToggle').checked = theme;
 
-            document.querySelectorAll('#modelSelect').forEach(modelSelect => {
+            const modelSelect = document.querySelector('.popup-content-wrapper #modelSelect');
+            
             modelSelect.innerHTML = '';
             CONFIG.providers[provider].models.forEach(model => {
                 const option = document.createElement('option');
@@ -4953,10 +4938,9 @@
                 modelSelect.value = CONFIG.providers[provider].models[0];
                 localStorage.setItem('mdv_model', CONFIG.providers[provider].models[0].trim());
             }
-            });
 
             const apiKey = localStorage.getItem(`mdv_${provider}_api_key`) || '';
-            document.querySelectorAll('#apiKeyInput').forEach(input => input.value = apiKey);
+            document.querySelector('.popup-content-wrapper #apiKeyInput').value = apiKey;
             
             updateRepoSettings();
             updateProvider(provider);
@@ -4972,6 +4956,7 @@
             const sourceProvider = settingsPopup.querySelector('#sourceSelect').value;
             const source = settingsPopup.querySelector('#sourceInput').value;
             const autoLoad = settingsPopup.querySelector('#autoLoadToggle').checked;
+            const theme = settingsPopup.querySelector('#themeToggle').checked;
 
             localStorage.setItem('mdv_provider', provider.trim());
             localStorage.setItem('mdv_model', model.trim());
@@ -4979,6 +4964,7 @@
             localStorage.setItem('mdv_source_provider', sourceProvider.trim());
             localStorage.setItem('mdv_source', source.trim());
             localStorage.setItem('mdv_autoload', autoLoad);
+            localStorage.setItem('mdv_theme', theme);
 
             updateUILanguage(language.trim());
         }
@@ -5151,29 +5137,25 @@
             }
         }
 
+        function applySettings() {
+            const isDarkTheme = localStorage.getItem('mdv_theme') === 'true';
+            document.documentElement.classList.add(isDarkTheme ? 'dark-mode' : 'light-mode');
+
+            const language = localStorage.getItem('mdv_language') || 'en';
+            updateUILanguage(language);
+
+            const autoLoad = localStorage.getItem('mdv_autoload') === 'true';
+            if (autoLoad) {
+            loadFromSource();
+            } else {
+            DOM.mainView.classList.remove('hidden');
+            }
+        }
+
         function init() {
             initEventListeners();
-            initThemeDetection();
+            applySettings();
             handleResize();
-
-            const storedLanguage = localStorage.getItem('mdv_language');
-            if (storedLanguage) {
-                updateUILanguage(storedLanguage);
-            }
-
-            document.querySelector('.chat-input textarea').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendQuestion();
-                }
-            });
-
-            const autoLoad = localStorage.getItem('mdv_autoload');
-            if (autoLoad === 'true') {
-                loadFromSource();
-            } else if (DOM.mainView) {
-                DOM.mainView.classList.remove('hidden');
-            }
         }
 
         document.addEventListener("DOMContentLoaded", init);
