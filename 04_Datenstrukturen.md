@@ -43,13 +43,10 @@ Sei ein Stack `S` wie folgt initialisiert:
 **Operationen auf** `S`:
 
 \begin{tabular}{lll}
-    1) & ``pop(S)`` & \tilerow{3,5,,} \\
-    \\[-0.7em]
-    2) & ``pop(S)`` & \tilerow{3,,,} \\
-    \\[-0.7em]
-    3) & ``push(S,1)`` & \tilerow{3,1,,} \\
-    \\[-0.7em]
-    4) & ``push(S,7)`` & \tilerow{3,1,7,} \\
+1) & ``pop(S)`` & \tilerow{3,5,,} \\
+2) & ``pop(S)`` & \tilerow{3,,,} \\
+3) & ``push(S,1)`` & \tilerow{3,1,,} \\
+4) & ``push(S,7)`` & \tilerow{3,1,7,} \\
 \end{tabular}
 
 ## Queues
@@ -77,13 +74,10 @@ Sei eine Queue `Q` wie folgt initialisiert:
 **Operationen auf** `Q`:
 
 \begin{tabular}{lll}
-    1) & ``dequeue(Q)`` & \tilerow{,2,5,} \\
-    \\[-0.7em]
-    2) & ``enqueue(Q,3)`` & \tilerow{,2,5,3} \\
-    \\[-0.7em]
-    3) & ``enqueue(Q,4)`` & \tilerow{4,2,5,3} \\
-    \\[-0.7em]
-    4) & ``dequeue(Q)`` & \tilerow{4,,5,3} \\
+1) & ``dequeue(Q)`` & \tilerow{,2,5,} \\
+2) & ``enqueue(Q,3)`` & \tilerow{,2,5,3} \\
+3) & ``enqueue(Q,4)`` & \tilerow{4,2,5,3} \\
+4) & ``dequeue(Q)`` & \tilerow{4,,5,3} \\
 \end{tabular}
 
 ## Verkettete Listen

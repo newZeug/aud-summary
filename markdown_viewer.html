@@ -185,7 +185,9 @@
         #markdownContent ul:not(.toc-sub-list),
         #markdownContent ol,
         .chat-container ul,
-        .chat-container ol {
+        .chat-container ol,
+        .popup-container ul,
+        .popup-container ol {
             padding-left: 2em;
             margin-bottom: 1em;
         }
@@ -580,8 +582,8 @@
             right: 20px;
         }
 
-        #mainView.add-content-popup h1,
-        #mainView.add-content-popup .settings-button {
+        .add-content-popup #mainView h1,
+        .add-content-popup #mainView .settings-button {
             display: none;
         }
 
@@ -898,7 +900,7 @@
             margin-left: 0.5rem;
             white-space: nowrap;
             overflow-y: hidden;
-            text-overflow: ellipsis;
+            /* text-overflow: ellipsis; */
             overflow-x: auto;
         }
 
@@ -2882,9 +2884,9 @@ Mit diesem Tool können Sie Markdown-Dateien direkt in Ihrem Browser anzeigen. S
 - **Text auswählen:** Wählen Sie einen beliebigen Text im Dokument aus, um den Kontext für die KI festzulegen.
 - **Fragen stellen:** Geben Sie Ihre Frage in das Chat-Eingabefeld ein und drücken Sie die Eingabetaste.
 
-    ### 5. Laden von Quellen
-    - **GitHub:** Laden Sie Markdown-Dateien direkt aus einem GitHub-Repository.
-    - **Automatisches Laden:** Lädt automatisch Dateien aus der angegebenen Quelle.
+### 5. Laden von Quellen
+- **GitHub:** Laden Sie Markdown-Dateien direkt aus einem GitHub-Repository.
+- **Automatisches Laden:** Lädt automatisch Dateien aus der angegebenen Quelle.
 
 <div class="help-buttons">
     <button class="understood-btn translate" data-translate-key="iUnderstand" onclick="localStorage.setItem('mdv_hasSeenReadme', 'true'); popupManager.closeAll();">Ich verstehe</button>
@@ -3364,8 +3366,40 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     formulars: [],
                     template: (className, content) => `<div class="${className}">${content}</div>`
                 },
+                tabular: {
+                    environments: ["tabular"],
+                    className: "tabular", 
+                    formulars: [],
+                    template: (className, content) => {
+                        // Extract column definition and table content
+                        const match = content.match(/\\begin{tabular}{(.+?)}\s*([\s\S]*?)\\end{tabular}/);
+                        if (!match) return content;
+                        
+                        const [_, colDef, tableContent] = match;
+                        
+                        // Parse column definition
+                        const cols = colDef.replace(/[^lcr]/g, '').length;
+                        
+                        // Split into rows
+                        const rows = tableContent.trim().split('\\\\');
+                        
+                        // Build HTML table
+                        let html = '<table>';
+                        rows.forEach(row => {
+                            html += '<tr>';
+                            const cells = row.split('&');
+                            cells.forEach(cell => {
+                                html += `<td>${cell.trim()}</td>`;
+                            });
+                            html += '</tr>';
+                        });
+                        html += '</table>';
+                        
+                        return `<div class="${className}">${html}</div>`;
+                    }
+                },
                 rest: {
-                    environments: ["tabular", "enumerate"],
+                    environments: ["enumerate"],
                     className: "rest",
                     formulars: [],
                     template: (className, content) => `\<div class="${className}"\>${content}\</div\>`
