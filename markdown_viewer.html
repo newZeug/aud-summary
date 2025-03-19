@@ -3496,7 +3496,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     environments: ["flalign\\*"],
                     type: "block",
                     className: "math-jaxs",
-                    template: (className, content) => `\<div class="${className}"\>${content}\<div\>`
+                    template: (className, content) => `<div class="${className}">${content}</div>`
                 },
                 tikzJax: {
                     environments: ["tikzpicture"],
@@ -3509,19 +3509,14 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     type: "block",
                     className: "tabular",
                     template: (className, content) => {
-                        // Extract column definition and table content
                         const match = content.match(/\\begin{tabular}{(.+?)}\s*([\s\S]*?)\\end{tabular}/);
                         if (!match) return content;
 
                         const [_, colDef, tableContent] = match;
 
-                        // Parse column definition
                         const cols = colDef.replace(/[^lcr]/g, '').length;
-
-                        // Split into rows and filter out empty rows
                         const rows = tableContent.trim().split('\\\\').filter(row => row.trim());
 
-                        // Build HTML table
                         let html = '<table>';
                         rows.forEach(row => {
                             html += '<tr>';
@@ -3544,10 +3539,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                         const match = content.match(/\\tilerow\{([^}]*?)\}/);
                         if (!match) return content;
 
-                        // Get the content between the curly braces
                         const tilesContent = match[1];
-
-                        // Split by comma, but preserve empty entries
                         const tiles = tilesContent.split(',');
 
                         let html = `<table class="${className}"><tr>`;
@@ -3954,6 +3946,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     const formular = formulars[index];
                     const placeholder = `LATEX_BLOCK_${formular.id}_${renderer}`;
                     const jax = template(className, formular.content);
+                    console.log(jax);
                     html = html.replace(placeholder, jax);
                 }
             }

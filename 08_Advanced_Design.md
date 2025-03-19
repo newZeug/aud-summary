@@ -183,8 +183,6 @@ Es gilt $V^{-1}=(\frac{\omega^{-ij}}{m})_{ij}$, denn:
                     \end{cases} &
 \end{flalign*}
 
-
-
 #### Algorithmen
 
 ```
