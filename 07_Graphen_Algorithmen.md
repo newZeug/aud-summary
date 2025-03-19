@@ -112,7 +112,10 @@ Eine mögliche topologische Sortierung für den Graph $S$ lautet dann $G \righta
 Graph $G=(V,E)$ ist ein Baum, wenn $V$ leer ist oder es einen Knoten $r \in V$ ("Wurzel") gibt, so dass jeder Knoten $v$ von der Wurzel aus per eindeutigem Pfad erreichbar ist.
 
 ### Darstellung als Matrix
-Für einen Graphen $G=(V,E)$ wobei $$V=\{1,2,3,4,5,6\}$$, $$E=\{(1,4),(1,5),(2,1),(2,2),(4,2),(5,6),(6,4)\}$$ gilt, sieht die Matrix wie folgt aus:<>
+Für einen Graphen $G=(V,E)$ wobei 
+$$V=\{1,2,3,4,5,6\}$$ 
+$$E=\{(1,4),(1,5),(2,1),(2,2),(4,2),(5,6),(6,4)\}$$ 
+gilt, sieht die Matrix wie folgt aus:<>
 
 $A=\begin{bmatrix}
     0 & 0 & 0 & 1 & 1 & 0 \\
