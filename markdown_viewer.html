@@ -2859,7 +2859,7 @@
                         <input class="translate" data-translate-key="enterRepo" type="text" id="sourceInput"
                             placeholder="e.g. newZeug/aud-summary" value="newZeug/aud-summary" disabled>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="autoLoadToggle" onclick="updateRepoSettings()">
+                            <input type="checkbox" id="autoLoadToggle" onclick="updateRepoSettings()" checked>
                             <span class="toggle-slider"></span>
                             <span class="translate" data-translate-key="autoLoad">Auto Load</span>
                         </label>
@@ -5211,9 +5211,10 @@ This tool allows you to view Markdown files directly in your browser. Here's how
 
         function updateSourceProvider(provider) {
             const sourceInput = document.querySelector('.popup-content-wrapper #sourceInput');
+            const autoLoadToggle = document.querySelector('.popup-content-wrapper #autoLoadToggle')
 
             sourceInput.value = '';
-            sourceInput.disabled = !autoLoadToggles[0].checked;
+            sourceInput.disabled = !autoLoadToggle.checked;
 
             switch (provider) {
                 case 'github':
@@ -5295,8 +5296,10 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             const savedModel = localStorage.getItem('mdv_model');
             const sourceProvider = localStorage.getItem('mdv_source_provider') || 'github';
             const repoLink = localStorage.getItem('mdv_source') || 'newZeug/aud-summary';
-            const autoLoad = localStorage.getItem('mdv_autoload') === 'true';
-            const theme = localStorage.getItem('mdv_theme') === 'true';
+            const mdvAutoLoad = localStorage.getItem('mdv_autoload');
+            const autoLoad = mdvAutoLoad ? mdvAutoLoad === 'true': true;
+            const mdvTheme = localStorage.getItem('mdv_theme');
+            const theme = mdvTheme ? mdvTheme === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches;
 
             document.querySelector('.popup-content-wrapper #languageSelect').value = language;
             document.querySelector('.popup-content-wrapper #providerSelect').value = provider;
@@ -5546,17 +5549,19 @@ This tool allows you to view Markdown files directly in your browser. Here's how
         }
 
         function applySettings() {
-            const isDarkTheme = localStorage.getItem('mdv_theme') === 'true';
+            const mdvTheme = localStorage.getItem('mdv_theme');
+            const isDarkTheme = mdvTheme ? mdvTheme === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches;
             document.documentElement.classList.add(isDarkTheme ? 'dark-mode' : 'light-mode');
 
             const language = localStorage.getItem('mdv_language') || 'en';
             updateUILanguage(language);
 
-            const autoLoad = localStorage.getItem('mdv_autoload') === 'true';
-            if (autoLoad) {
-                loadFromSource();
+            const mdvAutoLoad = localStorage.getItem('mdv_autoload');
+            if (mdvAutoLoad) {
+                if (mdvAutoLoad === 'true') loadFromSource();
+                else DOM.mainView.classList.remove('hidden');
             } else {
-                DOM.mainView.classList.remove('hidden');
+                loadFromSource()
             }
         }
 
