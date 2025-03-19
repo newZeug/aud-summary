@@ -22,10 +22,12 @@ The viewer can render LaTeX expressions using both KaTeX and MathJax:
    \end{flalign*}
    ```
 
-4. **TikZ Diagrams**: For creating mathematical diagrams
+4. **TikZ Diagrams**: For creating mathematical diagrams and visualizations
    ```latex
    \begin{tikzpicture}
-   \draw (0,0) -- (1,1) -- (2,0);
+   \draw[thick,->] (-2,0) -- (2,0) node[right]{$x$};
+   \draw[thick,->] (0,-2) -- (0,2) node[above]{$y$};
+   \draw[blue] (0,0) circle (1);
    \end{tikzpicture}
    ```
 
@@ -80,6 +82,11 @@ The viewer can render LaTeX expressions using both KaTeX and MathJax:
    ```md
    ![Alt text](image.png){width="300px", max-height="200px"}
    ```
+3. **Interactive Popup View**:
+   - Click images to open in fullscreen popup
+   - Double-click or pinch to zoom
+   - Pan zoomed images by dragging
+   - View image descriptions as captions
 
 ### Navigation Features
 
