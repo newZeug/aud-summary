@@ -293,7 +293,7 @@ Siehe Abbildung \ref{fig:minimum-edit-distance}
 
 ## Greedy Algorithmen
 
-Greedy-Algorithmen sind in der Informatik einfache Entscheidungsmethoden, bei denen immer die aktuell beste Option ausgewählt wird, ohne spätere Konsequenzen zu berücksichtigen. Sie sind schnell, aber nicht immer optimal. [Dijkstra-SSSP](#dijkstra) und [MST-Kruskal](#kruskal-algorithmus) sind z.B. solche Algorithmen.
+Greedy-Algorithmen sind in der Informatik einfache Entscheidungsmethoden, bei denen immer die aktuell beste Option ausgewählt wird, ohne spätere Konsequenzen zu berücksichtigen. Sie sind schnell, aber nicht immer optimal. Dijkstra-SSSP sind z.B. solche Algorithmen.
 
 **Genauer**: Finde Lösung $x=(x_1,x_2,...,x_n)$ indem Teillösung $x_1,x_2,...,x_{i-1}$ durch Kandidaten $x_i$ ergänzt wird, der lokal am günstigsten erscheint.
 
@@ -305,7 +305,7 @@ Der Algorithmus funktioniert zwar oft, manchmal ist er aber zu "gierig". Ein Bei
 
 Hierbei wäre der kosteneffizienteste Weg $1\rightarrow 2 \rightarrow 4 \rightarrow 3 \rightarrow 5$ mit Gewicht $6+2-5+0=3$. Allerdings wählt der Dijkstra Algorithmus den Weg $1 \rightarrow 5$ mit Gewicht $5$. (Abbildung \ref{fig:dijkstra-limitation})
 
-Siehe Abschnitte [Dijkstra](#dijkstra).
+Siehe Abschnitte Dijkstra.
 
 ### Traveling Salesperson Problem (TSP)
 

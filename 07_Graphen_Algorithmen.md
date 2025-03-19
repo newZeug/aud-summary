@@ -76,7 +76,7 @@ Wenn ein Graph $G'$ selber ein Graph ist und eine Teilmenge der Knoten und Kante
 
 ### Topologische Sortierung
 
-Damit ein Graph topologisch sortierbar ist, muss er [gerichtet](#gerichteter-graph) und [azyklisch](#azyklischer-graph) sein.
+Damit ein Graph topologisch sortierbar ist, muss er gerichtet sein.
 
 Sei ein Graph $S$ gegeben durch
 
@@ -105,7 +105,7 @@ Sei ein Graph $S$ gegeben durch
     \draw[->] (7) -- (8);
 \end{tikzpicture}
 
-Eine mögliche topologische Sortierung für den Graph $S$ lautet dann $G \rightarrow A \rightarrow B \rightarrow E \rightarrow F \rightarrow D \rightarrow H \rightarrow C$. Diese betrachtet die *Finishing Time* der einzelnen Knoten bei angewendeter [Tiefensuche](#depth-first-search-dfs).
+Eine mögliche topologische Sortierung für den Graph $S$ lautet dann $G \rightarrow A \rightarrow B \rightarrow E \rightarrow F \rightarrow D \rightarrow H \rightarrow C$. Diese betrachtet die *Finishing Time* der einzelnen Knoten bei angewendeter Tiefensuche.
 
 ### Graphen und Bäume
 
@@ -123,7 +123,7 @@ $A=\begin{bmatrix}
     0 & 0 & 0 & 1 & 0 & 0
 \end{bmatrix}$
 
-(siehe [adjunkte Matrix](#adjunkte-matrix))
+(siehe adjunkte Matrix
 
 ### Starke Zusammenhangskomponenten
 
@@ -591,7 +591,7 @@ Ford-Fulkerson(G,s,t,c):
 
 
 #### Beispiel
-Siehe Abbildung \ref{fig:ford-fulkerson} für ein Beispiel welches zur Pfadsuche [DFS](#depth-first-search-dfs) verwendet und immer den kleinsten Knoten zuerst bzw. Knoten $t$ vor allen anderen Knoten wählt.
+Siehe Abbildung \ref{fig:ford-fulkerson} für ein Beispiel welches zur Pfadsuche DFS verwendet und immer den kleinsten Knoten zuerst bzw. Knoten $t$ vor allen anderen Knoten wählt.
 
 ![Initialzustand](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/ford_fulkerson-init.png){ width=25% }
 

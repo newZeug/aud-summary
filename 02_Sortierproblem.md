@@ -108,7 +108,7 @@ $$5 \cdot n^2+n^4 \in O(n^2)+n^4 \subseteq O(n^4) \subseteq O(n^5)$$
 
 ### Ungleichungen
 
-Wie bereits im [Zusammenhang der Landau-Symbole](#zusammenhang-der-landau-symbole) definiert, wird für $\leq$-Ungleichungen $O$
+Wie bereits im Zusammenhang der Landau-Symbole definiert, wird für $\leq$-Ungleichungen $O$
 und für $\geq$-Ungleichungen $\Omega$ verwendet. Bspw.
 
 $$5 \cdot n^2+n^4 \leq 6 \cdot n^4=O(n^4)$$
@@ -136,7 +136,7 @@ Ein Sortierverfahren ist dann stabil, wenn es die ursprüngliche Reihenfolge der
 
 ## Insertionsort
 
-Insertionsort ist ein [stabiler](#stabilität) Sortieralgorithmus.
+Insertionsort ist ein stabiler Sortieralgorithmus.
 
 ### Algorithmus
 
@@ -218,7 +218,7 @@ Je länger ein String, desto weiter vorne in der sortierten Liste befindet er si
 
 ## Bubble Sort
 
-Bubble Sort ist ein [stabiler](#stabilität) Sortieralgorithmus.
+Bubble Sort ist ein stabiler Sortieralgorithmus.
 
 ### Algorithmus
 
@@ -239,7 +239,7 @@ $$n+n-1+...+0=\sum_{i=0}^{n}i=\frac{n(n+1)}{2}$$
 
 ## Mergesort
 
-Mergesort ist ein [stabiler](#stabilität) Sortieralgorithmus.
+Mergesort ist ein stabiler Sortieralgorithmus.
 
 ### Vorgehen
 
@@ -321,7 +321,7 @@ Ferner gilt: $B[i-1] \leq A[pl],A[pr]$
 
 ## Quicksort
 
-Quicksort ist **kein** [stabiler](#stabilität) Sortieralgorithmus
+Quicksort ist **kein** stabiler Sortieralgorithmus
 
 ### Vorgehen
 
@@ -376,7 +376,7 @@ Siehe Abbildung \ref{fig:quick-sort}
 
 ## Radix Sort
 
-Radix Sort ist ein [stabiler](#stabilität) Sortieralgorithmus
+Radix Sort ist ein stabiler Sortieralgorithmus
 
 ### Algorithmen
 

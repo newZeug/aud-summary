@@ -1787,6 +1787,20 @@
             display: block;
         }
 
+        #markdownContent .tile-row {
+            width: min(40rem, 50%);
+            border-collapse: collapse;
+            margin: 0.5em 0;
+            min-width: unset;
+            table-layout: fixed;
+        }
+
+        #markdownContent .tile-row .tile {
+            padding: 0.25em;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
         html.dark-mode {
             * {
                 --highlight-color: #619dcc;
@@ -1798,6 +1812,10 @@
                 --text-color: #e0e0e0;
                 --red-bg: #713535;
                 --red-color: #fdbebd;
+            }
+
+            #markdownContent .tile-row td {
+                border-color: #444;
             }
 
             mark.highlight {
@@ -2701,7 +2719,7 @@
             <div class="chat-input">
                 <textarea class="translate" data-translate-key="chatPlaceholder"
                     placeholder="Ask a question about the selected text..."></textarea>
-                <button onclick="sendQuestion()"><span class="material-symbols-rounded">send</span></button>
+                <button onclick="sendRequest()"><span class="material-symbols-rounded">send</span></button>
             </div>
         </div>
     </div>
@@ -3264,7 +3282,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             document.querySelector('.chat-input textarea').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendQuestion();
+                    sendRequest();
                 }
             });
 
@@ -3353,23 +3371,24 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                 ":wink:": "😉", ":cry:": "😢", ":laughing:": "😆", ":yum:": "😋", ":joy:": "😂",
                 ":-)": "😊", ":-(": "☹️", "8-)": "😎", ";)": "😉"
             };
-            let latexBlocks = {
+
+            const latexBlocks = {
                 mathJaxs: {
                     environments: ["flalign\\*"],
+                    type: "block",
                     className: "math-jaxs",
-                    formulars: [],
                     template: (className, content) => `\<p class="${className}"\>${content}\<p\>`
                 },
                 tikzJax: {
                     environments: ["tikzpicture"],
+                    type: "block",
                     className: "tikz",
-                    formulars: [],
                     template: (className, content) => `<div class="${className}">${content}</div>`
                 },
                 tabular: {
                     environments: ["tabular"],
+                    type: "block",
                     className: "tabular", 
-                    formulars: [],
                     template: (className, content) => {
                         // Extract column definition and table content
                         const match = content.match(/\\begin{tabular}{(.+?)}\s*([\s\S]*?)\\end{tabular}/);
@@ -3380,8 +3399,8 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                         // Parse column definition
                         const cols = colDef.replace(/[^lcr]/g, '').length;
                         
-                        // Split into rows
-                        const rows = tableContent.trim().split('\\\\');
+                        // Split into rows and filter out empty rows
+                        const rows = tableContent.trim().split('\\\\').filter(row => row.trim());
                         
                         // Build HTML table
                         let html = '<table>';
@@ -3389,7 +3408,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                             html += '<tr>';
                             const cells = row.split('&');
                             cells.forEach(cell => {
-                                html += `<td>${cell.trim()}</td>`;
+                                html += `<td>${renderMarkdown(cell.trim())}</td>`;
                             });
                             html += '</tr>';
                         });
@@ -3398,23 +3417,56 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                         return `<div class="${className}">${html}</div>`;
                     }
                 },
-                rest: {
-                    environments: ["enumerate"],
-                    className: "rest",
-                    formulars: [],
-                    template: (className, content) => `\<div class="${className}"\>${content}\</div\>`
+                tileRow: {
+                    environments: ["tilerow"],
+                    type: "single",
+                    className: "tile-row",
+                    template: (className, content) => {
+                        const match = content.match(/\\tilerow\{([^}]*?)\}/);
+                        if (!match) return content;
+                    
+                        // Get the content between the curly braces
+                        const tilesContent = match[1];
+                        
+                        // Split by comma, but preserve empty entries
+                        const tiles = tilesContent.split(',');
+                        
+                        let html = `<table class="${className}"><tr>`;
+                        tiles.forEach(tile => {
+                            const trimmedTile = tile.trim();
+                            html += `<td class="tile">${trimmedTile.length > 0 ? renderMarkdown(trimmedTile) : ''}</td>`;
+                        });
+                        html += '</tr></table>';
+                    
+                        return html;
+                    }
                 }
             };
 
-            for (renderer in latexBlocks) {
-                let { environments, formulars } = latexBlocks[renderer];
+            let formularMap = {};
+
+            for (const renderer in latexBlocks) {
+                let { environments, type } = latexBlocks[renderer];
                 environments.forEach(environment => {
-                    const regex = new RegExp(`\\\\begin\\{${environment}\\}[\\s\\S]*?\\\\end\\{${environment}\\}`, 'g');
-                    markdownText = markdownText.replace(regex, (match, content) => {
-                        const placeholder = `LATEX_BLOCK_${formulars.length}_${renderer}`;
-                        formulars.push(match);
-                        return placeholder;
-                    });
+                    if (type === 'block') {
+                        const regex = new RegExp(`\\\\begin\\{${environment}\\}[\\s\\S]*?\\\\end\\{${environment}\\}`, 'g');
+                        markdownText = markdownText.replace(regex, (match, content) => {
+                            if (!(renderer in formularMap)) formularMap[renderer] = [];
+                            const randomId = Math.random().toString(36).substring(2);
+                            const placeholder = `LATEX_BLOCK_${randomId}_${renderer}`;
+                            formularMap[renderer].push({ id: randomId, content: match });
+                            return placeholder;
+                        });
+                    } else if (type === 'single') {
+                        const regex = new RegExp(`\\\\${environment}\\{[0-9,]*?\\}`, 'g');
+                        markdownText = markdownText.replace(regex, (match, content) => {
+                            if (!(renderer in formularMap)) formularMap[renderer] = [];
+                            const randomId = Math.random().toString(36).substring(2);
+                            const placeholder = `LATEX_BLOCK_${randomId}_${renderer}`;
+                            formularMap[renderer].push({ id: randomId, content: match });
+                            return placeholder;
+                        });
+                    }
                 });
             }
 
@@ -3775,13 +3827,16 @@ This tool allows you to view Markdown files directly in your browser. Here's how
 
             let html = marked.parse(markdownText);
 
-            for (renderer in latexBlocks) {
-                let { className, formulars, template } = latexBlocks[renderer];
-                formulars.forEach((formular, index) => {
-                    const placeholder = `LATEX_BLOCK_${index}_${renderer}`;
-                    jax = template(className, formulars[index]);
+            for (const renderer in formularMap) {
+                const { className, template } = latexBlocks[renderer];
+                const formulars = formularMap[renderer];
+
+                for (const index in formulars) {
+                    const formular = formulars[index];
+                    const placeholder = `LATEX_BLOCK_${formular.id}_${renderer}`;
+                    const jax = template(className, formular.content);
                     html = html.replace(placeholder, jax);
-                });
+                }
             }
 
             return html
@@ -3911,10 +3966,10 @@ This tool allows you to view Markdown files directly in your browser. Here's how
         }
 
         function showPreview(markdownText, fileName = '') {
-            // Only hide mainView if it's not in popup mode
-            if (DOM.mainView && !DOM.mainView.classList.contains('popup')) {
+            if (DOM.mainView) {
                 DOM.mainView.classList.add('hidden');
             }
+
             document.body.style.overflow = '';
             DOM.previewView.classList.remove('hidden');
 
@@ -5068,9 +5123,9 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             renderMathIn(popupContent);
         }
 
-        async function sendQuestion() {
+        async function sendRequest() {
             const provider = localStorage.getItem('mdv_provider') || 'google';
-            const modelSelect = document.getElementById('modelSelect');
+            const modelSelect = document.querySelector('.popup-content-wrapper #modelSelect');
             const model = modelSelect ? modelSelect.value : (localStorage.getItem('mdv_model') || CONFIG.providers[provider].models[0]);
             const apiKey = localStorage.getItem(`mdv_${provider}_api_key`);
 
@@ -5146,7 +5201,6 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                 'Content-Type': 'application/json'
             };
 
-            // Add provider-specific headers
             switch (provider) {
                 case 'google':
                     headers['x-goog-api-key'] = apiKey;
