@@ -3946,7 +3946,6 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     const formular = formulars[index];
                     const placeholder = `LATEX_BLOCK_${formular.id}_${renderer}`;
                     const jax = template(className, formular.content);
-                    console.log(jax);
                     html = html.replace(placeholder, jax);
                 }
             }
