@@ -78,7 +78,7 @@ The viewer can render LaTeX expressions using both KaTeX and MathJax:
 1. **Automatic Loading**: Images are loaded with a loading state
 2. **Size Attributes**: Supports width and height via curly brackets
    ```md
-   ![Alt text](image.png){width=300px height=200px}
+   ![Alt text](image.png){width="300px", max-height="200px"}
    ```
 
 ### Navigation Features
@@ -92,9 +92,8 @@ The viewer can render LaTeX expressions using both KaTeX and MathJax:
 
 1. **Context-Aware AI**: Ask questions about selected text
 2. **Multiple AI Providers**:
-   - Google AI (PaLM)
+   - Google Gemini
    - OpenAI (GPT)
-   - Custom provider support
 
 ### Export Options
 
