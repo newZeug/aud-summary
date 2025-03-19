@@ -15,9 +15,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
-    <script src="https://tikzjax.com/v1/tikzjax.js"></script>
-
     <!-- For LaTeX code -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"></script>
@@ -1800,7 +1797,7 @@
             text-align: center;
             border: 1px solid #ddd;
         }
-        
+
         html.dark-mode {
             * {
                 --highlight-color: #619dcc;
@@ -3368,7 +3365,37 @@ This tool allows you to view Markdown files directly in your browser. Here's how
         }
 
         function renderTikzIn(element) {
-            const tikzCode = element.textContent.trim();
+    // Load TikZJS dynamically if not already present
+    if (!window.tikzjs) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.example.com/tikzjs/tikzjs.min.js';
+        script.onload = () => processTikZ(element);
+        document.head.appendChild(script);
+    } else {
+        processTikZ(element);
+    }
+}
+
+function processTikZ(element) {
+    const tikzCode = element.innerHTML.trim();
+    
+    // Create a container for the rendered output
+    const container = document.createElement('div');
+    container.className = 'tikz-container';
+    
+    // Render the TikZ code using the TikZJS library
+    window.tikzjs.render(tikzCode, container);
+    
+    // Replace the original content
+    element.innerHTML = '';
+    element.appendChild(container);
+}
+
+        function processDynamicTikz() {
+            document.querySelectorAll(".tikz:not([data-processed='true'])").forEach(element => {
+                renderTikzIn(element);
+                element.setAttribute('data-processed', 'true');
+            });
         }
 
         function renderMarkdown(markdownText) {
@@ -3382,7 +3409,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     environments: ["flalign\\*"],
                     type: "block",
                     className: "math-jaxs",
-                    template: (className, content) => `\<p class="${className}"\>${content}\<p\>`
+                    template: (className, content) => `\<div class="${className}"\>${content}\<div\>`
                 },
                 tikzJax: {
                     environments: ["tikzpicture"],
@@ -3393,20 +3420,20 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                 tabular: {
                     environments: ["tabular"],
                     type: "block",
-                    className: "tabular", 
+                    className: "tabular",
                     template: (className, content) => {
                         // Extract column definition and table content
                         const match = content.match(/\\begin{tabular}{(.+?)}\s*([\s\S]*?)\\end{tabular}/);
                         if (!match) return content;
-                        
+
                         const [_, colDef, tableContent] = match;
-                        
+
                         // Parse column definition
                         const cols = colDef.replace(/[^lcr]/g, '').length;
-                        
+
                         // Split into rows and filter out empty rows
                         const rows = tableContent.trim().split('\\\\').filter(row => row.trim());
-                        
+
                         // Build HTML table
                         let html = '<table>';
                         rows.forEach(row => {
@@ -3418,7 +3445,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                             html += '</tr>';
                         });
                         html += '</table>';
-                        
+
                         return `<div class="${className}">${html}</div>`;
                     }
                 },
@@ -3429,20 +3456,20 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     template: (className, content) => {
                         const match = content.match(/\\tilerow\{([^}]*?)\}/);
                         if (!match) return content;
-                    
+
                         // Get the content between the curly braces
                         const tilesContent = match[1];
-                        
+
                         // Split by comma, but preserve empty entries
                         const tiles = tilesContent.split(',');
-                        
+
                         let html = `<table class="${className}"><tr>`;
                         tiles.forEach(tile => {
                             const trimmedTile = tile.trim();
                             html += `<td class="tile">${trimmedTile.length > 0 ? renderMarkdown(trimmedTile) : ''}</td>`;
                         });
                         html += '</tr></table>';
-                    
+
                         return html;
                     }
                 }
@@ -4012,14 +4039,14 @@ This tool allows you to view Markdown files directly in your browser. Here's how
 
             buildTOC();
 
-            // Render math & latex
             renderMathIn(section);
             renderMathIn(DOM.tocContent);
-
-            section.querySelectorAll(".tikz").forEach(renderTikzIn);
+            
             section.querySelectorAll(".math-jaxs").forEach((el) => MathJax.typeset([el]));
 
             section.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(observeHeader);
+
+            processDynamicTikz();
         }
 
         function createFileNameDiv(fileName, section) {
