@@ -42,7 +42,7 @@ Beschränkt eine Funktion $f$ asymptotisch nach oben und unten.
 
 $$\Theta(g)=\{f : \exists c_1, c_2 \in \mathbb{R}_{>0}, n_0 \in \mathbb{N}, \forall{n \geq n_0}, 0 \leq c_1g(n)\leq f(n) \leq c_2g(n)\}$$
 
-![Theta-Notation Beispiel\label{fig:theta-notation}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/theta-notation.png){ width=12rem }
+![Theta-Notation Beispiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/theta-notation.png){ width=12rem }
 
 ### O-Notation - Big-O-Notation
 
@@ -315,7 +315,7 @@ Ferner gilt: $B[i-1] \leq A[pl],A[pr]$
 
 ### Beispiel
 
-![Beispiel Mergesort\label{fig:merge-sort}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/mergesort.png){ width="80%", max-width="min(35rem, 90%)"}
+![Beispiel Mergesort](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/mergesort.png){ width="80%", max-width="min(35rem, 90%)"}
 
 
 
@@ -370,9 +370,7 @@ Beim Eintritt in die `WHILE`-Schleife enthalten `A[left...p]` nur Elemente $\leq
 
 ### Beispiel
 
-Siehe Abbildung \ref{fig:quick-sort}
-
-![Beispiel Quicksort\label{fig:quick-sort}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/quicksort.jpg){ width="70%", max-width="min(40rem, 90%)"}
+![Beispiel Quicksort](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/quicksort.jpg){ width="70%", max-width="min(40rem, 90%)"}
 
 ## Radix Sort
 
@@ -439,9 +437,7 @@ Wenn $(i+1)$-te Ziffer gleich, dann steht nach Induktionsvoraussetzung der auf l
 
 ### Beispiel
 
-Siehe Abbildung \ref{fig:radix-sort}
-
-![Beispiel Radix Sort\label{fig:radix-sort}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/radix-sort-example.png){ width="70%", max-width="min(25rem, 90%)"}
+![Beispiel Radix Sort](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/radix-sort-example.png){ width="70%", max-width="min(25rem, 90%)"}
 
 ## Mastertheorem
 

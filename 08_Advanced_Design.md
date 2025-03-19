@@ -287,9 +287,7 @@ MinEditDist(X,Y,m,n):
 
 **Laufzeit**: $\Omega(mn)$
 
-Siehe Abbildung \ref{fig:minimum-edit-distance}
-
-![Minimum Edit Distance Bespiel\label{fig:minimum-edit-distance}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/minimum_edit_distance.png){ max-width="min(50rem, 90%)"}
+![Minimum Edit Distance Bespiel](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/minimum_edit_distance.png){ max-width="min(50rem, 90%)"}
 
 ## Greedy Algorithmen
 
@@ -301,9 +299,9 @@ Greedy-Algorithmen sind in der Informatik einfache Entscheidungsmethoden, bei de
 
 Der Algorithmus funktioniert zwar oft, manchmal ist er aber zu "gierig". Ein Beispiel dafür ist folgendes:
 
-![Beispiel Dijkstra Limitierung\label{fig:dijkstra-limitation}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/dijkstra_limitation.png){ max-width="min(15rem, 90%)"}
+![Beispiel Dijkstra Limitierung](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/dijkstra_limitation.png){ max-width="min(15rem, 90%)"}
 
-Hierbei wäre der kosteneffizienteste Weg $1\rightarrow 2 \rightarrow 4 \rightarrow 3 \rightarrow 5$ mit Gewicht $6+2-5+0=3$. Allerdings wählt der Dijkstra Algorithmus den Weg $1 \rightarrow 5$ mit Gewicht $5$. (Abbildung \ref{fig:dijkstra-limitation})
+Hierbei wäre der kosteneffizienteste Weg $1\rightarrow 2 \rightarrow 4 \rightarrow 3 \rightarrow 5$ mit Gewicht $6+2-5+0=3$. Allerdings wählt der Dijkstra Algorithmus den Weg $1 \rightarrow 5$ mit Gewicht $5$.
 
 Siehe Abschnitte Dijkstra.
 

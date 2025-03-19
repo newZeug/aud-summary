@@ -554,9 +554,7 @@ $$c_f(u,v)=\begin{cases}
 
 $G_f=(V,E_f) ~ \text{mit} ~ E_f=\{(u,v)\in V \times V ~|~c_f(u,v)>0\}$
 
-Siehe Abbildung \ref{fig:restkapazitaets-graph}
-
-![Beispiel Restkapazitäts-Graph\label{fig:restkapazitaets-graph}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/restkapazitaets_graph.png){ max-width="min(30rem, 90%)"}
+![Beispiel Restkapazitäts-Graph](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/restkapazitaets_graph.png){ max-width="min(30rem, 90%)"}
 
 #### Vorgehen
 
@@ -591,11 +589,11 @@ Ford-Fulkerson(G,s,t,c):
 
 
 #### Beispiel
-Siehe Abbildung \ref{fig:ford-fulkerson} für ein Beispiel welches zur Pfadsuche DFS verwendet und immer den kleinsten Knoten zuerst bzw. Knoten $t$ vor allen anderen Knoten wählt.
+FolgendesBeispiel verwendet zur Pfadsuche DFS und wählt immer den kleinsten Knoten zuerst bzw. Knoten $t$ vor allen anderen Knoten.
 
 ![Initialzustand](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/ford_fulkerson-init.png){ width=25% }
 
-![Beispiel Ford-Fulkerson\label{fig:ford-fulkerson}](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/ford_fulkerson.png){ width=85% }
+![Beispiel Ford-Fulkerson](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/ford_fulkerson.png){ width=85% }
 
 ### Max-Flow Min-Cut Theorem
 
