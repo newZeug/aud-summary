@@ -3969,14 +3969,6 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                 showPreview(errorContent, `${source} Error`);
             }
 
-            async function debugging() {
-                const imagesNames = ['rbt_fixColorsAfterInsertion.png', 'binary_searchtree.png', 'b_tree-insert2.png', 'b_tree-delete1.png', 'bfs_table_as_graph.png'];
-                const imagePaths = imagesNames.map((imageName) => `![No Title](utils/${imageName})`);
-                const content = imagePaths.join('\n');
-                showPreview(content, 'Images');
-            }
-
-
             async function loadFromGitHub(path = '') {
                 try {
                     const apiUrl = `https://api.github.com/repos/${sourcePath}/contents/${path}`;
@@ -4062,8 +4054,6 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             try {
                 DOM.mainView.classList.add('hidden');
                 DOM.previewView.classList.remove('hidden');
-                await debugging();
-                return;
 
                 switch (sourceProvider) {
                     case 'github':
