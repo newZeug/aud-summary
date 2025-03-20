@@ -1812,7 +1812,8 @@
             overflow: auto;
             min-height: 25vh;
             display: flex;
-            border-radius: 1.25rem;
+            justify-content: center;
+            align-items: center;
         }
 
         .popup-image {
@@ -3968,6 +3969,13 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                 showPreview(errorContent, `${source} Error`);
             }
 
+            async function debugging() {
+                const imagesNames = ['rbt_fixColorsAfterInsertion.png', 'binary_searchtree.png', 'b_tree-insert2.png', 'b_tree-delete1.png', 'bfs_table_as_graph.png'];
+                const imagePaths = imagesNames.map((imageName) => `![No Title](utils/${imageName})`);
+                const content = imagePaths.join('\n');
+                showPreview(content, 'Images');
+            }
+
 
             async function loadFromGitHub(path = '') {
                 try {
@@ -4054,6 +4062,8 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             try {
                 DOM.mainView.classList.add('hidden');
                 DOM.previewView.classList.remove('hidden');
+                await debugging();
+                return;
 
                 switch (sourceProvider) {
                     case 'github':
@@ -5056,7 +5066,6 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                 if (isZoomed) {
                     image.style.transform = 'scale(1)';
                     image.style.cursor = 'zoom-in';
-                    // Reset translation when zooming out
                     translateX = 0;
                     translateY = 0;
                 } else {
@@ -5087,36 +5096,26 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             document.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
                 e.preventDefault();
-                
-                // Calculate new position
+
                 translateX = e.clientX - startX;
                 translateY = e.clientY - startY;
-                // Get container and image dimensions
+                
                 const containerRect = imageScrollContainer.getBoundingClientRect();
-                const imageRect = image.getBoundingClientRect();
-                
-                // Since we're scaling 2x, the actual draggable area is larger
-                // Need to adjust based on the scale factor (2)
-                const scaleAdjustment = 2;
-                const scaledWidth = imageRect.width / scaleAdjustment;
-                const scaledHeight = imageRect.height / scaleAdjustment;
-                
-                // Calculate maximum allowed translation
-                const maxTranslateX = Math.max(0, (scaledWidth - containerRect.width / scaleAdjustment));
-                const maxTranslateY = Math.max(0, (scaledHeight - containerRect.height / scaleAdjustment));
-                
-                // Limit translation to container bounds
-                translateX = Math.min(Math.max(translateX, -maxTranslateX), maxTranslateX);
-                translateY = Math.min(Math.max(translateY, -maxTranslateY), maxTranslateY);
-                
-                // Apply the transform with both scale and translation
-                image.style.transform = `scale(${scaleAdjustment}) translate(${translateX/scaleAdjustment}px, ${translateY/scaleAdjustment}px)`;
-                image.style.transform = `scale(2) translate(${translateX/2}px, ${translateY/2}px)`;
+                const imageWidth = image.width * scaleAdjustment;
+                const imageHeight = image.height * scaleAdjustment;
+
+                const maxTranslateX = Math.abs(containerRect.width - imageWidth) / 2;
+                const maxTranslateY = Math.abs(containerRect.height - imageHeight) / 2;
+
+                translateX = (imageWidth > containerRect.width) ? Math.max(-maxTranslateX, Math.min(translateX, maxTranslateX)) : 0;
+                translateY = (imageHeight > containerRect.height) ? Math.max(-maxTranslateY, Math.min(translateY, maxTranslateY)) : 0;
+
+                image.style.transform = `scale(${scaleAdjustment}) translate(${translateX / scaleAdjustment}px, ${translateY / scaleAdjustment}px)`;
             });
             
             document.addEventListener('mouseup', () => {
                 isDragging = false;
-                image.style.transition = 'transform 0.3s ease'; // Restore transition
+                image.style.transition = 'transform 0.3s ease';
             });
             
             // Touch drag events for mobile
@@ -5142,25 +5141,21 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             image.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
                 e.preventDefault();
-                
-                // Calculate new position
+
                 translateX = e.touches[0].clientX - startX;
                 translateY = e.touches[0].clientY - startY;
                 
-                // Get container and image dimensions
                 const containerRect = imageScrollContainer.getBoundingClientRect();
-                const imageRect = image.getBoundingClientRect();
-                
-                // Calculate maximum allowed translation based on zoomed image and container dimensions
-                const maxTranslateX = Math.max(0, (imageRect.width - containerRect.width) / 2);
-                const maxTranslateY = Math.max(0, (imageRect.height - containerRect.height) / 2);
-                
-                // Limit translation to container bounds
-                translateX = Math.min(Math.max(translateX, -maxTranslateX), maxTranslateX);
-                translateY = Math.min(Math.max(translateY, -maxTranslateY), maxTranslateY);
-                
-                // Apply the transform with both scale and translation
-                image.style.transform = `scale(2) translate(${translateX/2}px, ${translateY/2}px)`;
+                const imageWidth = image.width * scaleAdjustment;
+                const imageHeight = image.height * scaleAdjustment;
+
+                const maxTranslateX = Math.abs(containerRect.width - imageWidth) / 2;
+                const maxTranslateY = Math.abs(containerRect.height - imageHeight) / 2;
+
+                translateX = (imageWidth > containerRect.width) ? Math.max(-maxTranslateX, Math.min(translateX, maxTranslateX)) : 0;
+                translateY = (imageHeight > containerRect.height) ? Math.max(-maxTranslateY, Math.min(translateY, maxTranslateY)) : 0;
+
+                image.style.transform = `scale(${scaleAdjustment}) translate(${translateX / scaleAdjustment}px, ${translateY / scaleAdjustment}px)`;
             });
             
             image.addEventListener('touchend', () => {
