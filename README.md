@@ -41,9 +41,7 @@ The viewer can render LaTeX expressions using both KaTeX and MathJax:
 
 6. **Tile Rows**: For creating tile-based layouts
    ```latex
-   \begin{tilerow}
-   1 & 2 & 3
-   \end{tilerow}
+   \tilerow{1,2,3,,}
    ```
 
 ### Code Block Features
@@ -106,7 +104,10 @@ The viewer can render LaTeX expressions using both KaTeX and MathJax:
 
 1. **HTML**: Export as self-contained HTML file
 2. **PDF**: Print-optimized layout
-3. **File Management**: Add, delete, and reorder sections
+
+### File Management
+
+Add, delete, and reorder sections
 
 ### Customization
 
