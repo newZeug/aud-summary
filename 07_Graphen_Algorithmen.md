@@ -89,8 +89,6 @@ $A=\begin{bmatrix}
     0 & 0 & 0 & 1 & 0 & 0
 \end{bmatrix}$
 
-(siehe adjunkte Matrix
-
 ### Starke Zusammenhangskomponenten
 
 Eine starke Zusammenhangskomponente eines gerichteten Graphen $G=(V,E)$ ist eine Knotenmenge $C \subseteq V$, so dass

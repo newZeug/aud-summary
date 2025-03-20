@@ -4581,11 +4581,11 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             const list = utils.createElement('ul', 'toc-list');
             fileNameContent.innerHTML = '';
 
-            if (headerTree) {
+            if (headerTree.length) {
                 buildTocFromTree(headerTree, list);
                 fileNameContent.appendChild(list);
             } else {
-                fileNameContent.innerHTML = '<p style="padding: 0.5rem;">No headers found in this section</p>';
+                fileNameContent.innerHTML = `<p style="padding: 0.5rem;" class="translate" data-translate-key="noHeaders">${translations.noHeaders}</p>`;
             }
         }
 
