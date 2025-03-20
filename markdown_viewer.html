@@ -2452,22 +2452,7 @@
             }
 
             /* Hide UI elements */
-            #mainView,
-            .topbar,
-            .toc,
-            .toc-toggle,
-            .back-arrow,
-            .add-content-button,
-            .search-container,
-            .file-controls,
-            .copy-button,
-            .save-button,
-            .theme-toggle,
-            .breadcrumb-path,
-            .numbered-code-block .line-numbers,
-            .file-name-content,
-            .chat-container,
-            .selection-chat-button {
+            .no-print {
                 display: none !important;
             }
 
@@ -2669,7 +2654,7 @@
 </head>
 
 <body>
-    <div id="mainView" class="container hidden">
+    <div id="mainView" class="container hidden no-print">
 
         <button class="settings-button control-button" onclick="toggleSettings()">settings</button>
 
@@ -2696,7 +2681,7 @@
     </div>
 
     <div id="previewView" class="hidden">
-        <div class="topbar">
+        <div class="topbar no-print">
             <div class="topbar-left non-selectable">
                 <button class="toc-toggle" onclick="toggleToc()">menu_open</button>
                 <button class="back-arrow control-button" onclick="showMainView()">arrow_back</button>
@@ -2731,7 +2716,7 @@
             </div>
         </div>
 
-        <nav class="toc">
+        <nav class="toc no-print">
             <div class="toc-controls">
                 <button class="back-arrow control-button mobile" onclick="showMainView()">arrow_back</button>
                 <button class="save-button control-button mobile" onclick="toggleSaveMenu(event)">save</button>
@@ -2753,14 +2738,14 @@
             <div id="timestamp" class="timestamp"></div>
         </div>
 
-        <div id="selectionChatButton" class="selection-chat-button non-selectable">
+        <div id="selectionChatButton" class="selection-chat-button non-selectable no-print">
             <button onclick="toggleChat()">
                 <span class="material-symbols-rounded">forum</span>
                 <span class="translate" data-translate-key="askMe">Ask me</span>
             </button>
         </div>
 
-        <div id="chatContainer" class="chat-container collapsed">
+        <div id="chatContainer" class="chat-container collapsed no-print">
             <div class="resize-handle non-selectable">
                 <div></div>
             </div>
@@ -2784,7 +2769,7 @@
         </div>
     </div>
 
-    <div class="settings hidden">
+    <div class="settings hidden no-print">
         <div class="settings-sidebar">
             <div class="settings-categories">
                 <button class="settings-category-btn active" data-category="general"
@@ -3107,7 +3092,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
 
                 // Create new popup if not cached
                 const popupContainer = document.createElement('div');
-                popupContainer.className = `popup-container ${settings.animation} ${settings.customClass}`;
+                popupContainer.className = `popup-container ${settings.animation} ${settings.customClass} no-print`;
 
                 const backdrop = document.createElement('div');
                 backdrop.className = 'popup-backdrop';
@@ -3671,7 +3656,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     let lineNumbersHtml = '';
                     if (!hasNoLineNumbers) {
                         const lines = code.split('\n');
-                        lineNumbersHtml = `<div class="line-numbers">
+                        lineNumbersHtml = `<div class="line-numbers no-print">
                             ${lines.map((_, index) => `<span class="line-number non-selectable">${index + 1}</span>`).join('')}
                         </div>`;
                     }
@@ -3689,7 +3674,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                             ${lineNumbersHtml}
                             <pre>${codeElement.outerHTML}</pre>
                         </div>
-                        <button class="copy-button" title="Copy Code" onclick="copyCodeBlock(this.parentElement.querySelector('code'), this)">
+                        <button class="copy-button no-print" title="Copy Code" onclick="copyCodeBlock(this.parentElement.querySelector('code'), this)">
                             content_copy
                         </button>
                     </div>`;
@@ -4141,7 +4126,7 @@ This tool allows you to view Markdown files directly in your browser. Here's how
             fileNameText.setAttribute('onclick', `toggleFileToc(this.closest('.file-name'))`);
 
             const breadcrumbPath = document.createElement('div');
-            breadcrumbPath.className = 'breadcrumb-path non-selectable';
+            breadcrumbPath.className = 'breadcrumb-path non-selectable no-print';
             fileNameInfo.append(fileNameText, breadcrumbPath);
 
             fileNameHeader.append(fileNameInfo);
