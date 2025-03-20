@@ -6,7 +6,7 @@
 
 ### Beispiel
 
-![Graph](utils/adjunkte_matrix_1.png){ max-width="min(25rem, 90%)" }
+![Graph](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/adjunkte_matrix_1.png){ max-width="min(25rem, 90%)" }
     
 $\texttt{adj(G,A)}=\begin{bmatrix}
     0 \\
@@ -66,7 +66,7 @@ Damit ein Graph topologisch sortierbar ist, muss er gerichtet sein.
 
 Sei ein Graph $S$ gegeben durch
 
-![Graph](utils/adjunkte_matrix_2.png){ max-width="min(25rem, 90%)" }
+![Graph](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/adjunkte_matrix_2.png){ max-width="min(25rem, 90%)" }
 
 Eine mögliche topologische Sortierung für den Graph $S$ lautet dann $G \rightarrow A \rightarrow B \rightarrow E \rightarrow F \rightarrow D \rightarrow H \rightarrow C$. Diese betrachtet die *Finishing Time* der einzelnen Knoten bei angewendeter Tiefensuche.
 
