@@ -6,21 +6,7 @@
 
 ### Beispiel
 
-\begin{tikzpicture}[auto, node distance=3cm, every loop/.style={},
-                    thick,main node/.style={circle,draw,font=\normalsize}]
-    \node[main node] (1) {A};
-    \node[main node] (2) [right of=1] {B};
-    \node[main node] (3) [right of=2] {C};
-    \node[main node] (4) [below of=1] {D};
-    \node[main node] (5) [below of=2] {E};
-
-    \draw (1) -- (2);
-    \draw (1) -- (4);
-    \draw (2) -- (3);
-    \draw (2) -- (4);
-    \draw (3) -- (5);
-    \draw (4) -- (5);
-\end{tikzpicture}
+![Graph](utils/adjunkte_matrix_1.png){ max-width="min(25rem, 90%)" }
     
 $\texttt{adj(G,A)}=\begin{bmatrix}
     0 \\
@@ -80,30 +66,7 @@ Damit ein Graph topologisch sortierbar ist, muss er gerichtet sein.
 
 Sei ein Graph $S$ gegeben durch
 
-\begin{tikzpicture}[auto, node distance=2cm, every loop/.style={},
-                        thick,main node/.style={circle,draw,font=\small}]
-    \node[main node] (1) {A};
-    \node[main node] (2) [right of=1] {B};
-    \node[main node] (3) [right of=2] {C};
-    \node[main node] (4) [right of=3] {D};
-    \node[main node] (5) [below of=1] {E};
-    \node[main node] (6) [below of=2] {F};
-    \node[main node] (7) [below of=3] {G};
-    \node[main node] (8) [below of=4] {H};
-
-    \draw[->] (1) -- (2);
-    \draw[->] (1) -- (5);
-    \draw[->] (2) -- (3);
-    \draw[->] (2) -- (5);
-    \draw[->] (4) -- (3);
-    \draw[->] (4) -- (8);
-    \draw[->] (5) -- (3);
-    \draw[->] (5) -- (6);
-    \draw[->] (6) -- (4);
-    \draw[->] (7) -- (4);
-    \draw[->] (7) -- (6);
-    \draw[->] (7) -- (8);
-\end{tikzpicture}
+![Graph](utils/adjunkte_matrix_2.png){ max-width="min(25rem, 90%)" }
 
 Eine mögliche topologische Sortierung für den Graph $S$ lautet dann $G \rightarrow A \rightarrow B \rightarrow E \rightarrow F \rightarrow D \rightarrow H \rightarrow C$. Diese betrachtet die *Finishing Time* der einzelnen Knoten bei angewendeter Tiefensuche.
 
@@ -364,7 +327,7 @@ MST-Prim(G,w,r):
 ```
 **Laufzeit**: $O(E+|V| \cdot \log{|V|})$
 
-![](utils/prim_graph.png){ width=35% } ![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/prim_table.png){ max-width="min(40rem, 90%)"}
+![](utils/prim_graph.png){ width="35%" } ![](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/prim_table.png){ max-width="min(40rem, 90%)"}
 
 
 ### Kruskal-Algorithmus

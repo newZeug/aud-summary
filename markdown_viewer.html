@@ -3703,66 +3703,58 @@ This tool allows you to view Markdown files directly in your browser. Here's how
                     return src.match(/!\[/)?.index;
                 },
                 tokenizer(src) {
-                    const match = /^!\[(.*?)\]\((.*?)(?:\s+"(.*?)")?\)(?:\s*\{([^}]*)\})?/.exec(src);
+                    const rule = /^!\[([^\]]*)\]\(([^)]+)\)(?:\{([^}]*)\})?/;
+                    const match = rule.exec(src);
                     if (match) {
-                        const [raw, text, href, title, attributesText] = match;
-
-                        const attributes = {};
-                        if (attributesText) {
-                            const regex = /([^=,]+)=(?:"([^"]*?)"|([^,]*?))?(?:,|$)/g;
-                            let match;
-                            while ((match = regex.exec(attributesText))) {
-                                const key = match[1].trim();
-                                const value = (match[2] || match[3] || '').trim();
-                                if (key) {
-                                    attributes[key] = value;
+                        const [raw, alt, src, attributes] = match;
+                        
+                        // Parse attributes if present and collect as styles
+                        let styles = [];
+                        if (attributes) {
+                            let current = '';
+                            let inQuotes = false;
+                            
+                            // Parse character by character to handle quotes correctly
+                            for (let i = 0; i < attributes.length; i++) {
+                                const char = attributes[i];
+                                
+                                if (char === '"' || char === "'") {
+                                    inQuotes = !inQuotes;
+                                } else if (char === ',' && !inQuotes) {
+                                    if (current.trim()) {
+                                        // Replace = with : for CSS style formatting
+                                        styles.push(current.trim().replace('=', ':'));
+                                    }
+                                    current = '';
+                                } else {
+                                    current += char;
                                 }
+                            }
+                            
+                            // Add the last style if exists and replace = with :
+                            if (current.trim()) {
+                                styles.push(current.trim().replace('=', ':'));
                             }
                         }
 
                         return {
                             type: 'customImage',
-                            raw: raw,
-                            href: href,
-                            title: title,
-                            text: text,
-                            attributes: attributes
+                            raw,
+                            alt: alt || '',
+                            src: src || '',
+                            styles
                         };
                     }
-                    return false;
                 },
                 renderer(token) {
-                    const imgId = `img-${Math.random().toString(36).substring(2)}`;
-                    const escapedHref = token.href.replace(/[<>'"]/g, char => ({
-                        '<': '&lt;',
-                        '>': '&gt;',
-                        "'": '&#39;',
-                        '"': '&quot;'
-                    }[char]));
-                    const escapedText = token.text.replace(/[<>'"]/g, char => ({
-                        '<': '&lt;',
-                        '>': '&gt;',
-                        "'": '&#39;',
-                        '"': '&quot;'
-                    }[char]));
-
-                    let styleAttr = '';
-                    const styles = [];
-                    for (const [key, value] of Object.entries(token.attributes)) {
-                        styles.push(`${key}: ${value.replace(/"/g, '&quot;')}`);
-                    }
-                    styleAttr = ` style="${styles.join('; ')}"`;
-
-                    return `<img
-                        id="${imgId}"
-                        src="${escapedHref}"
-                        alt="${escapedText || 'No title'}"
-                        ${token.title ? `title="${token.title.replace(/[<>'"]/g, '')}"` : ''}
-                        class="loading"
-                        onload="this.classList.remove('loading')"${styleAttr}
-                    >`;
+                    const styleAttr = token.styles && token.styles.length > 0 
+                        ? ` style="${token.styles.join('; ')}"` 
+                        : '';
+                    
+                    return `<img src="${token.src}" alt="${token.alt}"${styleAttr}>`;
                 }
             };
+
 
             const symbolsExtension = {
                 name: "symbolReplace",
