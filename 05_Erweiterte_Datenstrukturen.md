@@ -517,7 +517,7 @@ Bei **Min-Heaps** sind die Werte in den Elternknoten jeweils kleiner.
 
 ### Darstellung
 
-![Array](utils/heap1.png){ width="45%", max-width="min(30rem, 90%)"} ![Baum](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/heap2.png){ width="40%", max-width="min(25rem, 90%)"}
+![Array](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/heap1.png){ width="45%", max-width="min(30rem, 90%)"} ![Baum](https://raw.githubusercontent.com/newZeug/aud-summary/refs/heads/main/utils/heap2.png){ width="40%", max-width="min(25rem, 90%)"}
 
 ### Algorithmen
 
